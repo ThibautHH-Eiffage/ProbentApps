@@ -1,4 +1,6 @@
-﻿using Microsoft.EntityFrameworkCore.Migrations;
+﻿using System.Buffers.Text;
+using System.Security.Cryptography;
+using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace ProbentApps.Database.Migrations.Identity;
 
@@ -36,6 +38,7 @@ public partial class CreateIdentitySchema : Migration
                 NormalizedUserName = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
                 Email = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
                 NormalizedEmail = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
+                NormalizationSalt = table.Column<byte[]>(type: "binary(64)", nullable: true),
                 EmailConfirmed = table.Column<bool>(type: "bit", nullable: false),
                 PasswordHash = table.Column<string>(type: "nvarchar(max)", nullable: true),
                 SecurityStamp = table.Column<string>(type: "nvarchar(max)", nullable: true),
@@ -214,11 +217,26 @@ public partial class CreateIdentitySchema : Migration
             column: "NormalizedUserName",
             unique: true,
             filter: "[NormalizedUserName] IS NOT NULL");
+
+        migrationBuilder.Sql($"""
+            CREATE FUNCTION [identity].[BASE64_ENCODE]
+            (
+                @data AS varbinary({256 + SHA512.HashSizeInBytes}) NULL
+            )
+            RETURNS varchar({Base64.GetMaxEncodedToUtf8Length(256 + SHA512.HashSizeInBytes)})
+            WITH RETURNS NULL ON NULL INPUT
+            AS
+            BEGIN
+                RETURN (SELECT @data FOR XML PATH(''))
+            END;
+            """);
     }
 
     /// <inheritdoc />
     protected override void Down(MigrationBuilder migrationBuilder)
     {
+        migrationBuilder.Sql("DROP FUNCTION [identity].[BASE64_ENCODE];");
+
         migrationBuilder.DropTable(
             name: "RoleClaims",
             schema: "identity");

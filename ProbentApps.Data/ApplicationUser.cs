@@ -1,6 +1,10 @@
+using System.ComponentModel.DataAnnotations.Schema;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Metadata.Builders;
+
 namespace ProbentApps.Data;
 
-public class ApplicationUser : IdentityUser<Guid>;
+public class ApplicationUser : IdentityUser<Guid>, IHashedNormalizationUser
+{
+    [Column(TypeName = "binary(64)")]
+    public byte[]? NormalizationSalt { get; set; }
+}
