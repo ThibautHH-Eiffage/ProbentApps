@@ -129,6 +129,9 @@ partial class IdentityDbContextModelSnapshot : ModelSnapshot
 
             b.Property(u => u.LockoutEnd);
 
+            b.Property(u => u.NormalizationSalt)
+                .HasColumnType("binary(64)");
+
             b.Property(u => u.NormalizedEmail)
                 .HasMaxLength(256);
 

@@ -7,6 +7,7 @@ using ProbentApps.Components;
 using ProbentApps.Data;
 using ProbentApps.Database.Contexts;
 using ProbentApps.Services;
+using IdentityDbContext = ProbentApps.Database.Contexts.IdentityDbContext;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -19,9 +20,12 @@ builder.Services.AddDbContext<DataProtectionDbContext>(options => configureDbCon
 builder.Services.AddDbContextFactory<IdentityDbContext>(options => configureDbContext(options)
     .UseAsyncSeeding(async (context, _, cancellationToken) => {
         var users = context.Set<ApplicationUser>();
-        if (await users.FindAsync(new Guid(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1), cancellationToken) is null)
-            users.Add(new() { Id = new Guid(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1), UserName = "root" });
-        if (await users.FindAsync(Guid.AllBitsSet, cancellationToken) is null)
+        if (await users.FindAsync([new Guid(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1)], cancellationToken) is null)
+            users.Add(new() { Id = new Guid(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1),
+                UserName = "root", NormalizedUserName = "ROOT",
+                Email = "root@probentapps", NormalizedEmail = "ROOT@PROBENTAPPS",
+                EmailConfirmed = true });
+        if (await users.FindAsync([Guid.AllBitsSet], cancellationToken) is null)
             users.Add(new() { Id = Guid.AllBitsSet, UserName = "Deleted user" });
         await context.SaveChangesAsync(cancellationToken);
     }));
@@ -38,10 +42,14 @@ builder.Services.AddIdentity<ApplicationUser, IdentityRole<Guid>>(static options
         options.SignIn.RequireConfirmedAccount = true;
         options.Stores.ProtectPersonalData = true;
         options.Stores.SchemaVersion = IdentitySchemaVersions.Version2;
+        options.User.RequireUniqueEmail = true;
     })
     .AddPersonalDataProtection<LookupProtector, LookupProtectorKeyRing>()
     .AddEntityFrameworkStores<IdentityDbContext>()
     .AddDefaultTokenProviders();
+
+builder.Services.AddScoped<UserManager<ApplicationUser>, DataProtectionLookupProtectedUserManager<ApplicationUser>>();
+builder.Services.AddScoped<IUserStore<ApplicationUser>, DataProtectionLookupProtectedUserStore<ApplicationUser, IdentityRole<Guid>, IdentityDbContext, Guid>>();
 
 builder.Services.AddSingleton<IEmailSender<ApplicationUser>, IdentityNoOpEmailSender>();
 
@@ -66,8 +74,8 @@ if (!EF.IsDesignTime)
         await scope.ServiceProvider.GetRequiredService<IdentityDbContext>().Database.MigrateAsync();
         var userManager = scope.ServiceProvider.GetRequiredService<UserManager<ApplicationUser>>();
         var rootUser = (await userManager.FindByIdAsync(new Guid(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1).ToString()))!;
-        await userManager.RemovePasswordAsync(rootUser);
-        await userManager.AddPasswordAsync(rootUser, "Test123!");
+        var zbui = await userManager.RemovePasswordAsync(rootUser);
+        var iuzev=await userManager.AddPasswordAsync(rootUser, "Test123!");
     }
 
 if (app.Environment.IsDevelopment())

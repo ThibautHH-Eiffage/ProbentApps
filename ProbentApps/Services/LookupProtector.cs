@@ -11,7 +11,7 @@ public class LookupProtector(IDataProtectionProvider dataProtectionProvider) : I
     {
         if (data is null)
             return null;
-        return dataProtectionProvider.CreateProtector(keyId).Protect(data);
+        return dataProtectionProvider.CreateProtector(nameof(LookupProtector)).Protect(data);
     }
 
     [return: NotNullIfNotNull(nameof(data))]
@@ -19,6 +19,6 @@ public class LookupProtector(IDataProtectionProvider dataProtectionProvider) : I
     {
         if (data is null)
             return null;
-        return dataProtectionProvider.CreateProtector(keyId).Unprotect(data);
+        return dataProtectionProvider.CreateProtector(nameof(LookupProtector)).Unprotect(data);
     }
 }
