@@ -1,19 +1,20 @@
 ﻿using Microsoft.EntityFrameworkCore.Migrations;
+using ProbentApps.Database.Contexts;
 
 namespace ProbentApps.Database.Migrations.DataProtection;
 
 /// <inheritdoc />
-public partial class CreateDataProtectionSchema : Migration
+public partial class CreateSchema : Migration
 {
     /// <inheritdoc />
     protected override void Up(MigrationBuilder migrationBuilder)
     {
         migrationBuilder.EnsureSchema(
-            name: "dataprotection");
+            name: DataProtectionDbContext.Schema);
 
         migrationBuilder.CreateTable(
-            name: "DataProtectionKeys",
-            schema: "dataprotection",
+            name: nameof(DataProtectionDbContext.DataProtectionKeys),
+            schema: DataProtectionDbContext.Schema,
             columns: table => new
             {
                 Id = table.Column<int>(type: "int", nullable: false)
@@ -23,7 +24,7 @@ public partial class CreateDataProtectionSchema : Migration
             },
             constraints: table =>
             {
-                table.PrimaryKey("PK_DataProtectionKeys", x => x.Id);
+                table.PrimaryKey($"PK_{nameof(DataProtectionDbContext.DataProtectionKeys)}", x => x.Id);
             });
     }
 
@@ -31,7 +32,7 @@ public partial class CreateDataProtectionSchema : Migration
     protected override void Down(MigrationBuilder migrationBuilder)
     {
         migrationBuilder.DropTable(
-            name: "DataProtectionKeys",
-            schema: "dataprotection");
+            name: nameof(DataProtectionDbContext.DataProtectionKeys),
+            schema: DataProtectionDbContext.Schema);
     }
 }

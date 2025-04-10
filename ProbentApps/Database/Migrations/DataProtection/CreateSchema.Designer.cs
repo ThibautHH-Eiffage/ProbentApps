@@ -7,14 +7,14 @@ using ProbentApps.Database.Contexts;
 namespace ProbentApps.Database.Migrations.DataProtection;
 
 [DbContext(typeof(DataProtectionDbContext))]
-[Migration("00_CreateDataProtectionSchema")]
-partial class CreateDataProtectionSchema
+[Migration($"00_{nameof(CreateSchema)}")]
+partial class CreateSchema
 {
     /// <inheritdoc />
     protected override void BuildTargetModel(ModelBuilder modelBuilder)
     {
         modelBuilder
-            .HasDefaultSchema("dataprotection")
+            .HasDefaultSchema(DataProtectionDbContext.Schema)
             .HasAnnotation("ProductVersion", "9.0.2")
             .HasAnnotation("Relational:MaxIdentifierLength", 128)
             .UseIdentityColumns();
@@ -30,7 +30,7 @@ partial class CreateDataProtectionSchema
 
                 b.HasKey(k => k.Id);
 
-                b.ToTable("DataProtectionKeys");
+                b.ToTable(nameof(DataProtectionDbContext.DataProtectionKeys));
             });
     }
 }

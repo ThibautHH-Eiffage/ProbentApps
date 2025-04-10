@@ -1,4 +1,3 @@
-using System.Linq.Expressions;
 using System.Security.Cryptography;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
@@ -8,11 +7,15 @@ using ProbentApps.Data;
 
 namespace ProbentApps.Database.Contexts;
 
-public class IdentityDbContext(DbContextOptions<IdentityDbContext> options) : IdentityDbContext<ApplicationUser, IdentityRole<Guid>, Guid>(options)
+public class IdentityDbContext(DbContextOptions<IdentityDbContext> options) : IdentityDbContext<ApplicationUser, IdentityRole<Guid>, Guid>(options), IDbContext
 {
+    public static string Schema => "identity";
+
+    internal static string Base64EncodeFunctionName => "BASE64_ENCODE";
+
     protected override void OnModelCreating(ModelBuilder builder)
     {
-        builder.HasDefaultSchema("identity");
+        builder.HasDefaultSchema(Schema);
 
         base.OnModelCreating(builder);
 
@@ -25,8 +28,8 @@ public class IdentityDbContext(DbContextOptions<IdentityDbContext> options) : Id
         builder.Entity<IdentityUserToken<Guid>>().ToTable("UserTokens");
 
         builder.HasDbFunction(() => Convert.ToBase64String(Array.Empty<byte>()))
-            .HasName("BASE64_ENCODE")
-            .HasSchema("identity");
+            .HasName(Base64EncodeFunctionName)
+            .HasSchema(Schema);
         builder.HasDbFunction(() => SHA512.HashData(Array.Empty<byte>()))
             .HasTranslation(Functions.HashBytesWithSHA(SHA512.HashSizeInBits));
         builder.AddByteArrayConcatenation(new SqlServerByteArrayTypeMapping(null, 256 + SHA512.HashSizeInBytes));

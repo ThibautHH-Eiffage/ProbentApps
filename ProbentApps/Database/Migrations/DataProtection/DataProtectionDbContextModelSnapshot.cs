@@ -13,7 +13,7 @@ partial class DataProtectionDbContextModelSnapshot : ModelSnapshot
     protected override void BuildModel(ModelBuilder modelBuilder)
     {
         modelBuilder
-            .HasDefaultSchema("dataprotection")
+            .HasDefaultSchema(DataProtectionDbContext.Schema)
             .HasAnnotation("ProductVersion", "9.0.2")
             .HasAnnotation("Relational:MaxIdentifierLength", 128)
             .UseIdentityColumns();
@@ -29,7 +29,7 @@ partial class DataProtectionDbContextModelSnapshot : ModelSnapshot
 
             b.HasKey(k => k.Id);
 
-            b.ToTable("DataProtectionKeys");
+            b.ToTable(nameof(DataProtectionDbContext.DataProtectionKeys));
         });
     }
 }

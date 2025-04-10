@@ -8,14 +8,14 @@ using ProbentApps.Database.Contexts;
 namespace ProbentApps.Database.Migrations.Identity;
 
 [DbContext(typeof(IdentityDbContext))]
-[Migration($"00_{nameof(CreateIdentitySchema)}")]
-partial class CreateIdentitySchema
+[Migration($"00_{nameof(CreateSchema)}")]
+partial class CreateSchema
 {
     /// <inheritdoc />
     protected override void BuildTargetModel(ModelBuilder modelBuilder)
     {
         modelBuilder
-            .HasDefaultSchema("identity")
+            .HasDefaultSchema(IdentityDbContext.Schema)
             .HasAnnotation("ProductVersion", "9.0.2")
             .HasAnnotation("Relational:MaxIdentifierLength", 128)
             .UseIdentityColumns();
