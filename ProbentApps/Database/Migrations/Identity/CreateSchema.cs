@@ -1,21 +1,22 @@
-﻿using System.Buffers.Text;
+﻿using Microsoft.EntityFrameworkCore.Migrations;
+using ProbentApps.Database.Contexts;
+using System.Buffers.Text;
 using System.Security.Cryptography;
-using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace ProbentApps.Database.Migrations.Identity;
 
 /// <inheritdoc />
-public partial class CreateIdentitySchema : Migration
+public partial class CreateSchema : Migration
 {
     /// <inheritdoc />
     protected override void Up(MigrationBuilder migrationBuilder)
     {
         migrationBuilder.EnsureSchema(
-            name: "identity");
+            name: IdentityDbContext.Schema);
 
         migrationBuilder.CreateTable(
             name: "Roles",
-            schema: "identity",
+            schema: IdentityDbContext.Schema,
             columns: table => new
             {
                 Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
@@ -30,7 +31,7 @@ public partial class CreateIdentitySchema : Migration
 
         migrationBuilder.CreateTable(
             name: "Users",
-            schema: "identity",
+            schema: IdentityDbContext.Schema,
             columns: table => new
             {
                 Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
@@ -57,7 +58,7 @@ public partial class CreateIdentitySchema : Migration
 
         migrationBuilder.CreateTable(
             name: "RoleClaims",
-            schema: "identity",
+            schema: IdentityDbContext.Schema,
             columns: table => new
             {
                 Id = table.Column<int>(type: "int", nullable: false)
@@ -72,7 +73,7 @@ public partial class CreateIdentitySchema : Migration
                 table.ForeignKey(
                     name: "FK_RoleClaims_Roles_RoleId",
                     column: x => x.RoleId,
-                    principalSchema: "identity",
+                    principalSchema: IdentityDbContext.Schema,
                     principalTable: "Roles",
                     principalColumn: "Id",
                     onDelete: ReferentialAction.Cascade);
@@ -80,7 +81,7 @@ public partial class CreateIdentitySchema : Migration
 
         migrationBuilder.CreateTable(
             name: "UserClaims",
-            schema: "identity",
+            schema: IdentityDbContext.Schema,
             columns: table => new
             {
                 Id = table.Column<int>(type: "int", nullable: false)
@@ -95,7 +96,7 @@ public partial class CreateIdentitySchema : Migration
                 table.ForeignKey(
                     name: "FK_UserClaims_Users_UserId",
                     column: x => x.UserId,
-                    principalSchema: "identity",
+                    principalSchema: IdentityDbContext.Schema,
                     principalTable: "Users",
                     principalColumn: "Id",
                     onDelete: ReferentialAction.Cascade);
@@ -103,7 +104,7 @@ public partial class CreateIdentitySchema : Migration
 
         migrationBuilder.CreateTable(
             name: "UserLogins",
-            schema: "identity",
+            schema: IdentityDbContext.Schema,
             columns: table => new
             {
                 LoginProvider = table.Column<string>(type: "nvarchar(128)", maxLength: 128, nullable: false),
@@ -117,7 +118,7 @@ public partial class CreateIdentitySchema : Migration
                 table.ForeignKey(
                     name: "FK_UserLogins_Users_UserId",
                     column: x => x.UserId,
-                    principalSchema: "identity",
+                    principalSchema: IdentityDbContext.Schema,
                     principalTable: "Users",
                     principalColumn: "Id",
                     onDelete: ReferentialAction.Cascade);
@@ -125,7 +126,7 @@ public partial class CreateIdentitySchema : Migration
 
         migrationBuilder.CreateTable(
             name: "UserRoles",
-            schema: "identity",
+            schema: IdentityDbContext.Schema,
             columns: table => new
             {
                 UserId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
@@ -137,14 +138,14 @@ public partial class CreateIdentitySchema : Migration
                 table.ForeignKey(
                     name: "FK_UserRoles_Roles_RoleId",
                     column: x => x.RoleId,
-                    principalSchema: "identity",
+                    principalSchema: IdentityDbContext.Schema,
                     principalTable: "Roles",
                     principalColumn: "Id",
                     onDelete: ReferentialAction.Cascade);
                 table.ForeignKey(
                     name: "FK_UserRoles_Users_UserId",
                     column: x => x.UserId,
-                    principalSchema: "identity",
+                    principalSchema: IdentityDbContext.Schema,
                     principalTable: "Users",
                     principalColumn: "Id",
                     onDelete: ReferentialAction.Cascade);
@@ -152,7 +153,7 @@ public partial class CreateIdentitySchema : Migration
 
         migrationBuilder.CreateTable(
             name: "UserTokens",
-            schema: "identity",
+            schema: IdentityDbContext.Schema,
             columns: table => new
             {
                 UserId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
@@ -166,7 +167,7 @@ public partial class CreateIdentitySchema : Migration
                 table.ForeignKey(
                     name: "FK_UserTokens_Users_UserId",
                     column: x => x.UserId,
-                    principalSchema: "identity",
+                    principalSchema: IdentityDbContext.Schema,
                     principalTable: "Users",
                     principalColumn: "Id",
                     onDelete: ReferentialAction.Cascade);
@@ -174,13 +175,13 @@ public partial class CreateIdentitySchema : Migration
 
         migrationBuilder.CreateIndex(
             name: "IX_RoleClaims_RoleId",
-            schema: "identity",
+            schema: IdentityDbContext.Schema,
             table: "RoleClaims",
             column: "RoleId");
 
         migrationBuilder.CreateIndex(
             name: "RoleNameIndex",
-            schema: "identity",
+            schema: IdentityDbContext.Schema,
             table: "Roles",
             column: "NormalizedName",
             unique: true,
@@ -188,38 +189,38 @@ public partial class CreateIdentitySchema : Migration
 
         migrationBuilder.CreateIndex(
             name: "IX_UserClaims_UserId",
-            schema: "identity",
+            schema: IdentityDbContext.Schema,
             table: "UserClaims",
             column: "UserId");
 
         migrationBuilder.CreateIndex(
             name: "IX_UserLogins_UserId",
-            schema: "identity",
+            schema: IdentityDbContext.Schema,
             table: "UserLogins",
             column: "UserId");
 
         migrationBuilder.CreateIndex(
             name: "IX_UserRoles_RoleId",
-            schema: "identity",
+            schema: IdentityDbContext.Schema,
             table: "UserRoles",
             column: "RoleId");
 
         migrationBuilder.CreateIndex(
             name: "EmailIndex",
-            schema: "identity",
+            schema: IdentityDbContext.Schema,
             table: "Users",
             column: "NormalizedEmail");
 
         migrationBuilder.CreateIndex(
             name: "UserNameIndex",
-            schema: "identity",
+            schema: IdentityDbContext.Schema,
             table: "Users",
             column: "NormalizedUserName",
             unique: true,
             filter: "[NormalizedUserName] IS NOT NULL");
 
         migrationBuilder.Sql($"""
-            CREATE FUNCTION [identity].[BASE64_ENCODE]
+            CREATE FUNCTION [{IdentityDbContext.Schema}].[{IdentityDbContext.Base64EncodeFunctionName}]
             (
                 @data AS varbinary({256 + SHA512.HashSizeInBytes}) NULL
             )
@@ -235,34 +236,34 @@ public partial class CreateIdentitySchema : Migration
     /// <inheritdoc />
     protected override void Down(MigrationBuilder migrationBuilder)
     {
-        migrationBuilder.Sql("DROP FUNCTION [identity].[BASE64_ENCODE];");
+        migrationBuilder.Sql($"DROP FUNCTION [{IdentityDbContext.Schema}].[{IdentityDbContext.Base64EncodeFunctionName}];");
 
         migrationBuilder.DropTable(
             name: "RoleClaims",
-            schema: "identity");
+            schema: IdentityDbContext.Schema);
 
         migrationBuilder.DropTable(
             name: "UserClaims",
-            schema: "identity");
+            schema: IdentityDbContext.Schema);
 
         migrationBuilder.DropTable(
             name: "UserLogins",
-            schema: "identity");
+            schema: IdentityDbContext.Schema);
 
         migrationBuilder.DropTable(
             name: "UserRoles",
-            schema: "identity");
+            schema: IdentityDbContext.Schema);
 
         migrationBuilder.DropTable(
             name: "UserTokens",
-            schema: "identity");
+            schema: IdentityDbContext.Schema);
 
         migrationBuilder.DropTable(
             name: "Roles",
-            schema: "identity");
+            schema: IdentityDbContext.Schema);
 
         migrationBuilder.DropTable(
             name: "Users",
-            schema: "identity");
+            schema: IdentityDbContext.Schema);
     }
 }

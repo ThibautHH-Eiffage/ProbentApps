@@ -11,24 +11,34 @@ using IdentityDbContext = ProbentApps.Database.Contexts.IdentityDbContext;
 
 var builder = WebApplication.CreateBuilder(args);
 
-DbContextOptionsBuilder configureDbContext(DbContextOptionsBuilder options) =>
+void configureDbContext<TContext>(DbContextOptionsBuilder options) where TContext : IDbContext =>
     options.UseSqlServer(builder.Configuration.GetConnectionString(nameof(ProbentApps))
-            ?? throw new InvalidOperationException(@$"{nameof(ProbentApps)}: No such connection string"))
+            ?? throw new InvalidOperationException(@$"{nameof(ProbentApps)}: No such connection string"),
+            options => options.MigrationsHistoryTable("MigrationsHistory", TContext.Schema))
         .EnableSensitiveDataLogging(builder.Environment.IsDevelopment());
 
-builder.Services.AddDbContext<DataProtectionDbContext>(options => configureDbContext(options));
-builder.Services.AddDbContextFactory<IdentityDbContext>(options => configureDbContext(options)
-    .UseAsyncSeeding(async (context, _, cancellationToken) => {
+builder.Services.AddDbContext<DataProtectionDbContext>(configureDbContext<DataProtectionDbContext>)
+    .AddDbContext<IdentityDbContext>(options =>
+    {
+        configureDbContext<IdentityDbContext>(options);
+        options.UseAsyncSeeding(async (context, _, cancellationToken) =>
+        {
         var users = context.Set<ApplicationUser>();
         if (await users.FindAsync([new Guid(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1)], cancellationToken) is null)
-            users.Add(new() { Id = new Guid(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1),
-                UserName = "root", NormalizedUserName = "ROOT",
-                Email = "root@probentapps", NormalizedEmail = "ROOT@PROBENTAPPS",
-                EmailConfirmed = true });
+                users.Add(new()
+                {
+                    Id = new Guid(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1),
+                    UserName = "root",
+                    NormalizedUserName = "ROOT",
+                    Email = "root@probentapps",
+                    NormalizedEmail = "ROOT@PROBENTAPPS",
+                    EmailConfirmed = true
+                });
         if (await users.FindAsync([Guid.AllBitsSet], cancellationToken) is null)
             users.Add(new() { Id = Guid.AllBitsSet, UserName = "Deleted user" });
         await context.SaveChangesAsync(cancellationToken);
-    }));
+        });
+    });
 
 if (builder.Environment.IsDevelopment())
     builder.Services.AddDatabaseDeveloperPageExceptionFilter();

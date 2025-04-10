@@ -14,7 +14,7 @@ partial class IdentityDbContextModelSnapshot : ModelSnapshot
     protected override void BuildModel(ModelBuilder modelBuilder)
     {
         modelBuilder
-            .HasDefaultSchema("identity")
+            .HasDefaultSchema(IdentityDbContext.Schema)
             .HasAnnotation("ProductVersion", "9.0.2")
             .HasAnnotation("Relational:MaxIdentifierLength", 128)
             .UseIdentityColumns();

@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Identity;
 
 namespace ProbentApps.Data;
 
+[Table("Users", Schema = "identity")]
 public class ApplicationUser : IdentityUser<Guid>, IHashedNormalizationUser
 {
     [Column(TypeName = "binary(64)")]
