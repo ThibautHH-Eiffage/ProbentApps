@@ -3,7 +3,7 @@ using System.Security.Cryptography;
 using System.Text;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Options;
-using ProbentApps.Data;
+using ProbentApps.Model;
 
 namespace ProbentApps.Services;
 

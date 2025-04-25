@@ -1,7 +1,7 @@
-﻿using Microsoft.EntityFrameworkCore.Migrations;
-using ProbentApps.Database.Contexts;
-using System.Buffers.Text;
+﻿using System.Buffers.Text;
 using System.Security.Cryptography;
+using Microsoft.EntityFrameworkCore.Migrations;
+using ProbentApps.Database.Contexts;
 
 namespace ProbentApps.Database.Migrations.Identity;
 

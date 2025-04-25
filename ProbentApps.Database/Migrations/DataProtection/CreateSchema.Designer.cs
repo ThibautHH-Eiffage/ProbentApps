@@ -16,8 +16,7 @@ partial class CreateSchema
         modelBuilder
             .HasDefaultSchema(DataProtectionDbContext.Schema)
             .HasAnnotation("ProductVersion", "9.0.2")
-            .HasAnnotation("Relational:MaxIdentifierLength", 128)
-            .UseIdentityColumns();
+            .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
         modelBuilder.Entity<DataProtectionKey>(b =>
             {

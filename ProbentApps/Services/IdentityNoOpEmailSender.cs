@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI.Services;
-using ProbentApps.Data;
+using ProbentApps.Model;
 
 namespace ProbentApps.Services;
 

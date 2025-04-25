@@ -7,7 +7,7 @@ namespace ProbentApps.Database.Migrations.DataProtection;
 
 /// <inheritdoc />
 [DbContext(typeof(DataProtectionDbContext))]
-partial class DataProtectionDbContextModelSnapshot : ModelSnapshot
+internal class DataProtectionDbContextModelSnapshot : ModelSnapshot
 {
     /// <inheritdoc />
     protected override void BuildModel(ModelBuilder modelBuilder)
@@ -15,8 +15,7 @@ partial class DataProtectionDbContextModelSnapshot : ModelSnapshot
         modelBuilder
             .HasDefaultSchema(DataProtectionDbContext.Schema)
             .HasAnnotation("ProductVersion", "9.0.2")
-            .HasAnnotation("Relational:MaxIdentifierLength", 128)
-            .UseIdentityColumns();
+            .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
         modelBuilder.Entity<DataProtectionKey>(b =>
         {

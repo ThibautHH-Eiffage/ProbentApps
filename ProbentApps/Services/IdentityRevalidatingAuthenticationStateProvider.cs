@@ -1,9 +1,9 @@
+using System.Security.Claims;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Components.Server;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Options;
-using ProbentApps.Data;
-using System.Security.Claims;
+using ProbentApps.Model;
 
 namespace ProbentApps.Services;
 
