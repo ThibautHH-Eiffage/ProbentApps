@@ -1,7 +1,7 @@
 using System.ComponentModel.DataAnnotations.Schema;
 using Microsoft.AspNetCore.Identity;
 
-namespace ProbentApps.Data;
+namespace ProbentApps.Model;
 
 [Table("Users", Schema = "identity")]
 public class ApplicationUser : IdentityUser<Guid>, IHashedNormalizationUser

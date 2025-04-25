@@ -2,8 +2,8 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
-using ProbentApps.Data;
-using ProbentApps.Database;
+using ProbentApps.Database.Contexts;
+using ProbentApps.Model;
 
 namespace ProbentApps.Services;
 
@@ -24,8 +24,13 @@ public class DataProtectionLookupProtectedUserStore<TUser, TRole, TConext, TKey>
         cancellationToken.ThrowIfCancellationRequested();
         ThrowIfDisposed();
 
-        return Users.SingleOrDefaultAsync(u => u.NormalizedUserName != null && u.NormalizedUserName == (u.NormalizationSalt != null
-                ? Convert.ToBase64String(SHA512.HashData(Functions.ASCIIEncode(normalizedUserName).Concatenate(u.NormalizationSalt)))
+        return Users.SingleOrDefaultAsync(u => u.NormalizedUserName != null
+            && u.NormalizedUserName == (u.NormalizationSalt != null
+                ? Convert.ToBase64String(
+                    SHA512.HashData(
+                        IIdentityDbFunctions.ConcatenateBytes(
+                            IIdentityDbFunctions.GetASCIIBytes(normalizedUserName),
+                            u.NormalizationSalt)))
                 : normalizedUserName),
             cancellationToken);
     }
@@ -34,8 +39,13 @@ public class DataProtectionLookupProtectedUserStore<TUser, TRole, TConext, TKey>
     {
         cancellationToken.ThrowIfCancellationRequested();
         ThrowIfDisposed();
-        return Users.SingleOrDefaultAsync(u => u.NormalizedEmail != null && u.NormalizedEmail == (u.NormalizationSalt != null
-                ? Convert.ToBase64String(SHA512.HashData(Functions.ASCIIEncode(normalizedEmail).Concatenate(u.NormalizationSalt)))
+        return Users.SingleOrDefaultAsync(u => u.NormalizedEmail != null
+            && u.NormalizedEmail == (u.NormalizationSalt != null
+                ? Convert.ToBase64String(
+                    SHA512.HashData(
+                        IIdentityDbFunctions.ConcatenateBytes(
+                            IIdentityDbFunctions.GetASCIIBytes(normalizedEmail),
+                            u.NormalizationSalt)))
                 : normalizedEmail),
             cancellationToken);
     }

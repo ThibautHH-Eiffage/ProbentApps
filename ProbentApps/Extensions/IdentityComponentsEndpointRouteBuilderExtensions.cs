@@ -8,7 +8,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Primitives;
 using ProbentApps.Components.Account.Pages;
 using ProbentApps.Components.Account.Pages.Manage;
-using ProbentApps.Data;
+using ProbentApps.Model;
 
 namespace Microsoft.AspNetCore.Routing;
 

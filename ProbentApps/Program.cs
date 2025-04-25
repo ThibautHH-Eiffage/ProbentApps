@@ -4,10 +4,9 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using MudBlazor.Services;
 using ProbentApps.Components;
-using ProbentApps.Data;
 using ProbentApps.Database.Contexts;
+using ProbentApps.Model;
 using ProbentApps.Services;
-using IdentityDbContext = ProbentApps.Database.Contexts.IdentityDbContext;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -15,10 +14,16 @@ void configureDbContext<TContext>(DbContextOptionsBuilder options) where TContex
     options.UseSqlServer(builder.Configuration.GetConnectionString(nameof(ProbentApps))
             ?? throw new InvalidOperationException(@$"{nameof(ProbentApps)}: No such connection string"),
             options => options.MigrationsHistoryTable("MigrationsHistory", TContext.Schema))
-        .EnableSensitiveDataLogging(builder.Environment.IsDevelopment());
+        .EnableSensitiveDataLogging(builder.Environment.IsDevelopment())
+#pragma warning disable ASP0000
+        .UseInternalServiceProvider(new ServiceCollection().AddEntityFrameworkSqlServer()
+            .AddConventionSetPlugins()
+            .BuildServiceProvider());
+#pragma warning restore ASP0000
 
 builder.Services.AddDbContext<DataProtectionDbContext>(configureDbContext<DataProtectionDbContext>)
-    .AddDbContext<IdentityDbContext>(options =>
+    .AddDbContext<IdentityDbContext, IdentityDbContext<IdentityDbFunctions>>(configureDbContext<IdentityDbContext>)
+    .AddIdentityMigrationsDbContext(options =>
     {
         configureDbContext<IdentityDbContext>(options);
         options.UseAsyncSeeding(async (context, _, cancellationToken) =>
@@ -80,12 +85,12 @@ var app = builder.Build();
 if (!EF.IsDesignTime)
     await using (var scope = app.Services.CreateAsyncScope())
     {
-        await scope.ServiceProvider.GetRequiredService<DataProtectionDbContext>().Database.MigrateAsync();
-        await scope.ServiceProvider.GetRequiredService<IdentityDbContext>().Database.MigrateAsync();
+        await scope.ServiceProvider.MigrateDatabaseAsync<DataProtectionDbContext>();
+        await scope.ServiceProvider.MigrateDatabaseAsync<IdentityDbContext>();
         var userManager = scope.ServiceProvider.GetRequiredService<UserManager<ApplicationUser>>();
         var rootUser = (await userManager.FindByIdAsync(new Guid(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1).ToString()))!;
-        var zbui = await userManager.RemovePasswordAsync(rootUser);
-        var iuzev=await userManager.AddPasswordAsync(rootUser, "Test123!");
+        await userManager.RemovePasswordAsync(rootUser);
+        await userManager.AddPasswordAsync(rootUser, "Test123!");
     }
 
 if (app.Environment.IsDevelopment())

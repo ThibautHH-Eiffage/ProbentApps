@@ -1,23 +1,23 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
-using ProbentApps.Data;
+using Microsoft.EntityFrameworkCore.Migrations;
+using ProbentApps.Model;
 using ProbentApps.Database.Contexts;
 
 namespace ProbentApps.Database.Migrations.Identity;
 
-/// <inheritdoc/>
-[DbContext(typeof(IdentityDbContext))]
-partial class IdentityDbContextModelSnapshot : ModelSnapshot
+[DbContext(typeof(IServiceCollectionExtensions.MigrationsIdentityDbContext))]
+[Migration($"00_{nameof(CreateSchema)}")]
+partial class CreateSchema
 {
-    /// <inheritdoc/>
-    protected override void BuildModel(ModelBuilder modelBuilder)
+    /// <inheritdoc />
+    protected override void BuildTargetModel(ModelBuilder modelBuilder)
     {
         modelBuilder
             .HasDefaultSchema(IdentityDbContext.Schema)
             .HasAnnotation("ProductVersion", "9.0.2")
-            .HasAnnotation("Relational:MaxIdentifierLength", 128)
-            .UseIdentityColumns();
+            .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
         modelBuilder.Entity<IdentityRole<Guid>>(b =>
         {

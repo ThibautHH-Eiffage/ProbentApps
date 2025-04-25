@@ -1,5 +1,5 @@
 using Microsoft.AspNetCore.Identity;
-using ProbentApps.Data;
+using ProbentApps.Model;
 
 namespace ProbentApps.Services;
 
