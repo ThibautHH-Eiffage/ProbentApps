@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Diagnostics;
 using MudBlazor.Services;
 using ProbentApps.Components;
 using ProbentApps.Database.Contexts;
@@ -15,6 +16,7 @@ void configureDbContext<TContext>(DbContextOptionsBuilder options) where TContex
             ?? throw new InvalidOperationException(@$"{nameof(ProbentApps)}: No such connection string"),
             options => options.MigrationsHistoryTable("MigrationsHistory", TContext.Schema))
         .EnableSensitiveDataLogging(builder.Environment.IsDevelopment())
+        .ConfigureWarnings(warnings => warnings.Ignore(CoreEventId.SensitiveDataLoggingEnabledWarning))
 #pragma warning disable ASP0000
         .UseInternalServiceProvider(new ServiceCollection().AddEntityFrameworkSqlServer()
             .AddConventionSetPlugins()
