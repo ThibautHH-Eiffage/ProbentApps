@@ -31,17 +31,17 @@ builder.Services.AddDbContext<DataProtectionDbContext>(configureDbContext<DataPr
         options.UseAsyncSeeding(async (context, _, cancellationToken) =>
         {
         var users = context.Set<ApplicationUser>();
-        if (await users.FindAsync([new Guid(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1)], cancellationToken) is null)
-                users.Add(new()
-                {
-                    Id = new Guid(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1),
-                    UserName = "root",
-                    NormalizedUserName = "ROOT",
-                    Email = "root@probentapps",
-                    NormalizedEmail = "ROOT@PROBENTAPPS",
-                    EmailConfirmed = true
-                });
-        if (await users.FindAsync([Guid.AllBitsSet], cancellationToken) is null)
+        if (!await users.AnyAsync(u => u.Id == ApplicationUser.RootId, cancellationToken))
+			users.Add(new()
+			{
+				Id = ApplicationUser.RootId,
+				UserName = "root",
+				NormalizedUserName = "ROOT",
+				Email = "root@probentapps",
+				NormalizedEmail = "ROOT@PROBENTAPPS",
+				EmailConfirmed = true
+			});
+        if (!await users.AnyAsync(u => u.Id == Guid.AllBitsSet, cancellationToken))
             users.Add(new() { Id = Guid.AllBitsSet, UserName = "Deleted user" });
         await context.SaveChangesAsync(cancellationToken);
         });
@@ -90,7 +90,7 @@ if (!EF.IsDesignTime)
         await scope.ServiceProvider.MigrateDatabaseAsync<DataProtectionDbContext>();
         await scope.ServiceProvider.MigrateDatabaseAsync<IdentityDbContext>();
         var userManager = scope.ServiceProvider.GetRequiredService<UserManager<ApplicationUser>>();
-        var rootUser = (await userManager.FindByIdAsync(new Guid(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1).ToString()))!;
+        var rootUser = (await userManager.FindByIdAsync(ApplicationUser.RootId.ToString()))!;
         await userManager.RemovePasswordAsync(rootUser);
         await userManager.AddPasswordAsync(rootUser, "Test123!");
     }
