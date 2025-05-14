@@ -12,6 +12,7 @@
     <File Path="LICENSE.fr.txt" />
   </Folder>
   <Project Path="ProbentApps.Client/ProbentApps.Client.csproj" />
+  <Project Path="ProbentApps.Components/ProbentApps.Components.csproj" />
   <Project Path="ProbentApps.Data/ProbentApps.Data.csproj" />
   <Project Path="ProbentApps.Database/ProbentApps.Database.csproj" />
   <Project Path="ProbentApps.Model/ProbentApps.Model.csproj" />

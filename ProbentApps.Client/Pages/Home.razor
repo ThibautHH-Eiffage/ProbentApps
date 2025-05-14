@@ -1,5 +1,7 @@
 ﻿@page "/"
 
-<PageTitle>Home</PageTitle>
+@inject IStringLocalizer<SharedResources> SharedLocalizer
+
+<PageTitle>@SharedLocalizer["Home"]</PageTitle>
 
 <MudText Typo="Typo.h2" Align="Align.Center" GutterBottom>ProbentApps</MudText>
