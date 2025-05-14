@@ -32,15 +32,15 @@ builder.Services.AddDbContext<DataProtectionDbContext>(configureDbContext<DataPr
         {
         var users = context.Set<ApplicationUser>();
         if (!await users.AnyAsync(u => u.Id == ApplicationUser.RootId, cancellationToken))
-			users.Add(new()
-			{
-				Id = ApplicationUser.RootId,
-				UserName = "root",
-				NormalizedUserName = "ROOT",
-				Email = "root@probentapps",
-				NormalizedEmail = "ROOT@PROBENTAPPS",
-				EmailConfirmed = true
-			});
+            users.Add(new()
+            {
+                Id = ApplicationUser.RootId,
+                UserName = "root",
+                NormalizedUserName = "ROOT",
+                Email = "root@apps.probent.local",
+                NormalizedEmail = "ROOT@APPS.PROBENT.LOCAL",
+                EmailConfirmed = true
+            });
         if (!await users.AnyAsync(u => u.Id == Guid.AllBitsSet, cancellationToken))
             users.Add(new() { Id = Guid.AllBitsSet, UserName = "Deleted user" });
         await context.SaveChangesAsync(cancellationToken);
