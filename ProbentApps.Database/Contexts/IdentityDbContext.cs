@@ -19,7 +19,9 @@ public abstract class IdentityDbContext(DbContextOptions options) : IdentityDbCo
 
         base.OnModelCreating(builder);
 
-        builder.Entity<ApplicationUser>().ToTable("Users");
+        builder.Entity<ApplicationUser>()
+            .Ignore(static u => u.ManagedStructures)
+            .ToTable("Users");
         builder.Entity<IdentityRole<Guid>>().ToTable("Roles");
         builder.Entity<IdentityRoleClaim<Guid>>().ToTable("RoleClaims");
         builder.Entity<IdentityUserClaim<Guid>>().ToTable("UserClaims");
