@@ -10,4 +10,6 @@ public class ApplicationUser : IdentityUser<Guid>, IHashedNormalizationUser
 
     [Column(TypeName = "binary(64)")]
     public byte[]? NormalizationSalt { get; set; }
+
+    public required IList<Structure> ManagedStructures { get; set; }
 }
