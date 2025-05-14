@@ -5,6 +5,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using MudBlazor.Services;
+using MudBlazor.Translations;
 using ProbentApps.Components;
 using ProbentApps.Database.Contexts;
 using ProbentApps.Model;
@@ -76,7 +77,8 @@ builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents()
     .AddInteractiveWebAssemblyComponents()
     .AddAuthenticationStateSerialization();
-builder.Services.AddMudServices();
+builder.Services.AddMudServices()
+    .AddMudTranslations();
 
 builder.Services.AddCascadingAuthenticationState();
 builder.Services.AddScoped<IdentityUserAccessor>();
