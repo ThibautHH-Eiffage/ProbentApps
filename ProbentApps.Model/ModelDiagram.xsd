@@ -1,0 +1,265 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<xs:schema id="ModelDiagram" targetNamespace="http://tempuri.org/ModelDiagram.xsd" xmlns:mstns="http://tempuri.org/ModelDiagram.xsd" xmlns="http://tempuri.org/ModelDiagram.xsd" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata" xmlns:msprop="urn:schemas-microsoft-com:xml-msprop" attributeFormDefault="qualified" elementFormDefault="qualified">
+  <xs:element name="ModelDiagram" msdata:IsDataSet="true" msdata:UseCurrentLocale="true">
+    <xs:complexType>
+      <xs:choice minOccurs="0" maxOccurs="unbounded">
+        <xs:element name="Advancements">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="Id" msdata:DataType="System.Guid" type="xs:string" />
+              <xs:element name="Name">
+                <xs:simpleType>
+                  <xs:restriction base="xs:string">
+                    <xs:maxLength value="64" />
+                  </xs:restriction>
+                </xs:simpleType>
+              </xs:element>
+              <xs:element name="Description" minOccurs="0">
+                <xs:simpleType>
+                  <xs:restriction base="xs:string">
+                    <xs:maxLength value="512" />
+                  </xs:restriction>
+                </xs:simpleType>
+              </xs:element>
+              <xs:element name="Date" type="xs:date" />
+              <xs:element name="Price" type="xs:decimal" />
+              <xs:element name="OrderId" msdata:DataType="System.Guid" type="xs:string" />
+              <xs:element name="ReportId" msdata:DataType="System.Guid" type="xs:string" minOccurs="0" />
+              <xs:element name="InvoiceId" msdata:DataType="System.Guid" type="xs:string" minOccurs="0" />
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+        <xs:element name="Affairs">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="Id" msdata:DataType="System.Guid" type="xs:string" />
+              <xs:element name="Name">
+                <xs:simpleType>
+                  <xs:restriction base="xs:string">
+                    <xs:maxLength value="128" />
+                  </xs:restriction>
+                </xs:simpleType>
+              </xs:element>
+              <xs:element name="ProviderId">
+                <xs:simpleType>
+                  <xs:restriction base="xs:string">
+                    <xs:maxLength value="64" />
+                  </xs:restriction>
+                </xs:simpleType>
+              </xs:element>
+              <xs:element name="StructureId" msdata:DataType="System.Guid" type="xs:string" />
+              <xs:element name="ClientId" msdata:DataType="System.Guid" type="xs:string" />
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+        <xs:element name="Clients">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="Id" msdata:DataType="System.Guid" type="xs:string" />
+              <xs:element name="Name">
+                <xs:simpleType>
+                  <xs:restriction base="xs:string">
+                    <xs:maxLength value="128" />
+                  </xs:restriction>
+                </xs:simpleType>
+              </xs:element>
+              <xs:element name="MainProviderId" minOccurs="0">
+                <xs:simpleType>
+                  <xs:restriction base="xs:string">
+                    <xs:maxLength value="64" />
+                  </xs:restriction>
+                </xs:simpleType>
+              </xs:element>
+              <xs:element name="ExtraProviderIds" type="xs:string" />
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+        <xs:element name="Invoices">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="Id" msdata:DataType="System.Guid" type="xs:string" />
+              <xs:element name="Name">
+                <xs:simpleType>
+                  <xs:restriction base="xs:string">
+                    <xs:maxLength value="64" />
+                  </xs:restriction>
+                </xs:simpleType>
+              </xs:element>
+              <xs:element name="RequesterId" msdata:DataType="System.Guid" type="xs:string" />
+              <xs:element name="RequestDate" msdata:DataType="System.DateTimeOffset" type="xs:dateTime" minOccurs="0" />
+              <xs:element name="ProviderId" minOccurs="0">
+                <xs:simpleType>
+                  <xs:restriction base="xs:string">
+                    <xs:maxLength value="64" />
+                  </xs:restriction>
+                </xs:simpleType>
+              </xs:element>
+              <xs:element name="SubmissionDate" msdata:DataType="System.DateTimeOffset" type="xs:dateTime" minOccurs="0" />
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+        <xs:element name="Orders">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="Id" msdata:DataType="System.Guid" type="xs:string" />
+              <xs:element name="AffairId" msdata:DataType="System.Guid" type="xs:string" />
+              <xs:element name="ClientId" msdata:DataType="System.Guid" type="xs:string" />
+              <xs:element name="Name">
+                <xs:simpleType>
+                  <xs:restriction base="xs:string">
+                    <xs:maxLength value="128" />
+                  </xs:restriction>
+                </xs:simpleType>
+              </xs:element>
+              <xs:element name="ProviderId">
+                <xs:simpleType>
+                  <xs:restriction base="xs:string">
+                    <xs:maxLength value="64" />
+                  </xs:restriction>
+                </xs:simpleType>
+              </xs:element>
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+        <xs:element name="Reports">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="Id" msdata:DataType="System.Guid" type="xs:string" />
+              <xs:element name="Name">
+                <xs:simpleType>
+                  <xs:restriction base="xs:string">
+                    <xs:maxLength value="64" />
+                  </xs:restriction>
+                </xs:simpleType>
+              </xs:element>
+              <xs:element name="Intermediaries" minOccurs="0">
+                <xs:simpleType>
+                  <xs:restriction base="xs:string">
+                    <xs:maxLength value="128" />
+                  </xs:restriction>
+                </xs:simpleType>
+              </xs:element>
+              <xs:element name="Notes" minOccurs="0">
+                <xs:simpleType>
+                  <xs:restriction base="xs:string">
+                    <xs:maxLength value="512" />
+                  </xs:restriction>
+                </xs:simpleType>
+              </xs:element>
+              <xs:element name="IssuanceDate" type="xs:date" />
+              <xs:element name="AcceptanceDate" type="xs:date" minOccurs="0" />
+              <xs:element name="PreviousReportId" msdata:DataType="System.Guid" type="xs:string" minOccurs="0" />
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+        <xs:element name="StructureManagements">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="ManagerId" msdata:DataType="System.Guid" type="xs:string" />
+              <xs:element name="StructureId" msdata:DataType="System.Guid" type="xs:string" />
+              <xs:element name="StartDate" type="xs:date" />
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+        <xs:element name="Structures">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="Id" msdata:DataType="System.Guid" type="xs:string" />
+              <xs:element name="ParentId" msdata:DataType="System.Guid" type="xs:string" minOccurs="0" />
+              <xs:element name="Name">
+                <xs:simpleType>
+                  <xs:restriction base="xs:string">
+                    <xs:maxLength value="64" />
+                  </xs:restriction>
+                </xs:simpleType>
+              </xs:element>
+              <xs:element name="Code">
+                <xs:simpleType>
+                  <xs:restriction base="xs:string">
+                    <xs:maxLength value="32" />
+                  </xs:restriction>
+                </xs:simpleType>
+              </xs:element>
+              <xs:element name="ManagerId" msdata:DataType="System.Guid" type="xs:string" minOccurs="0" />
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+        <xs:element name="Users">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="Id" msdata:DataType="System.Guid" type="xs:string" />
+              <xs:element name="UserName" minOccurs="0">
+                <xs:simpleType>
+                  <xs:restriction base="xs:string">
+                    <xs:maxLength value="256" />
+                  </xs:restriction>
+                </xs:simpleType>
+              </xs:element>
+              <xs:element name="Email" minOccurs="0">
+                <xs:simpleType>
+                  <xs:restriction base="xs:string">
+                    <xs:maxLength value="256" />
+                  </xs:restriction>
+                </xs:simpleType>
+              </xs:element>
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+      </xs:choice>
+    </xs:complexType>
+    <xs:unique name="PK_Advancements" msdata:PrimaryKey="true">
+      <xs:selector xpath=".//mstns:Advancements" />
+      <xs:field xpath="mstns:Id" />
+    </xs:unique>
+    <xs:unique name="PK_Affairs" msdata:PrimaryKey="true">
+      <xs:selector xpath=".//mstns:Affairs" />
+      <xs:field xpath="mstns:Id" />
+    </xs:unique>
+    <xs:unique name="PK_Clients" msdata:PrimaryKey="true">
+      <xs:selector xpath=".//mstns:Clients" />
+      <xs:field xpath="mstns:Id" />
+    </xs:unique>
+    <xs:unique name="PK_Invoices" msdata:PrimaryKey="true">
+      <xs:selector xpath=".//mstns:Invoices" />
+      <xs:field xpath="mstns:Id" />
+    </xs:unique>
+    <xs:unique name="PK_Orders" msdata:PrimaryKey="true">
+      <xs:selector xpath=".//mstns:Orders" />
+      <xs:field xpath="mstns:Id" />
+    </xs:unique>
+    <xs:unique name="PK_Reports" msdata:PrimaryKey="true">
+      <xs:selector xpath=".//mstns:Reports" />
+      <xs:field xpath="mstns:Id" />
+    </xs:unique>
+    <xs:unique name="PK_StructureManagements" msdata:PrimaryKey="true">
+      <xs:selector xpath=".//mstns:StructureManagements" />
+      <xs:field xpath="mstns:ManagerId" />
+      <xs:field xpath="mstns:StructureId" />
+    </xs:unique>
+    <xs:unique name="PK_Structures" msdata:PrimaryKey="true">
+      <xs:selector xpath=".//mstns:Structures" />
+      <xs:field xpath="mstns:Id" />
+    </xs:unique>
+    <xs:unique name="PK_Users" msdata:PrimaryKey="true">
+      <xs:selector xpath=".//mstns:Users" />
+      <xs:field xpath="mstns:Id" />
+    </xs:unique>
+  </xs:element>
+  <xs:annotation>
+    <xs:appinfo>
+      <msdata:Relationship name="FK_Advancements_Invoices_InvoiceId" msdata:parent="Invoices" msdata:child="Advancements" msdata:parentkey="Id" msdata:childkey="InvoiceId" />
+      <msdata:Relationship name="FK_Advancements_Orders_OrderId" msdata:parent="Orders" msdata:child="Advancements" msdata:parentkey="Id" msdata:childkey="OrderId" />
+      <msdata:Relationship name="FK_Advancements_Reports_ReportId" msdata:parent="Reports" msdata:child="Advancements" msdata:parentkey="Id" msdata:childkey="ReportId" />
+      <msdata:Relationship name="FK_Affairs_Clients_ClientId" msdata:parent="Clients" msdata:child="Affairs" msdata:parentkey="Id" msdata:childkey="ClientId" />
+      <msdata:Relationship name="FK_Affairs_Structures_StructureId" msdata:parent="Structures" msdata:child="Affairs" msdata:parentkey="Id" msdata:childkey="StructureId" />
+      <msdata:Relationship name="FK_Invoices_Users_RequesterId" msdata:parent="Users" msdata:child="Invoices" msdata:parentkey="Id" msdata:childkey="RequesterId" />
+	  <msdata:Relationship name="FK_Orders_Clients_ClientId" msdata:parent="Clients" msdata:child="Orders" msdata:parentkey="Id" msdata:childkey="ClientId" />
+      <msdata:Relationship name="FK_Orders_Affairs_AffairId" msdata:parent="Affairs" msdata:child="Orders" msdata:parentkey="Id" msdata:childkey="AffairId" />
+      <msdata:Relationship name="FK_Reports_Reports_PreviousReportId" msdata:parent="Reports" msdata:child="Reports" msdata:parentkey="Id" msdata:childkey="PreviousReportId" />
+      <msdata:Relationship name="FK_StructureManagements_Structures_StructureId" msdata:parent="Structures" msdata:child="StructureManagements" msdata:parentkey="Id" msdata:childkey="StructureId" />
+      <msdata:Relationship name="FK_StructureManagements_Users_ManagerId" msdata:parent="Users" msdata:child="StructureManagements" msdata:parentkey="Id" msdata:childkey="ManagerId" />
+      <msdata:Relationship name="FK_Structures_Structures_ParentId" msdata:parent="Structures" msdata:child="Structures" msdata:parentkey="Id" msdata:childkey="ParentId" />
+      <msdata:Relationship name="FK_Structures_Users_ManagerId" msdata:parent="Users" msdata:child="Structures" msdata:parentkey="Id" msdata:childkey="ManagerId" />
+    </xs:appinfo>
+  </xs:annotation>
+</xs:schema>
