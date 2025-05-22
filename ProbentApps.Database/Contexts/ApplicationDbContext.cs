@@ -55,7 +55,6 @@ public partial class ApplicationDbContext(DbContextOptions<ApplicationDbContext>
         const string ManagerIdPropertyName = $"{nameof(Structure.Manager)}{nameof(ApplicationUser.Id)}";
 
         var structures = modelBuilder.Entity<Structure>();
-        structures.Property(static s => s.Code).IsUnicode(false);
         structures.Property(ManagerIdPropertyName)
             .HasComputedValue<StructureManagerValueGenerator>();
         structures.HasOne(static s => s.Manager).WithMany(static s => s.ManagedStructures)

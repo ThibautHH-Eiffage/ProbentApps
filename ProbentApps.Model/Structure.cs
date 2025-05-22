@@ -1,5 +1,4 @@
 ﻿using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
 using Microsoft.EntityFrameworkCore;
 
 namespace ProbentApps.Model;
@@ -12,7 +11,7 @@ public class Structure
     public required string Name { get; set; }
 
     [MaxLength(32)]
-    [Column(TypeName = "varchar(32)")]
+    [Unicode(false)]
     public required string Code { get; set; }
 
     [DeleteBehavior(DeleteBehavior.NoAction)]
