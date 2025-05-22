@@ -1,9 +1,8 @@
-﻿using Microsoft.EntityFrameworkCore;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
+using Microsoft.EntityFrameworkCore;
 
 namespace ProbentApps.Model;
 
-[Index($"{nameof(Order)}{nameof(Order.Id)}", $"{nameof(Report)}{nameof(Model.Report.Id)}", IsUnique = true)]
 public class Advancement
 {
     public Guid Id { get; set; }
@@ -19,9 +18,12 @@ public class Advancement
     [Precision(38, 2)]
     public decimal Price { get; set; }
 
+    [DeleteBehavior(DeleteBehavior.NoAction)]
     public required Order Order { get; set; }
 
+    [DeleteBehavior(DeleteBehavior.SetNull)]
     public Report? Report { get; set; }
 
+    [DeleteBehavior(DeleteBehavior.SetNull)]
     public Invoice? Invoice { get; set; }
 }
