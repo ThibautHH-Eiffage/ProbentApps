@@ -7,7 +7,8 @@ using MudBlazor.Services;
 using ProbentApps.Components;
 using ProbentApps.Database.Contexts;
 using ProbentApps.Model;
-using ProbentApps.Services;
+using ProbentApps.Services.Data.Identity;
+using ProbentApps.Services.Identity;
 
 var builder = WebApplication.CreateBuilder(args);
 

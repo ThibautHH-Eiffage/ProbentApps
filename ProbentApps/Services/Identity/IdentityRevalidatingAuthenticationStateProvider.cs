@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Options;
 using ProbentApps.Model;
 
-namespace ProbentApps.Services;
+namespace ProbentApps.Services.Identity;
 
 // This is a server-side AuthenticationStateProvider that revalidates the security stamp for the connected user
 // every 30 minutes an interactive circuit is connected.

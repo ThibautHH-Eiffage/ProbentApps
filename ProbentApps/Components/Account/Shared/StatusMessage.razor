@@ -1,6 +1,4 @@
-﻿@using ProbentApps.Services
-
-@if (!string.IsNullOrEmpty(DisplayMessage))
+﻿@if (!string.IsNullOrEmpty(DisplayMessage))
 {
     var severity = DisplayMessage.StartsWith("Error") ? Severity.Error : Severity.Success;
 

@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Options;
 using ProbentApps.Model;
 
-namespace ProbentApps.Services;
+namespace ProbentApps.Services.Data.Identity;
 
 /// <summary>
 /// A user manager that deterministically protects user lookup data, even when the personal data is protected non-deterministically.

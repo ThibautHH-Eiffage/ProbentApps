@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore;
 using ProbentApps.Database.Contexts;
 using ProbentApps.Model;
 
-namespace ProbentApps.Services;
+namespace ProbentApps.Services.Data.Identity;
 
 /// <summary>
 /// A user store that supports lookup of users based on non-deterministically protected personal data.
