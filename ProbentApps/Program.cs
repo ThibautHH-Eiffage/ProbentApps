@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
+using Microsoft.EntityFrameworkCore.Infrastructure;
 using MudBlazor.Services;
 using ProbentApps.Components;
 using ProbentApps.Database.Contexts;
@@ -13,16 +14,13 @@ using ProbentApps.Services.Identity;
 var builder = WebApplication.CreateBuilder(args);
 
 void configureDbContext<TContext>(DbContextOptionsBuilder options) where TContext : IDbContext =>
-    options.UseSqlServer(builder.Configuration.GetConnectionString(nameof(ProbentApps))
+    ((IDbContextOptionsBuilderInfrastructure)
+        options.UseSqlServer(builder.Configuration.GetConnectionString(nameof(ProbentApps))
             ?? throw new InvalidOperationException(@$"{nameof(ProbentApps)}: No such connection string"),
             options => options.MigrationsHistoryTable("MigrationsHistory", TContext.Schema))
         .EnableSensitiveDataLogging(builder.Environment.IsDevelopment())
-        .ConfigureWarnings(warnings => warnings.Ignore(CoreEventId.SensitiveDataLoggingEnabledWarning))
-#pragma warning disable ASP0000
-        .UseInternalServiceProvider(new ServiceCollection().AddEntityFrameworkSqlServer()
-            .AddConventionSetPlugins()
-            .BuildServiceProvider());
-#pragma warning restore ASP0000
+        .ConfigureWarnings(warnings => warnings.Ignore(CoreEventId.SensitiveDataLoggingEnabledWarning)))
+    .AddOrUpdateExtension(ProbentAppsDbContextOptionsExtension.Instance);
 
 builder.Services.AddDbContext<DataProtectionDbContext>(configureDbContext<DataProtectionDbContext>)
     .AddDbContext<IdentityDbContext, IdentityDbContext<IdentityDbFunctions>>(configureDbContext<IdentityDbContext>)
@@ -31,21 +29,21 @@ builder.Services.AddDbContext<DataProtectionDbContext>(configureDbContext<DataPr
         configureDbContext<IdentityDbContext>(options);
         options.UseAsyncSeeding(async (context, _, cancellationToken) =>
         {
-        var users = context.Set<ApplicationUser>();
-        if (!await users.AnyAsync(u => u.Id == ApplicationUser.RootId, cancellationToken))
-            users.Add(new()
-            {
-                Id = ApplicationUser.RootId,
-                UserName = "root",
-                NormalizedUserName = "ROOT",
-                Email = "root@apps.probent.local",
-                NormalizedEmail = "ROOT@APPS.PROBENT.LOCAL",
-                EmailConfirmed = true,
-                ManagedStructures = []
-            });
-        if (!await users.AnyAsync(u => u.Id == Guid.AllBitsSet, cancellationToken))
-            users.Add(new() { Id = Guid.AllBitsSet, UserName = "Deleted user", ManagedStructures = [] });
-        await context.SaveChangesAsync(cancellationToken);
+            var users = context.Set<ApplicationUser>();
+            if (!await users.AnyAsync(u => u.Id == ApplicationUser.RootId, cancellationToken))
+                users.Add(new()
+                {
+                    Id = ApplicationUser.RootId,
+                    UserName = "root",
+                    NormalizedUserName = "ROOT",
+                    Email = "root@apps.probent.local",
+                    NormalizedEmail = "ROOT@APPS.PROBENT.LOCAL",
+                    EmailConfirmed = true,
+                    ManagedStructures = []
+                });
+            if (!await users.AnyAsync(u => u.Id == Guid.AllBitsSet, cancellationToken))
+                users.Add(new() { Id = Guid.AllBitsSet, UserName = "Deleted user", ManagedStructures = [] });
+            await context.SaveChangesAsync(cancellationToken);
         });
     })
     .AddDbContextFactory<ApplicationDbContext>(configureDbContext<ApplicationDbContext>);
