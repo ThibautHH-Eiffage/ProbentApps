@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Components;
 using System.Diagnostics.CodeAnalysis;
 
-namespace ProbentApps.Services;
+namespace ProbentApps.Services.Identity;
 
 internal sealed class IdentityRedirectManager(NavigationManager navigationManager)
 {

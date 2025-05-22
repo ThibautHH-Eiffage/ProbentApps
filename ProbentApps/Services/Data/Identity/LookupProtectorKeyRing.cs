@@ -2,7 +2,7 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Options;
 
-namespace ProbentApps.Services;
+namespace ProbentApps.Services.Data.Identity;
 
 public class LookupProtectorKeyRing(TimeProvider timeProvider,
     IOptions<KeyManagementOptions> options,

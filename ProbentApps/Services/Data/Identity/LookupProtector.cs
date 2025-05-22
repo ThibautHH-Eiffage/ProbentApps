@@ -2,7 +2,7 @@
 using Microsoft.AspNetCore.Identity;
 using System.Diagnostics.CodeAnalysis;
 
-namespace ProbentApps.Services;
+namespace ProbentApps.Services.Data.Identity;
 
 public class LookupProtector(IDataProtectionProvider dataProtectionProvider) : ILookupProtector
 {
