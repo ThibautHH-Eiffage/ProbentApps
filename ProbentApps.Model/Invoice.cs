@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using Microsoft.EntityFrameworkCore;
+using System.ComponentModel.DataAnnotations;
 
 namespace ProbentApps.Model;
 
@@ -9,6 +10,7 @@ public class Invoice
     [MaxLength(64)]
     public required string Name { get; set; }
 
+    [DeleteBehavior(DeleteBehavior.NoAction)]
     public required ApplicationUser Requester { get; set; }
 
     public DateTimeOffset? RequestDate { get; set; }
