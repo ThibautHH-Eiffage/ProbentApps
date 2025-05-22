@@ -42,11 +42,9 @@ class ApplicationDbContextModelSnapshot : ModelSnapshot
 
             b.HasIndex("InvoiceId");
 
-            b.HasIndex("ReportId");
+            b.HasIndex("OrderId");
 
-            b.HasIndex("OrderId", "ReportId")
-                .IsUnique()
-                .HasFilter("[ReportId] IS NOT NULL");
+            b.HasIndex("ReportId");
 
             b.ToTable(nameof(ApplicationDbContext.Advancements));
         });
@@ -230,13 +228,13 @@ class ApplicationDbContextModelSnapshot : ModelSnapshot
             b.HasOne(a => a.Client)
                 .WithMany()
                 .HasForeignKey("ClientId")
-                .OnDelete(DeleteBehavior.Cascade)
+                .OnDelete(DeleteBehavior.NoAction)
                 .IsRequired();
 
             b.HasOne(a => a.Structure)
                 .WithMany()
                 .HasForeignKey("StructureId")
-                .OnDelete(DeleteBehavior.Cascade)
+                .OnDelete(DeleteBehavior.NoAction)
                 .IsRequired();
         });
 
@@ -244,17 +242,19 @@ class ApplicationDbContextModelSnapshot : ModelSnapshot
         {
             b.HasOne(a => a.Invoice)
                 .WithMany(i => i.Advancements)
-                .HasForeignKey("InvoiceId");
+                .HasForeignKey("InvoiceId")
+                .OnDelete(DeleteBehavior.SetNull);
 
             b.HasOne(a => a.Order)
                 .WithMany(o => o.Advancements)
                 .HasForeignKey("OrderId")
-                .OnDelete(DeleteBehavior.Cascade)
+                .OnDelete(DeleteBehavior.NoAction)
                 .IsRequired();
 
             b.HasOne(a => a.Report)
                 .WithMany(o => o.Advancements)
-                .HasForeignKey("ReportId");
+                .HasForeignKey("ReportId")
+                .OnDelete(DeleteBehavior.SetNull);
         });
 
         modelBuilder.Entity<Invoice>(b =>
@@ -262,7 +262,7 @@ class ApplicationDbContextModelSnapshot : ModelSnapshot
             b.HasOne(i => i.Requester)
                 .WithMany()
                 .HasForeignKey("RequesterId")
-                .OnDelete(DeleteBehavior.Cascade)
+                .OnDelete(DeleteBehavior.NoAction)
                 .IsRequired();
         });
 
@@ -271,13 +271,13 @@ class ApplicationDbContextModelSnapshot : ModelSnapshot
             b.HasOne(o => o.Affair)
                 .WithMany()
                 .HasForeignKey("AffairId")
-                .OnDelete(DeleteBehavior.Cascade)
+                .OnDelete(DeleteBehavior.NoAction)
                 .IsRequired();
 
             b.HasOne(o => o.Client)
                 .WithMany()
                 .HasForeignKey("ClientId")
-                .OnDelete(DeleteBehavior.Cascade)
+                .OnDelete(DeleteBehavior.NoAction)
                 .IsRequired();
         });
 
@@ -285,18 +285,21 @@ class ApplicationDbContextModelSnapshot : ModelSnapshot
         {
             b.HasOne(r => r.PreviousReport)
                 .WithMany()
-                .HasForeignKey("PreviousReportId");
+                .HasForeignKey("PreviousReportId")
+                .OnDelete(DeleteBehavior.NoAction);
         });
 
         modelBuilder.Entity<Structure>(b =>
         {
             b.HasOne(s => s.Manager)
                 .WithMany(u => u.ManagedStructures)
-                .HasForeignKey("ManagerId");
+                .HasForeignKey("ManagerId")
+                .OnDelete(DeleteBehavior.NoAction);
 
             b.HasOne(s => s.Parent)
                 .WithMany()
-                .HasForeignKey("ParentId");
+                .HasForeignKey("ParentId")
+                .OnDelete(DeleteBehavior.NoAction);
         });
 
         modelBuilder.Entity<StructureManagement>(b =>
@@ -304,13 +307,13 @@ class ApplicationDbContextModelSnapshot : ModelSnapshot
             b.HasOne(sm => sm.Manager)
                 .WithMany()
                 .HasForeignKey("ManagerId")
-                .OnDelete(DeleteBehavior.Cascade)
+                .OnDelete(DeleteBehavior.NoAction)
                 .IsRequired();
 
             b.HasOne(sm => sm.Structure)
                 .WithMany(s => s.Managements)
                 .HasForeignKey("StructureId")
-                .OnDelete(DeleteBehavior.Cascade)
+                .OnDelete(DeleteBehavior.NoAction)
                 .IsRequired();
         });
     }

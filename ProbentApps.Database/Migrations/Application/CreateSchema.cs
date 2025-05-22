@@ -47,13 +47,15 @@ public partial class CreateSchema : Migration
                     column: x => x.ParentId,
                     principalSchema: ApplicationDbContext.Schema,
                     principalTable: nameof(ApplicationDbContext.Structures),
-                    principalColumn: nameof(Structure.Id));
+                    principalColumn: nameof(Structure.Id),
+                    onDelete: ReferentialAction.NoAction);
                 table.ForeignKey(
                     name: $"FK_{nameof(ApplicationDbContext.Structures)}_Users_{nameof(Structure.Manager)}{nameof(ApplicationUser.Id)}",
                     column: x => x.ManagerId,
                     principalSchema: IdentityDbContext.Schema,
                     principalTable: "Users",
-                    principalColumn: nameof(ApplicationUser.Id));
+                    principalColumn: nameof(ApplicationUser.Id),
+                    onDelete: ReferentialAction.NoAction);
             });
 
         migrationBuilder.CreateTable(
@@ -76,14 +78,14 @@ public partial class CreateSchema : Migration
                     principalSchema: ApplicationDbContext.Schema,
                     principalTable: nameof(ApplicationDbContext.Clients),
                     principalColumn: nameof(Client.Id),
-                    onDelete: ReferentialAction.Cascade);
+                    onDelete: ReferentialAction.NoAction);
                 table.ForeignKey(
                     name: $"FK_{nameof(ApplicationDbContext.Affairs)}_{nameof(ApplicationDbContext.Structures)}_{nameof(Affair.Structure)}{nameof(Structure.Id)}",
                     column: x => x.StructureId,
                     principalSchema: ApplicationDbContext.Schema,
                     principalTable: nameof(ApplicationDbContext.Structures),
                     principalColumn: nameof(Structure.Id),
-                    onDelete: ReferentialAction.Cascade);
+                    onDelete: ReferentialAction.NoAction);
             });
 
         migrationBuilder.CreateTable(
@@ -104,14 +106,14 @@ public partial class CreateSchema : Migration
                     principalSchema: ApplicationDbContext.Schema,
                     principalTable: nameof(ApplicationDbContext.Structures),
                     principalColumn: nameof(Structure.Id),
-                    onDelete: ReferentialAction.Cascade);
+                    onDelete: ReferentialAction.NoAction);
                 table.ForeignKey(
                     name: $"FK_{nameof(ApplicationDbContext.StructureManagements)}_Users_{nameof(StructureManagement.Manager)}{nameof(ApplicationUser.Id)}",
                     column: x => x.ManagerId,
                     principalSchema: IdentityDbContext.Schema,
                     principalTable: "Users",
                     principalColumn: nameof(ApplicationUser.Id),
-                    onDelete: ReferentialAction.Cascade);
+                    onDelete: ReferentialAction.NoAction);
             });
 
         migrationBuilder.CreateTable(
@@ -135,7 +137,7 @@ public partial class CreateSchema : Migration
                     principalSchema: IdentityDbContext.Schema,
                     principalTable: "Users",
                     principalColumn: nameof(ApplicationUser.Id),
-                    onDelete: ReferentialAction.Cascade);
+                    onDelete: ReferentialAction.NoAction);
             });
 
         migrationBuilder.CreateTable(
@@ -159,7 +161,8 @@ public partial class CreateSchema : Migration
                     column: x => x.PreviousReportId,
                     principalSchema: ApplicationDbContext.Schema,
                     principalTable: nameof(ApplicationDbContext.Reports),
-                    principalColumn: nameof(Report.Id));
+                    principalColumn: nameof(Report.Id),
+                    onDelete: ReferentialAction.NoAction);
             });
 
         migrationBuilder.CreateTable(
@@ -182,14 +185,14 @@ public partial class CreateSchema : Migration
                     principalSchema: ApplicationDbContext.Schema,
                     principalTable: nameof(ApplicationDbContext.Affairs),
                     principalColumn: nameof(Affair.Id),
-                    onDelete: ReferentialAction.Cascade);
+                    onDelete: ReferentialAction.NoAction);
                 table.ForeignKey(
                     name: $"FK_{nameof(ApplicationDbContext.Orders)}_{nameof(ApplicationDbContext.Clients)}_{nameof(Order.Client)}{nameof(Client.Id)}",
                     column: x => x.ClientId,
                     principalSchema: ApplicationDbContext.Schema,
                     principalTable: nameof(ApplicationDbContext.Clients),
                     principalColumn: nameof(Client.Id),
-                    onDelete: ReferentialAction.Cascade);
+                    onDelete: ReferentialAction.NoAction);
             });
 
         migrationBuilder.CreateTable(
@@ -214,20 +217,22 @@ public partial class CreateSchema : Migration
                     column: x => x.InvoiceId,
                     principalSchema: ApplicationDbContext.Schema,
                     principalTable: nameof(ApplicationDbContext.Invoices),
-                    principalColumn: nameof(Invoice.Id));
+                    principalColumn: nameof(Invoice.Id),
+                    onDelete: ReferentialAction.SetNull);
                 table.ForeignKey(
                     name: $"FK_{nameof(ApplicationDbContext.Advancements)}_{nameof(ApplicationDbContext.Orders)}_{nameof(Advancement.Order)}{nameof(Order.Id)}",
                     column: x => x.OrderId,
                     principalSchema: ApplicationDbContext.Schema,
                     principalTable: nameof(ApplicationDbContext.Orders),
                     principalColumn: nameof(Order.Id),
-                    onDelete: ReferentialAction.Cascade);
+                    onDelete: ReferentialAction.NoAction);
                 table.ForeignKey(
                     name: $"FK_{nameof(ApplicationDbContext.Advancements)}_{nameof(ApplicationDbContext.Reports)}_{nameof(Advancement.Report)}{nameof(Report.Id)}",
                     column: x => x.ReportId,
                     principalSchema: ApplicationDbContext.Schema,
                     principalTable: nameof(ApplicationDbContext.Reports),
-                    principalColumn: nameof(Report.Id));
+                    principalColumn: nameof(Report.Id),
+                    onDelete: ReferentialAction.SetNull);
             });
 
         migrationBuilder.CreateIndex(
@@ -249,12 +254,10 @@ public partial class CreateSchema : Migration
             column: $"{nameof(Advancement.Invoice)}{nameof(Invoice.Id)}");
 
         migrationBuilder.CreateIndex(
-            name: $"IX_{nameof(ApplicationDbContext.Advancements)}_{nameof(Advancement.Order)}{nameof(Order.Id)}_{nameof(Advancement.Report)}{nameof(Report.Id)}",
+            name: $"IX_{nameof(ApplicationDbContext.Advancements)}_{nameof(Advancement.Order)}{nameof(Order.Id)}",
             schema: ApplicationDbContext.Schema,
             table: nameof(ApplicationDbContext.Advancements),
-            columns: [$"{nameof(Advancement.Order)}{nameof(Order.Id)}", $"{nameof(Advancement.Report)}{nameof(Report.Id)}"],
-            unique: true,
-            filter: $"[{nameof(Advancement.Report)}{nameof(Report.Id)}] IS NOT NULL");
+            column: $"{nameof(Advancement.Order)}{nameof(Order.Id)}");
 
         migrationBuilder.CreateIndex(
             name: $"IX_{nameof(ApplicationDbContext.Advancements)}_{nameof(Advancement.Report)}{nameof(Report.Id)}",

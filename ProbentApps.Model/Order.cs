@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using Microsoft.EntityFrameworkCore;
+using System.ComponentModel.DataAnnotations;
 
 namespace ProbentApps.Model;
 
@@ -9,6 +10,7 @@ public class Order
     [MaxLength(128)]
     public required string Name { get; set; }
 
+    [DeleteBehavior(DeleteBehavior.NoAction)]
     public required Affair Affair { get; set; }
 
     /// <summary>
@@ -21,6 +23,7 @@ public class Order
     /// from another <see cref="Invoice.Advancements"/>' <see cref="Advancement.Order"/>
     /// <see cref="Client"/>.
     /// </remarks>
+    [DeleteBehavior(DeleteBehavior.NoAction)]
     public required Client Client { get; set; }
 
     [MaxLength(64)]
