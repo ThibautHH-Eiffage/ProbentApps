@@ -1,0 +1,19 @@
+<Solution>
+  <Configurations>
+    <Platform Name="Any CPU" />
+    <Platform Name="x64" />
+  </Configurations>
+  <Folder Name="/Project files/">
+    <File Path=".gitignore" />
+    <File Path=".editorconfig" />
+    <File Path="README.md" />
+    <File Path="README.fr.md" />
+    <File Path="LICENSE.txt" />
+    <File Path="LICENSE.fr.txt" />
+  </Folder>
+  <Project Path="ProbentApps.Client/ProbentApps.Client.csproj" />
+  <Project Path="ProbentApps.Data/ProbentApps.Data.csproj" />
+  <Project Path="ProbentApps.Database/ProbentApps.Database.csproj" />
+  <Project Path="ProbentApps.Model/ProbentApps.Model.csproj" />
+  <Project Path="ProbentApps/ProbentApps.csproj" />
+</Solution>
