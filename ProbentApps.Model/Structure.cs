@@ -17,10 +17,14 @@ public class Structure
     [DeleteBehavior(DeleteBehavior.NoAction)]
     public required Structure? Parent { get; set; }
 
+    public required IList<Structure> Children { get; set; }
+
     public required IList<StructureManagement> Managements { get; set; }
 
     [DeleteBehavior(DeleteBehavior.NoAction)]
     public ApplicationUser? Manager { get; set; }
+
+    public required IList<Affair> Affairs { get; set; }
 
     public bool IsActive => Manager is not null;
 }
