@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace ProbentApps.Model;
 
-public class Report
+public class Report : IEntity
 {
     public Guid Id { get; set; }
 
