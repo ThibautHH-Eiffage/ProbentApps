@@ -5,47 +5,58 @@ using ProbentApps.Model;
 
 namespace ProbentApps.Database.Contexts;
 
-public partial class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : DbContext(options), IDbContext
+public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : DbContext(options), IDbContext
 {
     public static string Schema => "application";
 
-    public required DbSet<Structure> Structures { get; init; }
+    #region Lazy DbSets
 
-    public required DbSet<StructureManagement> StructureManagements { get; init; }
+    private DbSet<Structure>? _structures;
+    public DbSet<Structure> Structures => _structures ??= Set<Structure>();
 
-    public required DbSet<Affair> Affairs { get; init; }
+    private DbSet<StructureManagement>? _structureManagements;
+    public DbSet<StructureManagement> StructureManagements => _structureManagements ??= Set<StructureManagement>();
 
-    public required DbSet<Advancement> Advancements { get; init; }
+    private DbSet<Affair>? _affairs;
+    public DbSet<Affair> Affairs => _affairs ??= Set<Affair>();
 
-    public required DbSet<Order> Orders { get; init; }
+    private DbSet<Advancement>? _advancements;
+    public DbSet<Advancement> Advancements => _advancements ??= Set<Advancement>();
 
-    public required DbSet<Report> Reports { get; init; }
+    private DbSet<Order>? _orders;
+    public DbSet<Order> Orders => _orders ??= Set<Order>();
 
-    public required DbSet<Invoice> Invoices { get; init; }
+    private DbSet<Report>? _reports;
+    public DbSet<Report> Reports => _reports ??= Set<Report>();
 
-    public required DbSet<Client> Clients { get; init; }
+    private DbSet<Invoice>? _invoices;
+    public DbSet<Invoice> Invoices => _invoices ??= Set<Invoice>();
+
+    private DbSet<Client>? _clients;
+    public DbSet<Client> Clients => _clients ??= Set<Client>();
+
+    #endregion
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.HasDefaultSchema(Schema);
 
         static ReferenceCollectionBuilder<Report, Advancement> advancementReports(EntityTypeBuilder<Advancement> b) =>
-            b.HasOne(static a => a.Report).WithMany(static ar => ar.Advancements);
+            b.HasOne(static a => a.Report).WithMany(static r => r.Advancements);
         static ReferenceCollectionBuilder<Order, Advancement> advancementOrders(EntityTypeBuilder<Advancement> b) =>
             b.HasOne(static a => a.Order).WithMany(static o => o.Advancements);
         static ReferenceCollectionBuilder<Invoice, Advancement> advancementInvoices(EntityTypeBuilder<Advancement> b) =>
             b.HasOne(static a => a.Invoice).WithMany(static i => i.Advancements);
 
         var orders = modelBuilder.Entity<Order>();
-        orders.HasMany(static o => o.Reports).WithMany(static ar => ar.Orders)
+        orders.HasMany(static o => o.Reports).WithMany(static r => r.Orders)
             .UsingEntity<Advancement>(advancementReports, advancementOrders);
         orders.HasMany(static o => o.Invoices).WithMany(static i => i.Orders)
             .UsingEntity<Advancement>(advancementInvoices, advancementOrders);
-        modelBuilder.Entity<Invoice>()
-            .HasMany(static i => i.Reports).WithMany(static ar => ar.Invoices)
+        modelBuilder.Entity<Invoice>().HasMany(static i => i.Reports).WithMany(static r => r.Invoices)
             .UsingEntity<Advancement>(advancementReports, advancementInvoices);
 
-        modelBuilder.Entity<ApplicationUser>()
+        var structureManagements = modelBuilder.Entity<ApplicationUser>()
             .ToTable("Users", IdentityDbContext.Schema, static t => t.ExcludeFromMigrations())
             .HasMany<Structure>().WithMany()
             .UsingEntity<StructureManagement>(
@@ -59,5 +70,7 @@ public partial class ApplicationDbContext(DbContextOptions<ApplicationDbContext>
             .HasComputedValue<StructureManagerValueGenerator>();
         structures.HasOne(static s => s.Manager).WithMany(static s => s.ManagedStructures)
             .HasForeignKey(ManagerIdPropertyName);
+
+        structureManagements.Navigation(static sm => sm.Manager).AutoInclude();
     }
 }
