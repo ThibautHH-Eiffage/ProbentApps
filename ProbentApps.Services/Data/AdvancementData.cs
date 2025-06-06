@@ -2,16 +2,15 @@
 
 namespace ProbentApps.Services.Data;
 
-public record struct AdvancementCreationData(string Name, Guid OrderId, DateOnly? Date = null, string? Description = null);
+public record struct AdvancementCreationData(string Name, Guid OrderId, decimal Price, DateOnly? Date = null, string? Description = null);
 
-public record struct AdvancementUpdateData(string? Name = null, DateOnly? Date = null, string? Description = null);
+public record struct AdvancementUpdateData(string? Name = null, decimal? Price = null, DateOnly? Date = null, string? Description = null);
 
 public record struct AdvancementCreationResult(AdvancementCreationResult.Status Result, Advancement? Entity = null)
 {
     public enum Status : byte
     {
         Success,
-        Cancelled,
         OrderNotFound,
         InvalidData
     }
@@ -22,7 +21,7 @@ public record struct AdvancementUpdateResult(AdvancementUpdateResult.Status Resu
     public enum Status : byte
     {
         Success,
-        Cancelled,
+        NotFound,
         ReportAlreadyAccepted,
         InvoiceAlreadyRequested,
         InvalidData
@@ -34,7 +33,6 @@ public record struct AdvancementDeletionResult(AdvancementDeletionResult.Status 
     public enum Status : byte
     {
         Success,
-        Cancelled,
         NotFound,
         InvoiceAlreadyRequested,
         ReportAlreadyAccepted

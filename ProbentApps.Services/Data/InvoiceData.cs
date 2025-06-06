@@ -2,24 +2,26 @@
 
 namespace ProbentApps.Services.Data;
 
-public record struct InvoiceData(string Name);
+public record struct InvoiceCreationData(string Name, ApplicationUser Requester);
 
-public record struct InvoiceDraftingResult(InvoiceDraftingResult.Status Result, Invoice? Entity = null)
+public record struct InvoiceUpdateData(string Name);
+
+public record struct InvoiceCreationResult(InvoiceCreationResult.Status Result, Invoice? Entity = null)
 {
     public enum Status : byte
     {
         Success,
-        Cancelled,
         InvalidData
     }
 }
 
-public record struct InvoiceDraftModificationResult(InvoiceDraftModificationResult.Status Result)
+public record struct InvoiceUpdateResult(InvoiceUpdateResult.Status Result)
 {
     public enum Status : byte
     {
         Success,
-        Cancelled,
+        NotFound,
+        AlreadyRequested,
         InvalidData
     }
 }
@@ -29,10 +31,10 @@ public record struct AdvancementInvoicingResult(AdvancementInvoicingResult.Statu
     public enum Status : byte
     {
         Success,
-        Cancelled,
-        AdvancementNotFound,
         InvoiceNotFound,
-        InvoiceAlreadyRequested
+        InvoiceAlreadyRequested,
+        AdvancementNotFound,
+        AdvancementAlreadyInvoiced
     }
 }
 
@@ -41,7 +43,6 @@ public record struct AdvancementRemovalFromInvoiceResult(AdvancementRemovalFromI
     public enum Status : byte
     {
         Success,
-        Cancelled,
         AdvancementNotFound,
         AdvancementNotInvoicedByInvoice,
         InvoiceNotFound,
@@ -54,7 +55,6 @@ public record struct InvoiceDeletionResult(InvoiceDeletionResult.Status Result)
     public enum Status : byte
     {
         Success,
-        Cancelled,
         NotFound,
         AlreadyRequested
     }
@@ -65,9 +65,8 @@ public record struct InvoiceRequestResult(InvoiceRequestResult.Status Result)
     public enum Status : byte
     {
         Success,
-        Cancelled,
         NotFound,
-        InvoiceEmpty,
+        EmptyInvoice,
         AlreadyRequested
     }
 }
@@ -77,7 +76,6 @@ public record struct InvoiceSubmissionResult(InvoiceSubmissionResult.Status Resu
     public enum Status : byte
     {
         Success,
-        Cancelled,
         NotFound,
         NotYetRequested,
         UnregisteredClient,

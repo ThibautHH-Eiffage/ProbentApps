@@ -8,7 +8,7 @@ public interface IReportManager : IRepository<Report>
 
     Task<ReportUpdateResult> UpdateReportAsync(Guid reportId, ReportUpdateData data, CancellationToken cancellationToken = default);
 
-    Task<AdvancementTrackingInReportResult> TrackAdvancementsInReportAsync(Guid reportId, IEnumerable<Guid> advancementIds, CancellationToken cancellationToken = default);
+    Task<AdvancementTrackingResult> TrackAdvancementInReportAsync(Guid reportId, Guid advancementId, CancellationToken cancellationToken = default);
 
     Task<AdvancementRemovalFromReportResult> RemoveAdvancementFromReportAsync(Guid reportId, Guid advancementId, CancellationToken cancellationToken = default);
 

@@ -1,9 +1,9 @@
 ﻿using Microsoft.EntityFrameworkCore.Metadata.Conventions;
 using Microsoft.EntityFrameworkCore.Metadata.Conventions.Infrastructure;
 
-namespace ProbentApps.Database.Contexts;
+namespace ProbentApps.Services.Database;
 
-public class ValueGenerationStrategyConventionRemoverConventionSetPlugin : IConventionSetPlugin
+internal sealed class ValueGenerationStrategyConventionRemoverConventionSetPlugin : IConventionSetPlugin
 {
     public ConventionSet ModifyConventions(ConventionSet conventionSet)
     {

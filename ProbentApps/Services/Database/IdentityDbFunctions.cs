@@ -2,13 +2,16 @@
 using Microsoft.EntityFrameworkCore.Query.SqlExpressions;
 using Microsoft.EntityFrameworkCore.SqlServer.Storage.Internal;
 using Microsoft.EntityFrameworkCore.Storage;
+using ProbentApps.Database.Contexts;
 
-namespace ProbentApps.Database.Contexts;
+namespace ProbentApps.Services.Database;
 
 #pragma warning disable EF1001
 
-public class IdentityDbFunctions : IIdentityDbFunctions
+internal sealed class IdentityDbFunctions : IIdentityDbFunctions
 {
+    private IdentityDbFunctions() { }
+
     public static Func<IReadOnlyList<SqlExpression>, SqlExpression> EncodeToASCII =>
         args => ConvertTo(new SqlServerByteArrayTypeMapping(null, 256))([
             ConvertTo(new SqlServerStringTypeMapping(null, false, 256))(args)
