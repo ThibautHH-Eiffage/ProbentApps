@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Identity;
 using ProbentApps.Model;
 
-namespace ProbentApps.Services.Identity;
+namespace ProbentApps.Services.Components;
 
 internal sealed class IdentityUserAccessor(UserManager<ApplicationUser> userManager, IdentityRedirectManager redirectManager)
 {

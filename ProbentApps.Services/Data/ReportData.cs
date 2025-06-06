@@ -13,7 +13,6 @@ public record struct ReportCreationResult(ReportCreationResult.Status Result, Re
     public enum Status : byte
     {
         Success,
-        Cancelled,
         PreviousReportNotFound,
         IssuancePredatesPreviousReportIssuance,
         InvalidData
@@ -25,9 +24,9 @@ public record struct ReportUpdateResult(ReportUpdateResult.Status Result)
     public enum Status : byte
     {
         Success,
-        Cancelled,
         NotFound,
         IssuancePredatesPreviousReportIssuance,
+        IssuancePredatesAdavancement,
         AlreadyAccepted,
         InvalidData
     }
@@ -38,21 +37,20 @@ public record struct ReportDeletionResult(ReportDeletionResult.Status Result)
     public enum Status : byte
     {
         Success,
-        Cancelled,
         NotFound,
         AlreadyAccepted
     }
 }
 
-public record struct AdvancementTrackingInReportResult(AdvancementTrackingInReportResult.Status Result)
+public record struct AdvancementTrackingResult(AdvancementTrackingResult.Status Result)
 {
     public enum Status : byte
     {
         Success,
-        Cancelled,
-        AdvancementNotFound,
         ReportNotFound,
-        ReportAlreadyAccepted
+        ReportAlreadyAccepted,
+        AdvancementNotFound,
+        AdvancementAlreadyTracked
     }
 }
 
@@ -61,7 +59,6 @@ public record struct AdvancementRemovalFromReportResult(AdvancementRemovalFromRe
     public enum Status : byte
     {
         Success,
-        Cancelled,
         AdvancementNotFound,
         AdvancementNotTrackedByReport,
         ReportNotFound,
@@ -74,7 +71,6 @@ public record struct ReportAcceptanceSubmissionResult(ReportAcceptanceSubmission
     public enum Status : byte
     {
         Success,
-        Cancelled,
         NotFound,
         AcceptancePredatesIssuance,
         AlreadyAccepted

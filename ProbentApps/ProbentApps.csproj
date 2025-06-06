@@ -10,7 +10,6 @@
   <ItemGroup>
     <ProjectReference Include="..\ProbentApps.Client\ProbentApps.Client.csproj" />
     <ProjectReference Include="..\ProbentApps.Database\ProbentApps.Database.csproj" />
-    <ProjectReference Include="..\ProbentApps.Services\ProbentApps.Services.csproj" />
   </ItemGroup>
   
   <ItemGroup>
