@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace ProbentApps.Model;
 
-public class Advancement
+public class Advancement : IEntity
 {
     public Guid Id { get; set; }
 

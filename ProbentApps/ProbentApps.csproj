@@ -7,18 +7,20 @@
     <UserSecretsId>aspnet-ProbentApps-dea28281-bf5f-4bc2-808d-db782d8c698e</UserSecretsId>
   </PropertyGroup>
 
-
   <ItemGroup>
     <ProjectReference Include="..\ProbentApps.Client\ProbentApps.Client.csproj" />
     <ProjectReference Include="..\ProbentApps.Database\ProbentApps.Database.csproj" />
-    <ProjectReference Include="..\ProbentApps.Data\ProbentApps.Data.csproj" />
+  </ItemGroup>
+  
+  <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.Server" Version="9.*" />
     <PackageReference Include="Microsoft.AspNetCore.DataProtection.EntityFrameworkCore" Version="9.*" />
     <PackageReference Include="Microsoft.AspNetCore.Diagnostics.EntityFrameworkCore" Version="9.*" />
     <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="9.*" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="9.*" />
-	<PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="9.*" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="9.*" />
     <PackageReference Include="Extensions.MudBlazor.StaticInput" Version="3.*" />
+    <PackageReference Include="System.Linq.Async" Version="6.0.1" />
   </ItemGroup>
 
 </Project>
