@@ -3,11 +3,7 @@
 
 @if (externalLogins.Length == 0)
 {
-    <MudAlert Variant="Variant.Text" Severity="Severity.Warning">There are no external authentication services configured.</MudAlert>
-    <MudText Typo="Typo.body1" Class="pt-4">
-        See <MudLink Target="_blank" Href="https://go.microsoft.com/fwlink/?LinkID=532715">this article</MudLink>
-        about setting up this ASP.NET application to support logging in via external services
-    </MudText>
+    <MudAlert Variant="Variant.Text" Severity="Severity.Warning">There are no external authentication services available.</MudAlert>
 }
 else
 {

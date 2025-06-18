@@ -10,7 +10,7 @@
 
 <PageTitle>Register</PageTitle>
 
-<MudText Typo="Typo.h3" GutterBottom="true">Register</MudText>
+<MudText Typo="Typo.h3" GutterBottom>Register</MudText>
 
 <MudGrid>
     <MudItem md="6">
@@ -18,7 +18,7 @@
         <EditForm Model="Input" asp-route-returnUrl="@ReturnUrl" method="post" OnValidSubmit="RegisterUser" FormName="register">
             <DataAnnotationsValidator />
 
-            <MudText Typo="Typo.body1" GutterBottom="true">Create a new account.</MudText>
+            <MudText Typo="Typo.body1" GutterBottom>Create a new account.</MudText>
 
             <MudGrid>
                 <MudItem md="12">
@@ -37,13 +37,13 @@
                                         UserAttributes="@(new() { { "autocomplete", "new-password" }, { "aria-required", "true" } } )" />
                 </MudItem>
                 <MudItem md="12">
-                    <MudStaticButton Variant="Variant.Filled" Color="Color.Primary" FullWidth="true" FormAction="FormAction.Submit">Register</MudStaticButton>
+                    <MudStaticButton Variant="Variant.Filled" Color="Color.Primary" FullWidth FormAction="FormAction.Submit">Register</MudStaticButton>
                 </MudItem>
             </MudGrid>
         </EditForm>
     </MudItem>
     <MudItem md="6">
-        <MudText Typo="Typo.body1" GutterBottom="true">Use another service to register.</MudText>
+        <MudText Typo="Typo.body1" GutterBottom>Use another service to register.</MudText>
         <ExternalLoginPicker />
     </MudItem>
 </MudGrid>
