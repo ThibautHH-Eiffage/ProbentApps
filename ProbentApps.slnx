@@ -11,10 +11,21 @@
     <File Path="LICENSE.txt" />
     <File Path="LICENSE.fr.txt" />
   </Folder>
-  <Project Path="ProbentApps/ProbentApps.csproj" />
+  <Folder Name="/Data/">
+    <Project Path="ProbentApps.Model/ProbentApps.Model.csproj" />
+  </Folder>
+  <Folder Name="/Services/">
+    <Project Path="ProbentApps.Services.Data.Abstractions/ProbentApps.Services.Data.Abstractions.csproj" />
+    <Project Path="ProbentApps.Services.Database.Abstractions/ProbentApps.Services.Database.Abstractions.csproj" />
+    <Project Path="ProbentApps.Services.Database/ProbentApps.Services.Database.csproj" />
+    <Project Path="ProbentApps.Services/ProbentApps.Services.csproj" />
+  </Folder>
+  <Folder Name="/UI/">
+    <Project Path="ProbentApps.Components.Account/ProbentApps.Components.Account.csproj" />
+    <Project Path="ProbentApps.Components.Pages/ProbentApps.Components.Pages.csproj" />
+    <Project Path="ProbentApps.Components/ProbentApps.Components.csproj" />
+    <Project Path="ProbentApps.Localization/ProbentApps.Localization.csproj" />
+  </Folder>
   <Project Path="ProbentApps.Client/ProbentApps.Client.csproj" />
-  <Project Path="ProbentApps.Components/ProbentApps.Components.csproj" />
-  <Project Path="ProbentApps.Database/ProbentApps.Database.csproj" />
-  <Project Path="ProbentApps.Model/ProbentApps.Model.csproj" />
-  <Project Path="ProbentApps.Services/ProbentApps.Services.csproj" />
+  <Project Path="ProbentApps/ProbentApps.csproj" />
 </Solution>

@@ -1,0 +1,21 @@
+﻿<form @formname="@(FormName ?? Action ?? nameof(PostForm))" @onsubmit="@(Action is not null ? null : OnSubmit)" method="post" class="@Class">
+    <Microsoft.AspNetCore.Components.Forms.AntiforgeryToken />
+    @ChildContent
+</form>
+
+@code {
+    [Parameter]
+    public string? FormName { get; set; }
+
+    [Parameter]
+    public EventCallback OnSubmit { get; set; }
+
+    [Parameter]
+    public string? Action { get; set; }
+
+    [Parameter]
+    public string? Class { get; set; }
+
+    [Parameter]
+    public RenderFragment? ChildContent { get; set; }
+}

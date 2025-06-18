@@ -1,0 +1,16 @@
+﻿@inject IStringLocalizer<SharedResources> SharedLocalizer
+@inject IStringLocalizer<ServerError> Localizer
+
+<MudText Typo="Typo.h1" Align="Align.Center" Color="Color.Error" GutterBottom>@SharedLocalizer["Error"]</MudText>
+
+<MudText Typo="Typo.h2" GutterBottom>@Localizer["An error occurred while processing your request."]</MudText>
+
+@if (!string.IsNullOrEmpty(RequestId))
+{
+    <MudText Typo="Typo.body1" HtmlTag="strong">@Localizer["Request ID:"]</MudText> <MudText Typo="Typo.body1" HtmlTag="code">@RequestId</MudText>
+}
+
+@code {
+    [Parameter, EditorRequired]
+    public string? RequestId { get; set; }
+}

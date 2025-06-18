@@ -11,11 +11,14 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="MudBlazor" Version="8.*" />
+    <ProjectReference Include="..\ProbentApps.Localization\ProbentApps.Localization.csproj" />
+    <ProjectReference Include="..\ProbentApps.Model\ProbentApps.Model.csproj" />
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\ProbentApps.Data\ProbentApps.Data.csproj" />
+    <PackageReference Include="Microsoft.AspNetCore.Components.Authorization" Version="9.*" />
+    <PackageReference Include="MudBlazor" Version="8.*" />
+    <PackageReference Include="Extensions.MudBlazor.StaticInput" Version="3.*" />
   </ItemGroup>
 
 </Project>
