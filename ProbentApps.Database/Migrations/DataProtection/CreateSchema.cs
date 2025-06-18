@@ -17,10 +17,10 @@ public partial class CreateSchema : Migration
             schema: DataProtectionDbContext.Schema,
             columns: table => new
             {
-                Id = table.Column<int>(type: "int", nullable: false)
+                Id = table.Column<int>(nullable: false)
                     .Annotation("SqlServer:Identity", "1, 1"),
-                FriendlyName = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                Xml = table.Column<string>(type: "nvarchar(max)", nullable: true)
+                FriendlyName = table.Column<string>(nullable: true),
+                Xml = table.Column<string>(nullable: true)
             },
             constraints: table =>
             {

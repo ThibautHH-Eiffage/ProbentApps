@@ -1,9 +1,10 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using System.Security.Cryptography;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Migrations;
-using ProbentApps.Model;
 using ProbentApps.Database.Contexts;
+using ProbentApps.Model;
 
 namespace ProbentApps.Database.Migrations.Identity;
 
@@ -130,7 +131,7 @@ partial class CreateSchema
             b.Property(u => u.LockoutEnd);
 
             b.Property(u => u.NormalizationSalt)
-                .HasColumnType("binary(64)");
+                .HasMaxLength(SHA512.HashSizeInBytes);
 
             b.Property(u => u.NormalizedEmail)
                 .HasMaxLength(256);
