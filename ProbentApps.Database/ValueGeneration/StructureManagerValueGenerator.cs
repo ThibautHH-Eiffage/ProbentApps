@@ -16,18 +16,23 @@ internal class StructureManagerValueGenerator : ValueGenerator<Guid?>
         EntityEntry<Structure> entry = new(e.GetInfrastructure());
 #pragma warning restore EF1001
 
-        var managerProperty = entry.Property(static s => s.Manager);
+        var managerProperty = entry.Navigation(nameof(Structure.Manager));
+        var manager = (ApplicationUser?)managerProperty.CurrentValue;
+
+        if (manager is null && !managerProperty.IsLoaded
+            && entry.State != EntityState.Added)
+            return entry.Property<Guid?>($"{nameof(Structure.Manager)}{nameof(ApplicationUser.Id)}").OriginalValue;
 
         if (entry.State == EntityState.Added || managerProperty.IsModified)
         {
             entry.Context.Add(new StructureManagement
             {
-                Manager = managerProperty.CurrentValue,
+                Manager = manager,
                 Structure = entry.Entity,
                 StartDate = DateOnly.FromDateTime(DateTime.Now)
             });
         }
 
-        return managerProperty.CurrentValue?.Id;
+        return manager?.Id;
     }
 }

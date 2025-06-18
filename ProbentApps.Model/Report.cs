@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using Microsoft.EntityFrameworkCore;
+using System.ComponentModel.DataAnnotations;
 
 namespace ProbentApps.Model;
 
@@ -19,6 +20,7 @@ public class Report
 
     public DateOnly? AcceptanceDate { get; set; }
 
+    [DeleteBehavior(DeleteBehavior.NoAction)]
     public Report? PreviousReport { get; set; }
 
     public required IList<Advancement> Advancements { get; set; }

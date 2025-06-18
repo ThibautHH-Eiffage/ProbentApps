@@ -18,10 +18,10 @@ public partial class CreateSchema : Migration
             schema: ApplicationDbContext.Schema,
             columns: table => new
             {
-                Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                Name = table.Column<string>(type: "nvarchar(128)", maxLength: 128, nullable: false),
-                MainProviderId = table.Column<string>(type: "nvarchar(64)", maxLength: 64, nullable: true),
-                ExtraProviderIds = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                Id = table.Column<Guid>(nullable: false),
+                Name = table.Column<string>(maxLength: 128, nullable: false),
+                MainProviderId = table.Column<string>(maxLength: 64, nullable: true),
+                ExtraProviderIds = table.Column<string>(nullable: false)
             },
             constraints: table =>
             {
@@ -33,11 +33,11 @@ public partial class CreateSchema : Migration
             schema: ApplicationDbContext.Schema,
             columns: table => new
             {
-                Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                ParentId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
-                Name = table.Column<string>(type: "nvarchar(64)", maxLength: 64, nullable: false),
-                Code = table.Column<string>(type: "varchar(32)", maxLength: 32, nullable: false, unicode: false),
-                ManagerId = table.Column<Guid>(type: "uniqueidentifier", nullable: true)
+                Id = table.Column<Guid>(nullable: false),
+                ParentId = table.Column<Guid>(nullable: true),
+                Name = table.Column<string>(maxLength: 64, nullable: false),
+                Code = table.Column<string>(maxLength: 32, nullable: false, unicode: false),
+                ManagerId = table.Column<Guid>(nullable: true)
             },
             constraints: table =>
             {
@@ -47,13 +47,15 @@ public partial class CreateSchema : Migration
                     column: x => x.ParentId,
                     principalSchema: ApplicationDbContext.Schema,
                     principalTable: nameof(ApplicationDbContext.Structures),
-                    principalColumn: nameof(Structure.Id));
+                    principalColumn: nameof(Structure.Id),
+                    onDelete: ReferentialAction.NoAction);
                 table.ForeignKey(
                     name: $"FK_{nameof(ApplicationDbContext.Structures)}_Users_{nameof(Structure.Manager)}{nameof(ApplicationUser.Id)}",
                     column: x => x.ManagerId,
                     principalSchema: IdentityDbContext.Schema,
                     principalTable: "Users",
-                    principalColumn: nameof(ApplicationUser.Id));
+                    principalColumn: nameof(ApplicationUser.Id),
+                    onDelete: ReferentialAction.NoAction);
             });
 
         migrationBuilder.CreateTable(
@@ -61,11 +63,11 @@ public partial class CreateSchema : Migration
             schema: ApplicationDbContext.Schema,
             columns: table => new
             {
-                Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                Name = table.Column<string>(type: "nvarchar(128)", maxLength: 128, nullable: false),
-                ProviderId = table.Column<string>(type: "nvarchar(64)", maxLength: 64, nullable: false),
-                StructureId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                ClientId = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
+                Id = table.Column<Guid>(nullable: false),
+                Name = table.Column<string>(maxLength: 128, nullable: false),
+                ProviderId = table.Column<string>(maxLength: 64, nullable: false),
+                StructureId = table.Column<Guid>(nullable: false),
+                ClientId = table.Column<Guid>(nullable: false)
             },
             constraints: table =>
             {
@@ -76,14 +78,14 @@ public partial class CreateSchema : Migration
                     principalSchema: ApplicationDbContext.Schema,
                     principalTable: nameof(ApplicationDbContext.Clients),
                     principalColumn: nameof(Client.Id),
-                    onDelete: ReferentialAction.Cascade);
+                    onDelete: ReferentialAction.NoAction);
                 table.ForeignKey(
                     name: $"FK_{nameof(ApplicationDbContext.Affairs)}_{nameof(ApplicationDbContext.Structures)}_{nameof(Affair.Structure)}{nameof(Structure.Id)}",
                     column: x => x.StructureId,
                     principalSchema: ApplicationDbContext.Schema,
                     principalTable: nameof(ApplicationDbContext.Structures),
                     principalColumn: nameof(Structure.Id),
-                    onDelete: ReferentialAction.Cascade);
+                    onDelete: ReferentialAction.NoAction);
             });
 
         migrationBuilder.CreateTable(
@@ -91,9 +93,9 @@ public partial class CreateSchema : Migration
             schema: ApplicationDbContext.Schema,
             columns: table => new
             {
-                ManagerId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                StructureId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                StartDate = table.Column<DateOnly>(type: "date", nullable: false)
+                ManagerId = table.Column<Guid>(nullable: false),
+                StructureId = table.Column<Guid>(nullable: false),
+                StartDate = table.Column<DateOnly>(nullable: false)
             },
             constraints: table =>
             {
@@ -104,14 +106,14 @@ public partial class CreateSchema : Migration
                     principalSchema: ApplicationDbContext.Schema,
                     principalTable: nameof(ApplicationDbContext.Structures),
                     principalColumn: nameof(Structure.Id),
-                    onDelete: ReferentialAction.Cascade);
+                    onDelete: ReferentialAction.NoAction);
                 table.ForeignKey(
                     name: $"FK_{nameof(ApplicationDbContext.StructureManagements)}_Users_{nameof(StructureManagement.Manager)}{nameof(ApplicationUser.Id)}",
                     column: x => x.ManagerId,
                     principalSchema: IdentityDbContext.Schema,
                     principalTable: "Users",
                     principalColumn: nameof(ApplicationUser.Id),
-                    onDelete: ReferentialAction.Cascade);
+                    onDelete: ReferentialAction.NoAction);
             });
 
         migrationBuilder.CreateTable(
@@ -119,12 +121,12 @@ public partial class CreateSchema : Migration
             schema: ApplicationDbContext.Schema,
             columns: table => new
             {
-                Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                Name = table.Column<string>(type: "nvarchar(64)", maxLength: 64, nullable: false),
-                RequesterId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                RequestDate = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: true),
-                ProviderId = table.Column<string>(type: "nvarchar(64)", maxLength: 64, nullable: true),
-                SubmissionDate = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: true)
+                Id = table.Column<Guid>(nullable: false),
+                Name = table.Column<string>(maxLength: 64, nullable: false),
+                RequesterId = table.Column<Guid>(nullable: false),
+                RequestDate = table.Column<DateTimeOffset>(nullable: true),
+                ProviderId = table.Column<string>(maxLength: 64, nullable: true),
+                SubmissionDate = table.Column<DateTimeOffset>(nullable: true)
             },
             constraints: table =>
             {
@@ -135,7 +137,7 @@ public partial class CreateSchema : Migration
                     principalSchema: IdentityDbContext.Schema,
                     principalTable: "Users",
                     principalColumn: nameof(ApplicationUser.Id),
-                    onDelete: ReferentialAction.Cascade);
+                    onDelete: ReferentialAction.NoAction);
             });
 
         migrationBuilder.CreateTable(
@@ -143,13 +145,13 @@ public partial class CreateSchema : Migration
             schema: ApplicationDbContext.Schema,
             columns: table => new
             {
-                Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                Name = table.Column<string>(type: "nvarchar(64)", maxLength: 64, nullable: false),
-                Intermediaries = table.Column<string>(type: "nvarchar(128)", maxLength: 128, nullable: true),
-                Notes = table.Column<string>(type: "nvarchar(512)", maxLength: 512, nullable: true),
-                IssuanceDate = table.Column<DateOnly>(type: "date", nullable: false),
-                AcceptanceDate = table.Column<DateOnly>(type: "date", nullable: true),
-                PreviousReportId = table.Column<Guid>(type: "uniqueidentifier", nullable: true)
+                Id = table.Column<Guid>(nullable: false),
+                Name = table.Column<string>(maxLength: 64, nullable: false),
+                Intermediaries = table.Column<string>(maxLength: 128, nullable: true),
+                Notes = table.Column<string>(maxLength: 512, nullable: true),
+                IssuanceDate = table.Column<DateOnly>(nullable: false),
+                AcceptanceDate = table.Column<DateOnly>(nullable: true),
+                PreviousReportId = table.Column<Guid>(nullable: true)
             },
             constraints: table =>
             {
@@ -159,7 +161,8 @@ public partial class CreateSchema : Migration
                     column: x => x.PreviousReportId,
                     principalSchema: ApplicationDbContext.Schema,
                     principalTable: nameof(ApplicationDbContext.Reports),
-                    principalColumn: nameof(Report.Id));
+                    principalColumn: nameof(Report.Id),
+                    onDelete: ReferentialAction.NoAction);
             });
 
         migrationBuilder.CreateTable(
@@ -167,11 +170,11 @@ public partial class CreateSchema : Migration
             schema: ApplicationDbContext.Schema,
             columns: table => new
             {
-                Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                AffairId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                ClientId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                Name = table.Column<string>(type: "nvarchar(128)", maxLength: 128, nullable: false),
-                ProviderId = table.Column<string>(type: "nvarchar(64)", maxLength: 64, nullable: false)
+                Id = table.Column<Guid>(nullable: false),
+                AffairId = table.Column<Guid>(nullable: false),
+                ClientId = table.Column<Guid>(nullable: false),
+                Name = table.Column<string>(maxLength: 128, nullable: false),
+                ProviderId = table.Column<string>(maxLength: 64, nullable: false)
             },
             constraints: table =>
             {
@@ -182,14 +185,14 @@ public partial class CreateSchema : Migration
                     principalSchema: ApplicationDbContext.Schema,
                     principalTable: nameof(ApplicationDbContext.Affairs),
                     principalColumn: nameof(Affair.Id),
-                    onDelete: ReferentialAction.Cascade);
+                    onDelete: ReferentialAction.NoAction);
                 table.ForeignKey(
                     name: $"FK_{nameof(ApplicationDbContext.Orders)}_{nameof(ApplicationDbContext.Clients)}_{nameof(Order.Client)}{nameof(Client.Id)}",
                     column: x => x.ClientId,
                     principalSchema: ApplicationDbContext.Schema,
                     principalTable: nameof(ApplicationDbContext.Clients),
                     principalColumn: nameof(Client.Id),
-                    onDelete: ReferentialAction.Cascade);
+                    onDelete: ReferentialAction.NoAction);
             });
 
         migrationBuilder.CreateTable(
@@ -197,14 +200,14 @@ public partial class CreateSchema : Migration
             schema: ApplicationDbContext.Schema,
             columns: table => new
             {
-                Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                Name = table.Column<string>(type: "nvarchar(64)", maxLength: 64, nullable: false),
-                Description = table.Column<string>(type: "nvarchar(512)", maxLength: 512, nullable: true),
-                Date = table.Column<DateOnly>(type: "date", nullable: false),
-                Price = table.Column<decimal>(type: "decimal(38,2)", precision: 38, scale: 2, nullable: false),
-                OrderId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                ReportId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
-                InvoiceId = table.Column<Guid>(type: "uniqueidentifier", nullable: true)
+                Id = table.Column<Guid>(nullable: false),
+                Name = table.Column<string>(maxLength: 64, nullable: false),
+                Description = table.Column<string>(maxLength: 512, nullable: true),
+                Date = table.Column<DateOnly>(nullable: false),
+                Price = table.Column<decimal>(precision: 38, scale: 2, nullable: false),
+                OrderId = table.Column<Guid>(nullable: false),
+                ReportId = table.Column<Guid>(nullable: true),
+                InvoiceId = table.Column<Guid>(nullable: true)
             },
             constraints: table =>
             {
@@ -214,20 +217,22 @@ public partial class CreateSchema : Migration
                     column: x => x.InvoiceId,
                     principalSchema: ApplicationDbContext.Schema,
                     principalTable: nameof(ApplicationDbContext.Invoices),
-                    principalColumn: nameof(Invoice.Id));
+                    principalColumn: nameof(Invoice.Id),
+                    onDelete: ReferentialAction.SetNull);
                 table.ForeignKey(
                     name: $"FK_{nameof(ApplicationDbContext.Advancements)}_{nameof(ApplicationDbContext.Orders)}_{nameof(Advancement.Order)}{nameof(Order.Id)}",
                     column: x => x.OrderId,
                     principalSchema: ApplicationDbContext.Schema,
                     principalTable: nameof(ApplicationDbContext.Orders),
                     principalColumn: nameof(Order.Id),
-                    onDelete: ReferentialAction.Cascade);
+                    onDelete: ReferentialAction.NoAction);
                 table.ForeignKey(
                     name: $"FK_{nameof(ApplicationDbContext.Advancements)}_{nameof(ApplicationDbContext.Reports)}_{nameof(Advancement.Report)}{nameof(Report.Id)}",
                     column: x => x.ReportId,
                     principalSchema: ApplicationDbContext.Schema,
                     principalTable: nameof(ApplicationDbContext.Reports),
-                    principalColumn: nameof(Report.Id));
+                    principalColumn: nameof(Report.Id),
+                    onDelete: ReferentialAction.SetNull);
             });
 
         migrationBuilder.CreateIndex(
@@ -249,12 +254,10 @@ public partial class CreateSchema : Migration
             column: $"{nameof(Advancement.Invoice)}{nameof(Invoice.Id)}");
 
         migrationBuilder.CreateIndex(
-            name: $"IX_{nameof(ApplicationDbContext.Advancements)}_{nameof(Advancement.Order)}{nameof(Order.Id)}_{nameof(Advancement.Report)}{nameof(Report.Id)}",
+            name: $"IX_{nameof(ApplicationDbContext.Advancements)}_{nameof(Advancement.Order)}{nameof(Order.Id)}",
             schema: ApplicationDbContext.Schema,
             table: nameof(ApplicationDbContext.Advancements),
-            columns: [$"{nameof(Advancement.Order)}{nameof(Order.Id)}", $"{nameof(Advancement.Report)}{nameof(Report.Id)}"],
-            unique: true,
-            filter: $"[{nameof(Advancement.Report)}{nameof(Report.Id)}] IS NOT NULL");
+            column: $"{nameof(Advancement.Order)}{nameof(Order.Id)}");
 
         migrationBuilder.CreateIndex(
             name: $"IX_{nameof(ApplicationDbContext.Advancements)}_{nameof(Advancement.Report)}{nameof(Report.Id)}",
