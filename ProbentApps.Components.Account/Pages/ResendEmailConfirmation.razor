@@ -7,9 +7,9 @@
 
 <PageTitle>Resend email confirmation</PageTitle>
 
-<MudText Typo="Typo.h3" GutterBottom="true">Resend email confirmation</MudText>
+<MudText Typo="Typo.h3" GutterBottom>Resend email confirmation</MudText>
 
-<MudText Typo="Typo.body1" GutterBottom="true">Enter your email.</MudText>
+<MudText Typo="Typo.body1" GutterBottom>Enter your email.</MudText>
 
 <StatusMessage Message="@message" />
 
@@ -23,7 +23,7 @@
                                 UserAttributes="@(new() { { "autocomplete", "username" }, { "aria-required", "true" } } )" />
         </MudItem>
         <MudItem md="12">
-            <MudStaticButton Variant="Variant.Filled" Color="Color.Primary" FullWidth="true" FormAction="FormAction.Submit">Resend</MudStaticButton>
+            <MudStaticButton Variant="Variant.Filled" Color="Color.Primary" FullWidth FormAction="FormAction.Submit">Resend</MudStaticButton>
         </MudItem>
     </MudGrid>
 </EditForm>
