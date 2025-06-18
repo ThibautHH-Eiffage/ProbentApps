@@ -1,6 +1,13 @@
 # Supprimer la ligne ci-dessous si vous voulez hériter les paramètres .editorconfig des répertoires supérieurs
 root = true
 
+# Préférences de nouvelle ligne
+end_of_line = crlf
+insert_final_newline = true
+
+# Indentation et espacement
+indent_style = space
+
 # Fichiers C#
 [*.cs]
 
@@ -8,12 +15,7 @@ root = true
 
 # Indentation et espacement
 indent_size = 4
-indent_style = space
 tab_width = 4
-
-# Préférences de nouvelle ligne
-end_of_line = crlf
-insert_final_newline = true
 
 #### Actions du code .NET ####
 
@@ -249,3 +251,9 @@ tab_width = 4
 indent_size = 4
 dotnet_style_operator_placement_when_wrapping = beginning_of_line
 end_of_line = crlf
+
+[*.{csproj,slnx}]
+
+# Indentation et espacement
+tab_width = 2
+indent_size = 2
