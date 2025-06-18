@@ -1,0 +1,29 @@
+﻿@inherits LayoutComponentBase
+
+@using MudBlazor.Services
+@using MudBlazor.StaticInput
+
+<MudThemeProvider />
+<MudPopoverProvider />
+<MudDialogProvider />
+<MudSnackbarProvider />
+
+<MudLayout>
+    <MudAppBar Elevation="1">
+        <MudStaticNavDrawerToggle DrawerId="nav-drawer" Icon="@Icons.Material.Filled.Menu" Color="Color.Inherit" Edge="Edge.Start" />
+        <MudLink Href="" Typo="Typo.h5" Class="ml-3" Color="Color.Inherit" Underline="Underline.None">ProbentApps</MudLink>
+    </MudAppBar>
+    <MudDrawer id="nav-drawer" ClipMode="DrawerClipMode.Always" Elevation="2" Open>
+        <NavMenu />
+    </MudDrawer>
+    <MudMainContent Class="mt-16 pa-4">
+        @Body
+    </MudMainContent>
+</MudLayout>
+
+
+<div id="blazor-error-ui" data-nosnippet>
+    An unhandled error has occurred.
+    <a href="." class="reload">Reload</a>
+    <span class="dismiss">🗙</span>
+</div>

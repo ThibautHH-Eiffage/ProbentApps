@@ -7,7 +7,18 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\ProbentApps.Model\ProbentApps.Model.csproj" />
+    <FrameworkReference Include="Microsoft.AspNetCore.App" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\ProbentApps.Services.Data.Abstractions\ProbentApps.Services.Data.Abstractions.csproj" />
+    <ProjectReference Include="..\ProbentApps.Services.Database\ProbentApps.Services.Database.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="System.Linq.Async" Version="6.*" />
+    <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.Server" Version="9.*" />
+    <PackageReference Include="MudBlazor.Translations" Version="2.*" />
+  </ItemGroup>
+    
 </Project>

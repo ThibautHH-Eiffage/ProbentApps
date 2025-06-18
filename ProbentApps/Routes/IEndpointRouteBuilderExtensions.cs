@@ -1,5 +1,4 @@
-﻿using ProbentApps.Components;
-using ProbentApps.Routes.Identity;
+﻿using ProbentApps.Routes.Identity;
 
 namespace ProbentApps.Routes;
 
@@ -12,7 +11,7 @@ internal static class IEndpointRouteBuilderExtensions
         app.MapRazorComponents<App>()
             .AddInteractiveServerRenderMode()
             .AddInteractiveWebAssemblyRenderMode()
-            .AddAdditionalAssemblies(typeof(ProbentApps.Client._Imports).Assembly);
+            .AddAdditionalAssemblies(typeof(Components.Pages.Routes).Assembly, typeof(Components.Account._Imports).Assembly);
 
         return app.MapAdditionalIdentityEndpoints();
     }

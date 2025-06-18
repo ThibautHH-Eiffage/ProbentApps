@@ -1,0 +1,18 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.Razor">
+
+  <PropertyGroup>
+    <TargetFramework>net9.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <SupportedPlatform Include="browser" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\ProbentApps.Components\ProbentApps.Components.csproj" />
+    <ProjectReference Include="..\ProbentApps.Services.Data.Abstractions\ProbentApps.Services.Data.Abstractions.csproj" />
+  </ItemGroup>
+
+</Project>
