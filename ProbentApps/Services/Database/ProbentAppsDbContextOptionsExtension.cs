@@ -1,29 +1,28 @@
 ﻿using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata.Conventions.Infrastructure;
 
-namespace ProbentApps.Database.Contexts;
+namespace ProbentApps.Services.Database;
 
-public class ProbentAppsDbContextOptionsExtension : IDbContextOptionsExtension
+internal class ProbentAppsDbContextOptionsExtension : IDbContextOptionsExtension
 {
-    public static readonly ProbentAppsDbContextOptionsExtension Instance = new();
-
     private sealed class ExtensionInfo(IDbContextOptionsExtension extension) : DbContextOptionsExtensionInfo(extension)
     {
         public override bool IsDatabaseProvider => false;
 
-        public override string LogFragment => "";
+        public override string LogFragment => "NoDefaultSqlServerIdentityColumns ";
 
         public override int GetServiceProviderHashCode() => 0;
 
-        public override void PopulateDebugInfo(IDictionary<string, string> debugInfo) => debugInfo["ProbentApps:DisableSqlServerIdentityColumns"] = "true";
+        public override void PopulateDebugInfo(IDictionary<string, string> debugInfo) => debugInfo["ProbentApps:DisableDefaultSqlServerIdentityColumns"] = "true";
 
         public override bool ShouldUseSameServiceProvider(DbContextOptionsExtensionInfo other) => other is ExtensionInfo;
     }
 
-    private DbContextOptionsExtensionInfo? _info;
+    public static readonly ProbentAppsDbContextOptionsExtension Instance = new();
 
     private ProbentAppsDbContextOptionsExtension() { }
 
+    private DbContextOptionsExtensionInfo? _info;
     public DbContextOptionsExtensionInfo Info => _info ??= new ExtensionInfo(this);
 
     public void ApplyServices(IServiceCollection services) => new EntityFrameworkServicesBuilder(services)

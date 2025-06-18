@@ -10,9 +10,9 @@ using ProbentApps.Components.Account.Pages;
 using ProbentApps.Components.Account.Pages.Manage;
 using ProbentApps.Model;
 
-namespace Microsoft.AspNetCore.Routing;
+namespace ProbentApps.Routes.Identity;
 
-internal static class IdentityComponentsEndpointRouteBuilderExtensions
+internal static class IEndpointRouteBuilderExtensions
 {
     // These endpoints are required by the Identity Razor components defined in the /Components/Account/Pages directory of this project.
     public static IEndpointConventionBuilder MapAdditionalIdentityEndpoints(this IEndpointRouteBuilder endpoints)

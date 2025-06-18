@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Options;
 using ProbentApps.Model;
 
-namespace ProbentApps.Services.Identity;
+namespace ProbentApps.Services.Components;
 
 // This is a server-side AuthenticationStateProvider that revalidates the security stamp for the connected user
 // every 30 minutes an interactive circuit is connected.
@@ -23,6 +23,7 @@ internal sealed class IdentityRevalidatingAuthenticationStateProvider(
         // Get the user manager from a new scope to ensure it fetches fresh data
         await using var scope = scopeFactory.CreateAsyncScope();
         var userManager = scope.ServiceProvider.GetRequiredService<UserManager<ApplicationUser>>();
+        cancellationToken.ThrowIfCancellationRequested();
         return await ValidateSecurityStampAsync(userManager, authenticationState.User);
     }
 

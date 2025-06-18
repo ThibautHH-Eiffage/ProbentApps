@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace ProbentApps.Model;
 
-public class Invoice
+public class Invoice : IEntity
 {
     public Guid Id { get; set; }
 
