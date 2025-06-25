@@ -1,4 +1,4 @@
-﻿namespace ProbentApps.Services.Authorization;
+namespace ProbentApps.Services.Authorization;
 
 public class AuthorizationBuilderExtensions
 {

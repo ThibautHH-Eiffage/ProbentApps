@@ -1,12 +1,16 @@
 # Supprimer la ligne ci-dessous si vous voulez hériter les paramètres .editorconfig des répertoires supérieurs
 root = true
 
+#Encodage de fichier
+charset = utf-8
+
 # Préférences de nouvelle ligne
 end_of_line = crlf
 insert_final_newline = true
 
 # Indentation et espacement
 indent_style = space
+trim_trailing_whitespace = true
 
 # Fichiers C#
 [*.cs]
@@ -246,13 +250,7 @@ dotnet_naming_style.begins_with_i.required_suffix =
 dotnet_naming_style.begins_with_i.word_separator = 
 dotnet_naming_style.begins_with_i.capitalization = pascal_case
 
-[*.{cs,vb}]
-tab_width = 4
-indent_size = 4
-dotnet_style_operator_placement_when_wrapping = beginning_of_line
-end_of_line = crlf
-
-[*.{csproj,slnx}]
+[*.{csproj,slnx,resx}]
 
 # Indentation et espacement
 tab_width = 2

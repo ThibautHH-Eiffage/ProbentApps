@@ -1,4 +1,4 @@
-﻿namespace ProbentApps.Services.Database.Abstractions.Contexts;
+namespace ProbentApps.Services.Database.Abstractions.Contexts;
 
 public interface IDbContext
 {

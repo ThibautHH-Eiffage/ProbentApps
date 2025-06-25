@@ -1,4 +1,4 @@
-﻿using System.Buffers.Text;
+using System.Buffers.Text;
 using System.Security.Cryptography;
 using Microsoft.EntityFrameworkCore.Migrations;
 using ProbentApps.Services.Database.Abstractions.Contexts;

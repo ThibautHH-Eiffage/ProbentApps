@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Diagnostics.EntityFrameworkCore;
+using Microsoft.AspNetCore.Diagnostics.EntityFrameworkCore;
 
 namespace ProbentApps.Middleware;
 

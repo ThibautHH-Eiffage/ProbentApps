@@ -1,4 +1,4 @@
-﻿using ProbentApps.Model;
+using ProbentApps.Model;
 
 namespace ProbentApps.Services.Data.Abstractions;
 
