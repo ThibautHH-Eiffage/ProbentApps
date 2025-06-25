@@ -1,4 +1,4 @@
-﻿namespace ProbentApps.Model;
+namespace ProbentApps.Model;
 
 public interface IHashedNormalizationUser
 {

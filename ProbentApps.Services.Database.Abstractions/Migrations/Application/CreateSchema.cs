@@ -1,4 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore.Migrations;
+using Microsoft.EntityFrameworkCore.Migrations;
 using ProbentApps.Services.Database.Abstractions.Contexts;
 using ProbentApps.Model;
 

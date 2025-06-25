@@ -1,4 +1,4 @@
-﻿using System.Diagnostics.CodeAnalysis;
+using System.Diagnostics.CodeAnalysis;
 using Microsoft.AspNetCore.StaticFiles;
 using ProbentApps.Services.Database.Abstractions.Contexts;
 

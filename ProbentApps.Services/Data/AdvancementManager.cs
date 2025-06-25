@@ -1,4 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using ProbentApps.Services.Data.Abstractions;
 using ProbentApps.Services.Database.Abstractions.Contexts;
 using ProbentApps.Model;

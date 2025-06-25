@@ -1,4 +1,4 @@
-﻿<form @formname="@(FormName ?? Action ?? nameof(PostForm))" @onsubmit="@(Action is not null ? null : OnSubmit)" method="post" class="@Class">
+<form @formname="@(FormName ?? Action ?? nameof(PostForm))" @onsubmit="@(Action is not null ? null : OnSubmit)" method="post" class="@Class">
     <Microsoft.AspNetCore.Components.Forms.AntiforgeryToken />
     @ChildContent
 </form>
