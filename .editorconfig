@@ -276,7 +276,7 @@ dotnet_naming_style.begins_with_underscore.required_suffix =
 dotnet_naming_style.begins_with_underscore.word_separator = 
 dotnet_naming_style.begins_with_underscore.capitalization = camel_case
 
-[*.{csproj,slnx,resx,json}]
+[*.{csproj,slnx,resx,json,yaml}]
 
 # Indentation et espacement
 tab_width = 2

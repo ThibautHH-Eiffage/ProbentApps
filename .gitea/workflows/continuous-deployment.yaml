@@ -1,0 +1,115 @@
+name: Continuous Deployment
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  publish:
+    runs-on: windows-nanoserver-2019
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: milliewalky/setup-pwsh@v1
+      - name: Restore
+        shell: pwsh
+        run: dotnet restore --ucr
+      - name: Build & publish
+        shell: pwsh
+        run: dotnet publish ProbentApps/ProbentApps.csproj --no-restore -c Release -o Publish
+      - shell: pwsh
+        run: Compress-Archive -Path Publish/wwwroot/* -DestinationPath Publish/wwwroot.zip
+      - name: Create changelog
+        shell: pwsh
+        run: (git tag -l --format='%(contents:body)' '${{ gitea.ref_name }}' | Out-String).Trim() | Out-File -NoNewLine Publish/changes.txt
+      - name: Create commit log
+        shell: pwsh
+        run: git log --format='- %h `%s`' "$(git describe --tags --abbrev=0 HEAD^).." | Out-File -NoNewLine Publish/commit-log.txt
+      - name: Upload published application
+        uses: actions/upload-artifact@v4
+        with:
+          name: published-application
+          path: |
+            Publish/*
+            !Publish/wwwroot/
+  release:
+    runs-on: windows-nanoserver-2019
+    needs: publish
+    steps:
+      - uses: actions-ecosystem/action-regex-match@v2
+        id: version
+        with:
+          text: ${{ gitea.ref_name }}
+          regex: '^v(.*?(?:-(.*)))$'
+      - name: Retrieve published application
+        uses: actions/download-artifact@v4
+        with:
+          name: published-application
+      - uses: milliewalky/setup-pwsh@v1
+      - id: text
+        shell: pwsh
+        run: |
+          echo 'changes<<EOF' >> $GITEA_OUTPUT
+          cat changes.txt >> $GITEA_OUTPUT
+          echo EOF >> $GITEA_OUTPUT
+          rm -f changes.txt
+          echo 'commit-log<<EOF' >> $GITEA_OUTPUT
+          cat commit-log.txt >> $GITEA_OUTPUT
+          echo EOF >> $GITEA_OUTPUT
+          rm -f commit-log.txt
+      - name: Create Gitea release
+        uses: https://gitea.com/actions/release-action@main
+        with:
+          pre_release: ${{ steps.version.outputs.group2 != '' }}
+          title: 'ProbentApps ${{ gitea.ref_name }}'
+          body: |-
+            \# ProbentApps version ${{ steps.version.outputs.group1 }} release
+
+            This is the release of version ${{ steps.version.outputs.group1 }} of ProbentApps.
+
+            \## Changes
+
+            ${{ steps.text.outputs.changes }}
+
+            \### Commit log
+
+            ${{ steps.text.outputs.commit-log }}
+
+            \## Installation instructions
+
+            To install this version, download the files below and move them to the installation directory of ProbentApps.
+            Then, unzip the `wwwroot.zip` file into the `wwwroot` directory.
+            Finally, you can execute the `ProbentApps.exe` file to start the application.
+
+            You will need administrator privileges to start the application with the default configuration,
+            which uses the default HTTP ports with are privileged.
+          files: |-
+            wwwroot.zip
+            appsettings.json
+            appsettings.Production.json
+            ProbentApps.exe
+            Microsoft.Data.SqlClient.SNI.dll
+            ProbentApps.staticwebassets.endpoints.json
+          api_key: '${{ secrets.RELEASE_TOKEN }}'
+  deploy:
+    runs-on: host
+    needs: publish
+    steps:
+      - name: Clear previous version
+        shell: pwsh
+        run: Remove-Item -Path 'C:\ProbentApps\*' -Recurse -Force
+      - name: Retrieve published application
+        uses: actions/download-artifact@v4
+        with:
+          name: published-application
+      - name: Install new version
+        shell: pwsh
+        run: |
+          Move-Item -Path * -Destination C:\ProbentApps
+          Expand-Archive -Path C:\ProbentApps\wwwroot.zip -DestinationPath C:\ProbentApps\wwwroot
+          Remove-Item -Path C:\ProbentApps\wwwroot.zip
+      - name: Start application
+        shell: pwsh
+        run: Start-ScheduledTask ProbentApps
