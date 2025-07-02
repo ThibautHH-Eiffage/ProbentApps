@@ -1,0 +1,98 @@
+name: Continuous Deployment
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '9.x'
+      - name: Restore
+        run: dotnet restore -r win-x64
+      - name: Build & publish
+        run: dotnet publish ProbentApps/ProbentApps.csproj --no-restore -c Release -o Publish
+      - run: tar -czvf ProbentApps.tar.gz -C Publish .
+      - name: Create changelog
+        run: git tag -l --format='%(contents:body)' '${{ gitea.ref_name }}' > Publish/changes.txt
+      - name: Create commit log
+        run: git log --format='- %h `%s`' "$(git describe --tags --abbrev=0 HEAD^).." > Publish/commit-log.txt
+      - name: Upload published application
+        uses: actions/upload-artifact@v4
+        with:
+          name: published-application
+          path: ProbentApps.tar.gz
+  release:
+    runs-on: ubuntu-latest
+    needs: publish
+    steps:
+      - uses: actions-ecosystem/action-regex-match@v2
+        id: version
+        with:
+          text: ${{ gitea.ref_name }}
+          regex: '^v(.*?(?:-(.*)))$'
+      - name: Retrieve published application
+        uses: actions/download-artifact@v4
+        with:
+          name: published-application
+      - id: text
+        run: |
+          echo 'changes<<EOF' >> $GITEA_OUTPUT
+          truncate -s -1 changes.txt >> $GITEA_OUTPUT
+          echo EOF >> $GITEA_OUTPUT
+          rm changes.txt
+          echo 'commit-log<<EOF' >> $GITEA_OUTPUT
+          truncate -s -1 commit-log.txt >> $GITEA_OUTPUT
+          echo EOF >> $GITEA_OUTPUT
+          rm commit-log.txt
+      - name: Create Gitea release
+        uses: https://gitea.com/actions/release-action@main
+        with:
+          pre_release: ${{ steps.version.outputs.group2 != '' }}
+          title: 'ProbentApps ${{ gitea.ref_name }}'
+          body: |-
+            \# ProbentApps version `${{ steps.version.outputs.group1 }}` release
+
+            This is the release of version `${{ steps.version.outputs.group1 }}` of ProbentApps.
+
+            \## Changes
+
+            ${{ steps.text.outputs.changes }}
+
+            \### Commit log
+
+            <details><summary>Expand log</summary>
+            
+            ${{ steps.text.outputs.commit-log }}
+            </details>
+
+            \## Installation instructions
+
+            To install this version, download the archive below and extract its contents into the installation directory of ProbentApps.
+            You can then execute the `ProbentApps.exe` file to start the application.
+          files: ProbentApps.tar.gz
+          api_key: '${{ secrets.RELEASE_TOKEN }}'
+  deploy:
+    runs-on: host
+    needs: publish
+    steps:
+      - name: Stop application
+        run: Stop-ScheduledTask ProbentApps
+      - name: Clear previous version
+        run: Remove-Item -Path 'C:\ProbentApps\*' -Recurse -Force
+      - name: Retrieve published application
+        uses: actions/download-artifact@v4
+        with:
+          name: published-application
+      - name: Install new version
+        run: |
+          tar -xzvf ProbentApps.tar.gz -C C:\ProbentApps
+      - name: Start application
+        run: Start-ScheduledTask ProbentApps
