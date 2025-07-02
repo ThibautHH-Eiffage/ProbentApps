@@ -10,8 +10,20 @@
     <RunAOTCompilation>true</RunAOTCompilation>
     <WasmStripILAfterAOT>true</WasmStripILAfterAOT>
     <BlazorWebAssemblyLoadAllGlobalizationData>true</BlazorWebAssemblyLoadAllGlobalizationData>
+    <RuntimeIdentifiers>browser-wasm</RuntimeIdentifiers>
   </PropertyGroup>
 
+  <PropertyGroup Condition="'$(Configuration)'=='Release'">
+    <DebugType>None</DebugType>
+    <DebugSymbols>false</DebugSymbols>
+  </PropertyGroup>
+
+  <Target Name="_RemoveMonoFrameworkReferences" AfterTargets="ProcessFrameworkReferences">
+    <ItemGroup>
+      <PackageDownload Remove="Microsoft.NETCore.App.Runtime.Mono.$(RuntimeIdentifier)" />
+    </ItemGroup>
+  </Target>
+  
   <ItemGroup>
     <ProjectReference Include="..\ProbentApps.Components.Pages\ProbentApps.Components.Pages.csproj" />
   </ItemGroup>

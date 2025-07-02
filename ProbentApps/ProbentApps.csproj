@@ -5,7 +5,22 @@
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <UserSecretsId>aspnet-ProbentApps-dea28281-bf5f-4bc2-808d-db782d8c698e</UserSecretsId>
+    <UseAppHost>true</UseAppHost>
+    <PublishSelfContained>true</PublishSelfContained>
+    <PublishReadyToRun>true</PublishReadyToRun>
+    <PublishSingleFile>true</PublishSingleFile>
+    <PublishIISAssets>false</PublishIISAssets>
   </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)'=='Release'">
+    <DebugType>None</DebugType>
+    <DebugSymbols>false</DebugSymbols>
+  </PropertyGroup>
+
+  <ItemGroup Condition="'$(Configuration)'=='Release'">
+    <Content Remove="appsettings.Development.json" />
+    <None Include="appsettings.Development.json" />
+  </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\ProbentApps.Client\ProbentApps.Client.csproj" />
@@ -13,7 +28,6 @@
   </ItemGroup>
   
   <ItemGroup>
-    <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.Server" Version="9.*" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="9.*" />
   </ItemGroup>
 
