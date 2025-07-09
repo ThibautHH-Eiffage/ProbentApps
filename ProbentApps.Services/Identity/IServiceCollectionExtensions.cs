@@ -1,10 +1,10 @@
+using System.Diagnostics.CodeAnalysis;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.DependencyInjection;
 using ProbentApps.Model;
 using ProbentApps.Services.Database.Abstractions.Contexts;
 using ProbentApps.Services.Identity.Data;
-using System.Diagnostics.CodeAnalysis;
 
 namespace ProbentApps.Services.Identity;
 
@@ -43,7 +43,7 @@ internal static class IServiceCollectionExtensions
 
         services.AddScoped<UserManager<ApplicationUser>, LookupHashingUserManager<ApplicationUser>>()
             .AddScoped<IUserStore<ApplicationUser>, LookupHashingUserStore<ApplicationUser, IdentityRole<Guid>, IdentityDbContext, Guid>>()
-            .AddSingleton<IEmailSender<ApplicationUser>, IdentityNoOpEmailSender>();
+            .AddScoped<IEmailSender<ApplicationUser>, IdentityEmailSender>();
 
         return services;
     }

@@ -3,6 +3,7 @@ using Microsoft.Extensions.Hosting;
 using ProbentApps.Services.Components;
 using ProbentApps.Services.Data;
 using ProbentApps.Services.Database;
+using ProbentApps.Services.Email;
 using ProbentApps.Services.Identity;
 using ProbentApps.Services.Options;
 
@@ -12,6 +13,7 @@ public static class IServiceCollectionExtensions
 {
     public static IServiceCollection AddApplicationServices(this IHostApplicationBuilder builder) => builder
         .AddDatabaseServices()
+        .AddEmailServices()
         .AddIdentityServices()
         .AddDataServices()
         .AddComponentServices()
