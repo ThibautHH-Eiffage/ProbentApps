@@ -1,6 +1,7 @@
 @page "/Account/Manage/TwoFactorAuthentication"
 
 @using Microsoft.AspNetCore.Http.Features
+
 @inject UserManager<ApplicationUser> UserManager
 @inject SignInManager<ApplicationUser> SignInManager
 @inject IdentityUserAccessor UserAccessor
@@ -30,25 +31,19 @@
             <MudAlert Variant="Variant.Text" Severity="Severity.Warning">You have 1 recovery code left.</MudAlert>
 
             <MudText Typo="Typo.body1" Class="pt-4">
-                You can <MudLink Href="Account/Manage/GenerateRecoveryCodes">generate a new set of recovery codes</MudLink>.
-            </MudText>
-        }
-        else if (recoveryCodesLeft <= 3)
-        {
-            <MudAlert Variant="Variant.Text" Severity="Severity.Warning">You have @recoveryCodesLeft recovery codes left.</MudAlert>
-
-            <MudText Typo="Typo.body1" Class="pt-4">
                 You should <MudLink Href="Account/Manage/GenerateRecoveryCodes">generate a new set of recovery codes</MudLink>.
             </MudText>
+        }
+        else
+        {
+            <MudAlert Variant="Variant.Text" Severity="Severity.Info">You have @recoveryCodesLeft recovery codes left.</MudAlert>
         }
 
         if (isMachineRemembered)
         {
-            <form style="display: inline-block" @formname="forget-browser" @onsubmit="OnSubmitForgetBrowserAsync" method="post">
-                <AntiforgeryToken />
-                
+            <PostForm Class="d-inline-block" FormName="forget-browser" OnSubmit="OnSubmitForgetBrowserAsync">
                 <MudStaticButton Variant="Variant.Filled" Color="Color.Primary" FullWidth FormAction="FormAction.Submit">Forget this browser</MudStaticButton>
-            </form>
+            </PostForm>
         }
 
         <MudLink Href="Account/Manage/Disable2fa">Disable 2FA</MudLink><br />
@@ -57,7 +52,7 @@
 
     <MudText Typo="Typo.h6" GutterBottom>Authenticator app</MudText>
 
-    @if (!hasAuthenticator)
+    @if (!has2faKey)
     {
         <MudLink Href="Account/Manage/EnableAuthenticator">Add authenticator app</MudLink><br />
     }
@@ -71,14 +66,12 @@ else
 {
     <MudAlert Variant="Variant.Text" Severity="Severity.Error">Privacy and cookie policy have not been accepted.</MudAlert>
 
-    <MudText Typo="Typo.body1" Class="pt-4">
-        You must accept the policy before you can enable two factor authentication.
-    </MudText>
+    <MudText Class="mt-4">You must accept the policy before you can enable two factor authentication.</MudText>
 }
 
 @code {
     private bool canTrack;
-    private bool hasAuthenticator;
+    private bool has2faKey;
     private int recoveryCodesLeft;
     private bool is2faEnabled;
     private bool isMachineRemembered;
@@ -90,7 +83,7 @@ else
     {
         var user = await UserAccessor.GetRequiredUserAsync(HttpContext);
         canTrack = HttpContext.Features.Get<ITrackingConsentFeature>()?.CanTrack ?? true;
-        hasAuthenticator = await UserManager.GetAuthenticatorKeyAsync(user) is not null;
+        has2faKey = await UserManager.GetAuthenticatorKeyAsync(user) is not null;
         is2faEnabled = await UserManager.GetTwoFactorEnabledAsync(user);
         isMachineRemembered = await SignInManager.IsTwoFactorClientRememberedAsync(user);
         recoveryCodesLeft = await UserManager.CountRecoveryCodesAsync(user);

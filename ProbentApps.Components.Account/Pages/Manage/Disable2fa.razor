@@ -7,9 +7,7 @@
 
 <PageTitle>Disable two-factor authentication (2FA)</PageTitle>
 
-<StatusMessage />
-
-<MudText Typo="Typo.h6" GutterBottom>Disable two-factor authentication (2FA)</MudText>
+<MudText Typo="Typo.h5" GutterBottom>Disable two-factor authentication (2FA)</MudText>
 
 <StatusMessage Message="@message" />
 
@@ -44,13 +42,15 @@
 
     private async Task OnSubmitAsync()
     {
-        var disable2faResult = await UserManager.SetTwoFactorEnabledAsync(user, false);
-        if (!disable2faResult.Succeeded)
+        var result = await UserManager.SetTwoFactorEnabledAsync(user, false);
+        if (!result.Succeeded)
         {
-            throw new InvalidOperationException("Unexpected error occurred disabling 2FA.");
+            message = $"Error: {string.Join(", ", result.Errors.Select(error => error.Description))}";
+            return;
         }
 
-        Logger.LogInformation("User with ID '{UserName}' has disabled 2fa.", user.UserName);
+        Logger.LogInformation("User with ID '{UserId}' has disabled 2fa.", user.Id);
+
         RedirectManager.RedirectToWithStatus(
             "Account/Manage/TwoFactorAuthentication",
             "2fa has been disabled. You can reenable 2fa by setting up an authenticator app.",

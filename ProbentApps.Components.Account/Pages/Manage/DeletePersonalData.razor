@@ -8,13 +8,13 @@
 
 <PageTitle>Delete Personal Data</PageTitle>
 
-<MudText Typo="Typo.h6" GutterBottom>Delete personal data</MudText>
-
-<StatusMessage Message="@message" />
+<MudText Typo="Typo.h5" GutterBottom>Delete personal data</MudText>
 
 <MudAlert Severity="Severity.Error" Variant="Variant.Text">
     Deleting this data will permanently close your account, and this cannot be undone.
 </MudAlert>
+
+<StatusMessage Message="@message" />
 
 <EditForm Model="Input" FormName="delete-user" OnValidSubmit="OnValidSubmitAsync" method="post">
     <DataAnnotationsValidator />
@@ -62,13 +62,13 @@
         var result = await UserManager.DeleteAsync(user);
         if (!result.Succeeded)
         {
-            message = $"Error: {string.Join(",", result.Errors.Select(error => error.Description))}";
+            message = $"Error: {string.Join(", ", result.Errors.Select(error => error.Description))}";
             return;
         }
 
-        await SignInManager.SignOutAsync();
-
         Logger.LogInformation("User with ID '{UserId}' deleted themselves.", user.Id);
+
+        await SignInManager.SignOutAsync();
 
         RedirectManager.RedirectToCurrentPage();
     }

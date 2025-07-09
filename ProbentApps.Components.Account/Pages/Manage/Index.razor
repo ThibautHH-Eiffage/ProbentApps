@@ -4,10 +4,11 @@
 @inject SignInManager<ApplicationUser> SignInManager
 @inject IdentityUserAccessor UserAccessor
 @inject IdentityRedirectManager RedirectManager
+@inject ILogger<Index> Logger
 
 <PageTitle>Profile</PageTitle>
 
-<MudText Typo="Typo.h6" GutterBottom>Profile</MudText>
+<MudText Typo="Typo.h5" GutterBottom>Profile</MudText>
 
 <StatusMessage />
 
@@ -16,14 +17,14 @@
 
     <MudGrid>
         <MudItem md="12">
-            <MudStaticTextField For="@(() => Input.UserName)" @bind-Value="Input.UserName"
-                                Label="Username" HelperText="Please choose your username."
-                                UserAttributes="@(new() { { "autocomplete", "username" }, { "aria-required", "true" } })" />
+            <MudStaticTextField For="@(() => Input.Username)" @bind-Value="Input.Username"
+                Label="Username" HelperText="Please choose your username."
+                autocomplete="username" aria-required="true" />
         </MudItem>
         <MudItem md="12">
             <MudStaticTextField For="@(() => Input.PhoneNumber)" @bind-Value="Input.PhoneNumber"
-                                Label="Phone Number" HelperText="Please enter your phone number."
-                                UserAttributes="@(new() { { "autocomplete", "tel-national" } } )" />
+                Label="Phone number" HelperText="Please enter your phone number."
+                autocomplete="tel-national" />
         </MudItem>
         <MudItem md="12">
             <MudStaticButton Variant="Variant.Filled" Color="Color.Primary" FullWidth FormAction="FormAction.Submit">Save</MudStaticButton>
@@ -48,12 +49,28 @@
         username = await UserManager.GetUserNameAsync(user);
         phoneNumber = await UserManager.GetPhoneNumberAsync(user);
 
-        Input.UserName ??= username;
+        if (HttpMethods.IsPost(HttpContext.Request.Method) && string.IsNullOrWhiteSpace(Input.PhoneNumber))
+        {
+            Input.PhoneNumber = null;
+        }
+
+        Input.Username ??= username;
         Input.PhoneNumber ??= phoneNumber;
     }
 
     private async Task OnValidSubmitAsync()
     {
+        if (Input.Username != username)
+        {
+            var setNameResult = await UserManager.SetUserNameAsync(user, Input.Username);
+            if (!setNameResult.Succeeded)
+            {
+                RedirectManager.RedirectToCurrentPageWithStatus("Error: Failed to set user name.", HttpContext);
+            }
+
+            Logger.LogInformation("User with ID '{UserId}' changed their username to '{UserName}'.", user.Id, Input.Username);
+        }
+
         if (Input.PhoneNumber != phoneNumber)
         {
             var setPhoneResult = await UserManager.SetPhoneNumberAsync(user, Input.PhoneNumber);
@@ -61,15 +78,8 @@
             {
                 RedirectManager.RedirectToCurrentPageWithStatus("Error: Failed to set phone number.", HttpContext);
             }
-        }
 
-        if (Input.UserName != username)
-        {
-            var setNameResult = await UserManager.SetUserNameAsync(user, Input.UserName);
-            if (!setNameResult.Succeeded)
-            {
-                RedirectManager.RedirectToCurrentPageWithStatus("Error: Failed to set user name.", HttpContext);
-            }
+            Logger.LogInformation("User with ID '{UserId}' changed their phone number to '{PhoneNumber}'.", user.Id, Input.PhoneNumber);
         }
 
         await SignInManager.RefreshSignInAsync(user);
@@ -79,8 +89,8 @@
     private sealed class InputModel
     {
         [Required]
-        [Display(Name = "Username")]
-        public string? UserName { get; set; } = "";
+        [Display(Name = nameof(Username))]
+        public string? Username { get; set; }
 
         [Phone]
         [Display(Name = "Phone number")]
