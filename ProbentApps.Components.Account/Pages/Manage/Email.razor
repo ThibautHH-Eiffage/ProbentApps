@@ -7,24 +7,24 @@
 
 <PageTitle>Manage email address</PageTitle>
 
-<MudText Typo="Typo.h6" GutterBottom>Manage email address</MudText>
+<MudText Typo="Typo.h5" GutterBottom>Manage email address</MudText>
 
 <StatusMessage Message="@message" />
 
 <MudGrid>
     <MudItem md="12">
-        <MudStaticTextField Value="@email" Disabled Placeholder="john.doe@example.com" Label="Email address"
-            Adornment="Adornment.End"
+        <MudStaticTextField Value="@email" Disabled Placeholder="No email address registered" Label="Email address"
+            Adornment="@(email is not null ? Adornment.End : Adornment.None)"
             AdornmentIcon="@(isEmailConfirmed ? Icons.Material.Filled.Check : Icons.Material.Filled.Close)"
             AdornmentColor="@(isEmailConfirmed ? Color.Success : Color.Error)" />
-        @if (!isEmailConfirmed)
+        @if (email is not null && !isEmailConfirmed)
         {
             <MudAlert Severity="Severity.Warning" Variant="Variant.Outlined" Icon="@Icons.Material.Filled.Warning" Class="mt-2 py-0">
                 Your email address is unconfirmed!
             </MudAlert>
         }
     </MudItem>
-    @if (!isEmailConfirmed)
+    @if (email is not null && !isEmailConfirmed)
     {
         <MudItem md="12">
             <PostForm FormName="send-verification" OnSubmit="OnSendEmailVerificationAsync">
@@ -39,7 +39,7 @@
                 <MudItem md="12">
                     <MudStaticTextField @bind-Value="@Input.NewEmail" For="@(() => Input.NewEmail)"
                         Label="New email address" HelperText="Please enter your new email address."
-                        UserAttributes="@(new() { { "autocomplete", "email" }, { "aria-required", "true" } })" />
+                        autocomplete="email" aria-required="true" />
                 </MudItem>
                 <MudItem md="12">
                     <MudStaticButton Variant="Variant.Filled" Color="Color.Primary" FullWidth FormAction="FormAction.Submit">Change email address</MudStaticButton>
@@ -78,7 +78,7 @@
             return;
         }
 
-        await SendLinkAsync(Input.NewEmail, await UserManager.GenerateChangeEmailTokenAsync(user, Input.NewEmail));
+        await SendLinkAsync("Account/ConfirmEmailChange", Input.NewEmail, await UserManager.GenerateChangeEmailTokenAsync(user, Input.NewEmail));
 
         message = "Confirmation link to change email sent. Please check your email.";
     }
@@ -90,15 +90,15 @@
             return;
         }
 
-        await SendLinkAsync(email, await UserManager.GenerateEmailConfirmationTokenAsync(user));
+        await SendLinkAsync("Account/ConfirmEmail", email, await UserManager.GenerateEmailConfirmationTokenAsync(user));
 
         message = "Verification email sent. Please check your email.";
     }
 
-    private Task SendLinkAsync(string email, string code)
+    private Task SendLinkAsync(string uri, string email, string code)
     {
         var callbackUrl = NavigationManager.GetUriWithQueryParameters(
-            NavigationManager.ToAbsoluteUri("Account/ConfirmEmail").AbsoluteUri,
+            NavigationManager.ToAbsoluteUri(uri).AbsoluteUri,
             new Dictionary<string, object?> { ["userId"] = user.Id, ["code"] = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(code)) });
 
         return EmailSender.SendConfirmationLinkAsync(user, email, HtmlEncoder.Default.Encode(callbackUrl));

@@ -3,13 +3,14 @@
 @inject UserManager<ApplicationUser> UserManager
 @inject IdentityRedirectManager RedirectManager
 
-<PageTitle>Confirm email</PageTitle>
+<PageTitle>Email confirmation</PageTitle>
 
-<h1>Confirm email</h1>
-<StatusMessage Message="@statusMessage" />
+<MudText Typo="Typo.h3" GutterBottom>Email confirmed</MudText>
+
+<StatusMessage Message="@message" />
 
 @code {
-    private string? statusMessage;
+    private string? message;
 
     [CascadingParameter]
     private HttpContext HttpContext { get; set; } = default!;
@@ -22,22 +23,15 @@
 
     protected override async Task OnInitializedAsync()
     {
-        if (UserId is null || Code is null)
+        if (UserId is null || Code is null
+            || await UserManager.FindByIdAsync(UserId) is not ApplicationUser user
+            || !(await UserManager.ConfirmEmailAsync(user, Encoding.UTF8.GetString(WebEncoders.Base64UrlDecode(Code)))).Succeeded)
         {
-            RedirectManager.RedirectTo("");
-        }
-
-        var user = await UserManager.FindByIdAsync(UserId);
-        if (user is null)
-        {
-            HttpContext.Response.StatusCode = StatusCodes.Status404NotFound;
-            statusMessage = $"Error loading user with ID {UserId}";
+            RedirectManager.RedirectToWithStatus("Account/ResendEmailConfirmation", "Error: Invalid email confirmation link.", HttpContext);
         }
         else
         {
-            var code = Encoding.UTF8.GetString(WebEncoders.Base64UrlDecode(Code));
-            var result = await UserManager.ConfirmEmailAsync(user, code);
-            statusMessage = result.Succeeded ? "Thank you for confirming your email." : "Error confirming your email.";
+            message = "Thank you for confirming your email.";
         }
     }
 }
