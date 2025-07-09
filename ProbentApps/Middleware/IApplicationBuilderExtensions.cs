@@ -16,5 +16,6 @@ public static class IApplicationBuilderExtensions
         .UseHttpsRedirection()
         .UseAuthentication()
         .UseAuthorization()
-        .UseAntiforgery();
+        .UseAntiforgery()
+		.UseRequestLocalization("en", "fr");
 }
