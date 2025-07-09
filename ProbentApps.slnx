@@ -18,6 +18,7 @@
     <Project Path="ProbentApps.Services.Data.Abstractions/ProbentApps.Services.Data.Abstractions.csproj" />
     <Project Path="ProbentApps.Services.Database.Abstractions/ProbentApps.Services.Database.Abstractions.csproj" />
     <Project Path="ProbentApps.Services.Database/ProbentApps.Services.Database.csproj" />
+    <Project Path="ProbentApps.Services.Email/ProbentApps.Services.Email.csproj" />
     <Project Path="ProbentApps.Services/ProbentApps.Services.csproj" />
   </Folder>
   <Folder Name="/UI/">
