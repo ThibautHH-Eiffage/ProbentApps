@@ -18,6 +18,9 @@ public class PostForm : ComponentBase
     [Parameter]
     public string? Class { get; set; }
 
+    [Parameter(CaptureUnmatchedValues = true)]
+    public Dictionary<string, object?> AdditionalAttributes { get; set; } = [];
+
     [Parameter]
     public RenderFragment? ChildContent { get; set; }
 
@@ -34,6 +37,7 @@ public class PostForm : ComponentBase
         {
             __builder.AddAttribute(3, "onsubmit", OnSubmit);
         }
+        __builder.AddMultipleAttributes(4, AdditionalAttributes.Where(p => p.Value is not null)!);
         __builder.AddNamedEvent("onsubmit", FormName ?? Action ?? nameof(PostForm));
         __builder.OpenComponent<AntiforgeryToken>(4);
         __builder.CloseComponent();
