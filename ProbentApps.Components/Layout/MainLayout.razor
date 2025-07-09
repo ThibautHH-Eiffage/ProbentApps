@@ -4,9 +4,13 @@
 @using MudBlazor.StaticInput
 
 <MudThemeProvider />
-<MudPopoverProvider />
-<MudDialogProvider />
-<MudSnackbarProvider />
+
+@if (RendererInfo.IsInteractive)
+{
+    <MudPopoverProvider />
+    <MudDialogProvider />
+    <MudSnackbarProvider />
+}
 
 <MudLayout>
     <MudAppBar Elevation="1">
