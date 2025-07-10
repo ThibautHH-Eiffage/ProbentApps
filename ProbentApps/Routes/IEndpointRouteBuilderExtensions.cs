@@ -8,11 +8,11 @@ internal static class IEndpointRouteBuilderExtensions
     {
         app.MapStaticAssets();
 
-        app.MapRazorComponents<App>()
+        app.MapAdditionalIdentityEndpoints();
+
+        return app.MapRazorComponents<App>()
             .AddInteractiveServerRenderMode()
             .AddInteractiveWebAssemblyRenderMode()
             .AddAdditionalAssemblies(typeof(Components.Pages.Routes).Assembly, typeof(Components.Account._Imports).Assembly);
-
-        return app.MapAdditionalIdentityEndpoints();
     }
 }
