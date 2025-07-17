@@ -1,11 +1,9 @@
-using Microsoft.AspNetCore.Diagnostics.EntityFrameworkCore;
-
 namespace ProbentApps.Middleware;
 
 public static class IApplicationBuilderExtensions
 {
     public static void UseDevelopmentMiddleware(this IApplicationBuilder app) => app
-        .UseMiddleware<MigrationsEndPointMiddleware>()
+        .UseDeveloperExceptionPage()
         .UseWebAssemblyDebugging();
 
     public static IApplicationBuilder UseProductionMiddleware(this IApplicationBuilder app) => app

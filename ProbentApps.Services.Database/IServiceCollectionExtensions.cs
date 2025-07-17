@@ -30,9 +30,6 @@ public static class IServiceCollectionExtensions
             .AddIdentityMigrationsDbContext(builder.ConfigureDbContext<IdentityDbContext>)
             .AddDbContextFactory<ApplicationDbContext>(builder.ConfigureDbContext<ApplicationDbContext>);
 
-        if (builder.Environment.IsDevelopment())
-            builder.Services.AddDatabaseDeveloperPageExceptionFilter();
-
         return builder.Services;
     }
 }
