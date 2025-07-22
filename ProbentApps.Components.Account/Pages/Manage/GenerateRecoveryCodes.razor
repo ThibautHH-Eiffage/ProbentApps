@@ -5,9 +5,7 @@
 @inject IdentityRedirectManager RedirectManager
 @inject ILogger<GenerateRecoveryCodes> Logger
 
-<PageTitle>@(recoveryCodes is null ? "Generate two-factor authentication (2FA) recovery codes" : "Recovery codes")</PageTitle>
-
-<MudText Typo="Typo.h5" GutterBottom>@(recoveryCodes is null ? "Generate two-factor authentication (2FA) recovery codes" : "Recovery codes")</MudText>
+<PageTitle Title="@(recoveryCodes is null ? "Generate two-factor authentication (2FA) recovery codes" : "Recovery codes")" SubPage />
 
 <StatusMessage Message="@message" />
 
