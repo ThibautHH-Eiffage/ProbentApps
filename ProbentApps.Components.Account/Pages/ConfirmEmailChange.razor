@@ -29,13 +29,13 @@
             || await UserManager.FindByIdAsync(UserId) is not ApplicationUser user
             || !(await UserManager.ChangeEmailAsync(user, Email, Encoding.UTF8.GetString(WebEncoders.Base64UrlDecode(Code)))).Succeeded)
         {
-            RedirectManager.RedirectToWithStatus("Account/Email", "Error: Invalid email change confirmation link.", HttpContext);
+            RedirectManager.RedirectToWithStatus("Account/Email", "Error: Invalid email address change confirmation link.", HttpContext);
         }
         else
         {
             await SignInManager.RefreshSignInAsync(user);
 
-            message = "Thank you for confirming your email change.";
+            message = "Email address change confirmed successfully.";
         }
     }
 }
