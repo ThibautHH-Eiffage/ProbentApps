@@ -25,11 +25,11 @@
             || await UserManager.FindByIdAsync(UserId) is not ApplicationUser user
             || !(await UserManager.ConfirmEmailAsync(user, Encoding.UTF8.GetString(WebEncoders.Base64UrlDecode(Code)))).Succeeded)
         {
-            RedirectManager.RedirectToWithStatus("Account/ResendEmailConfirmation", "Error: Invalid email confirmation link.", HttpContext);
+            RedirectManager.RedirectToWithStatus("Account/ResendEmailConfirmation", "Error: Invalid email address confirmation link.", HttpContext);
         }
         else
         {
-            message = "Thank you for confirming your email.";
+            message = "Email address confirmed successfully.";
         }
     }
 }
