@@ -24,7 +24,7 @@
             <MudItem md="12">
                 <MudStaticTextField For="@(() => Input.Password)" @bind-Value="Input.Password" InputType="InputType.Password"
                     Label="Password" HelperText="Please enter your password."
-                    UserAttributes="@(new() { { "autocomplete", "current-password" }, { "aria-required", "true" } } )" />
+                    autocomplete="current-password" aria-required="true" />
             </MudItem>
         }
         <MudItem md="12">
