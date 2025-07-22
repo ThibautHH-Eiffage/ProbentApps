@@ -3,7 +3,7 @@
 
 <Router AppAssembly="typeof(Routes).Assembly">
     <Found Context="routeData">
-        <AuthorizeRouteView RouteData="routeData" DefaultLayout="typeof(Layout.MainLayout)">
+        <AuthorizeRouteView RouteData="routeData" DefaultLayout="typeof(MainLayout)">
             <NotAuthorized>
                 <AuthorizationRedirect IsAuthenticated=@(context.User.Identity?.IsAuthenticated ?? false) />
             </NotAuthorized>
