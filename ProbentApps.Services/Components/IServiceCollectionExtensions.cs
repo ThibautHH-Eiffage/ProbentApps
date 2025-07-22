@@ -22,6 +22,7 @@ internal static class IServiceCollectionExtensions
             .AddScoped<IdentityRedirectManager>();
 
         services.AddLocalization()
+            .AddSingleton<IdentityLocalizer>()
             .AddMudServices()
             .AddMudTranslations();
 
