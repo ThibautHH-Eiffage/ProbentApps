@@ -25,6 +25,7 @@
   <ItemGroup>
     <ProjectReference Include="..\ProbentApps.Client\ProbentApps.Client.csproj" />
     <ProjectReference Include="..\ProbentApps.Components.Account\ProbentApps.Components.Account.csproj" />
+    <ProjectReference Include="..\ProbentApps.Configuration\ProbentApps.Configuration.csproj" />
   </ItemGroup>
   
   <ItemGroup>
