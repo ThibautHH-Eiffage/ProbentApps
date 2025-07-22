@@ -1,0 +1,14 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net9.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\ProbentApps.Services.Data.Abstractions\ProbentApps.Services.Data.Abstractions.csproj" />
+    <ProjectReference Include="..\ProbentApps.Services.Database.Abstractions\ProbentApps.Services.Database.Abstractions.csproj" />
+  </ItemGroup>
+
+</Project>
