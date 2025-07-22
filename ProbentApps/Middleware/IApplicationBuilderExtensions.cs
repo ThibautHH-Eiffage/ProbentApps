@@ -11,9 +11,10 @@ public static class IApplicationBuilderExtensions
         .UseHsts();
 
     public static IApplicationBuilder UseApplicationMiddleware(this IApplicationBuilder app) => app
+        .UseForwardedHeaders()
         .UseHttpsRedirection()
         .UseAuthentication()
         .UseAuthorization()
         .UseAntiforgery()
-		.UseRequestLocalization("en", "fr");
+        .UseRequestLocalization("en", "fr");
 }
