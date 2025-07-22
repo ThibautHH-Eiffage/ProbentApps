@@ -35,7 +35,9 @@
             <DataAnnotationsValidator />
             <MudGrid>
                 <MudItem md="12">
-                    <MudStaticTextField @bind-Value="@Input.Code" For="@(() => Input.Code)" Label="Verification code" HelperText="Please enter the code." />
+                    <MudStaticTextField For="@(() => Input.Code)" @bind-Value="@Input.Code"
+                        Label="Verification code" HelperText="Please enter the code."
+                        autocomplete="one-time-code" aria-required="true" />
                 </MudItem>
                 <MudItem md="12">
                     <MudStaticButton Variant="Variant.Filled" Color="Color.Primary" FullWidth FormAction="FormAction.Submit">Verify</MudStaticButton>
