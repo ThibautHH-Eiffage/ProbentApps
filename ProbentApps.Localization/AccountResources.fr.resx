@@ -117,4 +117,22 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <data name="Email address" xml:space="preserve">
+    <value>Adresse électronique</value>
+  </data>
+  <data name="Password" xml:space="preserve">
+    <value>Mot de passe</value>
+  </data>
+  <data name="External logins" xml:space="preserve">
+    <value>Comptes externes</value>
+  </data>
+  <data name="Personal data" xml:space="preserve">
+    <value>Données personnelles</value>
+  </data>
+  <data name="Profile" xml:space="preserve">
+    <value>Profil</value>
+  </data>
+  <data name="Two-factor authentication" xml:space="preserve">
+    <value>Authentification à deux facteurs</value>
+  </data>
 </root>

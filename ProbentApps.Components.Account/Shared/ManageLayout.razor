@@ -2,11 +2,13 @@
 
 @layout ProbentApps.Components.Layout.MainLayout
 
-<MudText Typo="Typo.h3" GutterBottom>Manage your account</MudText>
+@inject IStringLocalizer<ManageLayout> Localizer
+
+<MudText Typo="Typo.h3" GutterBottom>@Localizer["Manage account"]</MudText>
 
 <MudGrid>
     <MudItem md="5">
-        <MudText Typo="Typo.h6" GutterBottom>Change your account settings</MudText>
+        <MudText Typo="Typo.h6" GutterBottom>@Localizer["Account settings"]</MudText>
         <ManageNavMenu />
     </MudItem>
     <MudItem md="7">
