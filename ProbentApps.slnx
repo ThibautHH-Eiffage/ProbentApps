@@ -17,7 +17,8 @@
   <Folder Name="/Data/">
     <Project Path="ProbentApps.Model/ProbentApps.Model.csproj" />
   </Folder>
-  <Folder Name="/Services/">
+  <Folder Name="/Infrastructure/">
+    <Project Path="ProbentApps.Configuration/ProbentApps.Configuration.csproj" />
     <Project Path="ProbentApps.Services.Data.Abstractions/ProbentApps.Services.Data.Abstractions.csproj" />
     <Project Path="ProbentApps.Services.Data/ProbentApps.Services.Data.csproj" />
     <Project Path="ProbentApps.Services.Database.Abstractions/ProbentApps.Services.Database.Abstractions.csproj" />
