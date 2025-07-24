@@ -20,6 +20,7 @@
   <ItemGroup>
     <ProjectReference Include="..\ProbentApps.Services.Data.Abstractions\ProbentApps.Services.Data.Abstractions.csproj" />
     <ProjectReference Include="..\ProbentApps.Services.Database\ProbentApps.Services.Database.csproj" />
+    <ProjectReference Include="..\ProbentApps.Services.Email\ProbentApps.Services.Email.csproj" />
   </ItemGroup>
 
   <ItemGroup>
