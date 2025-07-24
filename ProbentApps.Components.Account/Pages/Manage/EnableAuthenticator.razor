@@ -1,71 +1,49 @@
 @page "/Account/Manage/EnableAuthenticator"
 
-@using System.Globalization
-
 @inject UserManager<ApplicationUser> UserManager
 @inject IdentityUserAccessor UserAccessor
 @inject UrlEncoder UrlEncoder
 @inject IdentityRedirectManager RedirectManager
 @inject ILogger<EnableAuthenticator> Logger
 
-<PageTitle>Configure authenticator app</PageTitle>
+<PageTitle Title="Configure a two-factor authentication app" SubPage />
 
-@if (recoveryCodes is not null)
-{
-    <ShowRecoveryCodes RecoveryCodes="recoveryCodes.ToArray()" StatusMessage="@message" />
-}
-else
-{
-    <MudText Typo="Typo.h6" GutterBottom="true">Configure authenticator app</MudText>
+<StatusMessage Message="@message" />
 
-    <StatusMessage Message="@message" />
+<MudText GutterBottom>To use an authenticator app go through the following steps:</MudText>
 
-    <MudText Typo="Typo.body1" GutterBottom="true">To use an authenticator app go through the following steps:</MudText>
+<ol>
+    <li>
+        <MudText Typo="Typo.body2">Install a two-factor authentication app.</MudText>
+    </li>
+    <li>
+        <MudText Typo="Typo.body2">
+            Enter this key into your two-factor authentication app. Spaces and casing do not matter.
+        </MudText>
 
-    <ol class="list">
-        <li>
-            <MudText Typo="Typo.body2">
-                Download a two-factor authenticator app like Microsoft Authenticator for
-                <MudLink Target="_blank" Href="https://go.microsoft.com/fwlink/?Linkid=825072">Android</MudLink> and
-                <MudLink Target="_blank" Href="https://go.microsoft.com/fwlink/?Linkid=825073">iOS</MudLink> or
-                Google Authenticator for
-                <MudLink Target="_blank" Href="https://play.google.com/store/apps/details?id=com.google.android.apps.authenticator2&amp;hl=en">Android</MudLink> and
-                <MudLink Target="_blank" Href="https://itunes.apple.com/us/app/google-authenticator/id388497605?mt=8">iOS</MudLink>.
-            </MudText>
-        </li>
-        <li>
-            <MudText Typo="Typo.body2">
-                Scan the QR Code or enter this key into your two factor authenticator app. Spaces and casing do not matter:
-            </MudText>
+        <MudAlert Severity="Severity.Info" Icon="@Icons.Material.Filled.Key">@sharedKey</MudAlert>
+    </li>
+    <li>
+        <MudText Typo="Typo.body2">
+            Once you have input the key above, your two factor authentication app will provide you
+            with a one-time code. Enter the code in the confirmation box below.
+        </MudText>
 
-            <MudAlert Variant="Variant.Text" Severity="Severity.Info" Icon="@Icons.Material.Filled.Key">@sharedKey</MudAlert>
-
-            <MudText Typo="Typo.body2">
-                Learn how to <MudLink Target="_blank" Href="https://go.microsoft.com/fwlink/?Linkid=852423">enable QR code generation</MudLink>.
-            </MudText>
-
-            <div data-url="@authenticatorUri"></div>
-        </li>
-        <li>
-            <MudText Typo="Typo.body2">
-                Once you have scanned the QR code or input the key above, your two factor authentication app will provide you
-                with a unique code. Enter the code in the confirmation box below.
-            </MudText>
-
-            <EditForm Model="Input" FormName="send-code" OnValidSubmit="OnValidSubmitAsync" method="post">
-                <DataAnnotationsValidator />
-                <MudGrid>
-                    <MudItem md="12">
-                        <MudStaticTextField @bind-Value="@Input.Code" For="@(() => Input.Code)" Label="Verification Code" HelperText="Please enter the code." />
-                    </MudItem>
-                    <MudItem md="12">
-                        <MudStaticButton Variant="Variant.Filled" Color="Color.Primary" FullWidth="true" FormAction="FormAction.Submit">Verify</MudStaticButton>
-                    </MudItem>
-                </MudGrid>
-            </EditForm>
-        </li>
-    </ol>
-}
+        <EditForm Model="Input" FormName="send-code" OnValidSubmit="OnValidSubmitAsync" method="post">
+            <DataAnnotationsValidator />
+            <MudGrid>
+                <MudItem md="12">
+                    <MudStaticTextField For="@(() => Input.Code)" @bind-Value="@Input.Code"
+                        Label="Verification code" HelperText="Please enter the code."
+                        autocomplete="one-time-code" aria-required="true" />
+                </MudItem>
+                <MudItem md="12">
+                    <MudStaticButton Variant="Variant.Filled" Color="Color.Primary" FullWidth FormAction="FormAction.Submit">Verify</MudStaticButton>
+                </MudItem>
+            </MudGrid>
+        </EditForm>
+    </li>
+</ol>
 
 @code {
     private const string AuthenticatorUriFormat = "otpauth://totp/{0}:{1}?secret={2}&issuer={0}&digits=6";
@@ -74,7 +52,6 @@ else
     private ApplicationUser user = default!;
     private string? sharedKey;
     private string? authenticatorUri;
-    private IEnumerable<string>? recoveryCodes;
 
     [CascadingParameter]
     private HttpContext HttpContext { get; set; } = default!;
@@ -104,19 +81,10 @@ else
         }
 
         await UserManager.SetTwoFactorEnabledAsync(user, true);
-        var userId = await UserManager.GetUserIdAsync(user);
-        Logger.LogInformation("User with ID '{UserId}' has enabled 2FA with an authenticator app.", userId);
 
-        message = "Your authenticator app has been verified.";
+        Logger.LogInformation("User with ID '{UserId}' has enabled 2FA with an authenticator app.", user.Id);
 
-        if (await UserManager.CountRecoveryCodesAsync(user) == 0)
-        {
-            recoveryCodes = await UserManager.GenerateNewTwoFactorRecoveryCodesAsync(user, 10);
-        }
-        else
-        {
-            RedirectManager.RedirectToWithStatus("Account/Manage/TwoFactorAuthentication", message, HttpContext);
-        }
+        RedirectManager.RedirectToWithStatus("Account/Manage/TwoFactorAuthentication", "Your authenticator app has been verified.", HttpContext);
     }
 
     private async ValueTask LoadSharedKeyAndQrCodeUriAsync(ApplicationUser user)
@@ -152,20 +120,18 @@ else
         return result.ToString().ToLowerInvariant();
     }
 
-    private string GenerateQrCodeUri(string email, string unformattedKey)
-    {
-        return string.Format(
-            CultureInfo.InvariantCulture,
+    private string GenerateQrCodeUri(string email, string unformattedKey) =>
+        string.Format(
+            System.Globalization.CultureInfo.InvariantCulture,
             AuthenticatorUriFormat,
-            UrlEncoder.Encode("Microsoft.AspNetCore.Identity.UI"),
+            UrlEncoder.Encode(@$"{nameof(ProbentApps)}.{nameof(Components)}.{nameof(Account)}"),
             UrlEncoder.Encode(email),
             unformattedKey);
-    }
 
     private sealed class InputModel
     {
         [Required]
-        [StringLength(7, ErrorMessage = "The {0} must be at least {2} and at max {1} characters long.", MinimumLength = 6)]
+        [StringLength(6, ErrorMessage = "The {0} must be exactly {1} characters long.", MinimumLength = 6)]
         [DataType(DataType.Text)]
         [Display(Name = "Verification Code")]
         public string Code { get; set; } = "";

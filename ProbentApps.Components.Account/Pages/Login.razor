@@ -1,59 +1,54 @@
 @page "/Account/Login"
 
 @inject SignInManager<ApplicationUser> SignInManager
+@inject UserManager<ApplicationUser> UserManager
 @inject ILogger<Login> Logger
-@inject NavigationManager NavigationManager
 @inject IdentityRedirectManager RedirectManager
 
-<PageTitle>Log in</PageTitle>
-
-<MudText Typo="Typo.h3" GutterBottom="true">Log in</MudText>
+<PageTitle Title="Log in" />
 
 <MudGrid>
     <MudItem md="6">
-        <StatusMessage Message="@errorMessage" />
-        <EditForm Model="Input" method="post" OnValidSubmit="LoginUser" FormName="login">
+        <StatusMessage Message="@message" />
+        <EditForm Model="Input" OnValidSubmit="OnValidSubmitAsync" FormName="login" method="post">
             <DataAnnotationsValidator />
 
-            <MudText GutterBottom="true" Typo="Typo.body1">Use a local account to log in.</MudText>
+            <MudText GutterBottom>Use a local account to log in.</MudText>
 
             <MudGrid>
                 <MudItem md="12">
-                    <MudStaticTextField For="@(() => Input.UserName)" @bind-Value="Input.UserName" 
-                        Label="Username" 
-                        UserAttributes="@(new() { { "autocomplete", "username" }, { "aria-required", "true" } } )" />
+                    <MudStaticTextField For="@(() => Input.Username)" @bind-Value="Input.Username"
+                        Label=@(nameof(Input.Username))
+                        autocomplete="username" aria-required="true" />
                 </MudItem>
                 <MudItem md="12">
-                    <MudStaticTextField For="@(() => Input.Password)" @bind-Value="Input.Password" 
-                        Label="Password" InputType="InputType.Password" Placeholder="password" 
-                        UserAttributes="@(new() { { "autocomplete", "current-password" }, { "aria-required", "true" } } )" />
+                    <MudStaticTextField For="@(() => Input.Password)" @bind-Value="Input.Password"
+                        Label=@(nameof(Input.Password)) InputType="InputType.Password"
+                        autocomplete="current-password" aria-required="true" />
                 </MudItem>
                 <MudItem md="12">
-                    <MudStaticCheckBox For="@(() => Input.RememberMe)" @bind-Value="Input.RememberMe">Remember me</MudStaticCheckBox>
+                    <MudStaticCheckBox For="@(() => Input.RememberMe)" @bind-Value="Input.RememberMe">Remember me?</MudStaticCheckBox>
                 </MudItem>
                 <MudItem md="12">
-                    <MudStaticButton Variant="Variant.Filled" Color="Color.Primary" FullWidth="true" FormAction="FormAction.Submit">Log in</MudStaticButton>
+                    <MudStaticButton Variant="Variant.Filled" Color="Color.Primary" FullWidth FormAction="FormAction.Submit">Log in</MudStaticButton>
                 </MudItem>
             </MudGrid>
         </EditForm>
 
-        <MudGrid Class="mt-4">
-            <MudItem md="12">
-                <MudLink Href="Account/ForgotPassword">Forgot your password?</MudLink><br />
-                <MudLink Href="@(NavigationManager.GetUriWithQueryParameters("Account/Register", new Dictionary<string, object?> { ["ReturnUrl"] = ReturnUrl }))">Register as a new user</MudLink><br />
-                <MudLink Href="Account/ResendEmailConfirmation">Resend email confirmation</MudLink>
-            </MudItem>
-        </MudGrid>
+        <MudStack Class="mt-6">
+            <MudLink Href="Account/ForgotPassword">Forgot your password?</MudLink>
+            <MudLink Href="@(RedirectManager.GetUriWithReturnUrl("Account/Register", ReturnUrl))">Register as a new user</MudLink>
+            <MudLink Href="Account/ResendEmailConfirmation">Resend email confirmation</MudLink>
+        </MudStack>
     </MudItem>
     <MudItem md="6">
-        <MudText GutterBottom="true" Typo="Typo.body1">Use another service to log in.</MudText>
-
+        <MudText GutterBottom>Use another service to log in.</MudText>
         <ExternalLoginPicker />
     </MudItem>
 </MudGrid>
 
 @code {
-    private string? errorMessage;
+    private string? message;
 
     [CascadingParameter]
     private HttpContext HttpContext { get; set; } = default!;
@@ -73,40 +68,41 @@
         }
     }
 
-    public async Task LoginUser()
+    public async Task OnValidSubmitAsync()
     {
-        // This doesn't count login failures towards account lockout
-        // To enable password failures to trigger account lockout, set lockoutOnFailure: true
-        var result = await SignInManager.PasswordSignInAsync(Input.UserName, Input.Password, Input.RememberMe, lockoutOnFailure: false);
-        if (result.Succeeded)
+        if ((await UserManager.FindByNameAsync(Input.Username) ?? await UserManager.FindByEmailAsync(Input.Username)) is ApplicationUser user)
         {
-            Logger.LogInformation("User logged in.");
-            RedirectManager.RedirectTo(ReturnUrl);
+            var result = await SignInManager.PasswordSignInAsync(user, Input.Password, Input.RememberMe, lockoutOnFailure: true);
+
+            if (result.Succeeded)
+            {
+                Logger.LogInformation("User with ID '{UserId}' logged in.", user.Id);
+                RedirectManager.RedirectTo(ReturnUrl);
+            }
+            else if (result.RequiresTwoFactor)
+            {
+                RedirectManager.RedirectTo("Account/LoginWith2fa",
+                    new() { ["returnUrl"] = ReturnUrl, ["rememberMe"] = Input.RememberMe });
+            }
+            else if (result.IsLockedOut)
+            {
+                Logger.LogWarning("User with ID '{UserId}' locked out.", user.Id);
+                RedirectManager.RedirectToCurrentPageWithStatus("Error: Account has been locked out. Please try again later.", HttpContext);
+            }
         }
-        else if (result.RequiresTwoFactor)
-        {
-            RedirectManager.RedirectTo(
-                "Account/LoginWith2fa",
-                new() { ["returnUrl"] = ReturnUrl, ["rememberMe"] = Input.RememberMe });
-        }
-        else if (result.IsLockedOut)
-        {
-            Logger.LogWarning("User account locked out.");
-            RedirectManager.RedirectTo("Account/Lockout");
-        }
-        else
-        {
-            errorMessage = "Error: Invalid login attempt.";
-        }
+
+        message = "Error: Invalid login attempt.";
     }
 
     private sealed class InputModel
     {
         [Required]
-        public string UserName { get; set; } = "";
+        [Display(Name = nameof(Username))]
+        public string Username { get; set; } = "";
 
         [Required]
         [DataType(DataType.Password)]
+        [Display(Name = nameof(Password))]
         public string Password { get; set; } = "";
 
         [Display(Name = "Remember me?")]

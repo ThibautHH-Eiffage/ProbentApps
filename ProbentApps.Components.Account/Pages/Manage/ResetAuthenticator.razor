@@ -6,11 +6,7 @@
 @inject IdentityRedirectManager RedirectManager
 @inject ILogger<ResetAuthenticator> Logger
 
-<PageTitle>Reset authenticator key</PageTitle>
-
-<MudText Typo="Typo.h6" GutterBottom="true">Reset authenticator key</MudText>
-
-<StatusMessage />
+<PageTitle Title="Reset authenticator" SubPage />
 
 <MudAlert Severity="Severity.Warning" Variant="Variant.Text">
     If you reset your authenticator key your authenticator app will not work until you reconfigure it.
@@ -21,11 +17,9 @@
     If you do not complete your authenticator app configuration you may lose access to your account.
 </MudText>
 
-<form @formname="reset-authenticator" @onsubmit="OnSubmitAsync" method="post">
-    <AntiforgeryToken />
-
-    <MudStaticButton Variant="Variant.Filled" Color="Color.Primary" FullWidth="true" FormAction="FormAction.Submit">Reset authenticator key</MudStaticButton>
-</form>
+<PostForm FormName="reset-authenticator" OnSubmit="OnSubmitAsync">
+    <MudStaticButton Variant="Variant.Filled" Color="Color.Primary" FullWidth FormAction="FormAction.Submit">Reset authenticator key</MudStaticButton>
+</PostForm>
 
 @code {
     [CascadingParameter]
@@ -36,14 +30,14 @@
         var user = await UserAccessor.GetRequiredUserAsync(HttpContext);
         await UserManager.SetTwoFactorEnabledAsync(user, false);
         await UserManager.ResetAuthenticatorKeyAsync(user);
-        var userId = await UserManager.GetUserIdAsync(user);
-        Logger.LogInformation("User with ID '{UserId}' has reset their authentication app key.", userId);
+
+        Logger.LogInformation("User with ID '{UserId}' has reset their authentication app key.", user.Id);
 
         await SignInManager.RefreshSignInAsync(user);
 
         RedirectManager.RedirectToWithStatus(
             "Account/Manage/EnableAuthenticator",
-            "Your authenticator app key has been reset, you will need to configure your authenticator app using the new key.",
+            "Your authenticator app key has been reset, you will need to reconfigure your authenticator app using the new key.",
             HttpContext);
     }
 }
