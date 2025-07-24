@@ -4,9 +4,7 @@
 @inject SignInManager<ApplicationUser> SignInManager
 @inject IdentityRedirectManager RedirectManager
 
-<PageTitle>Confirm email change</PageTitle>
-
-<h1>Confirm email change</h1>
+<PageTitle Title="Email address change confirmation" />
 
 <StatusMessage Message="@message" />
 
@@ -27,37 +25,17 @@
 
     protected override async Task OnInitializedAsync()
     {
-        if (UserId is null || Email is null || Code is null)
+        if (UserId is null || Email is null || Code is null
+            || await UserManager.FindByIdAsync(UserId) is not ApplicationUser user
+            || !(await UserManager.ChangeEmailAsync(user, Email, Encoding.UTF8.GetString(WebEncoders.Base64UrlDecode(Code)))).Succeeded)
         {
-            RedirectManager.RedirectToWithStatus(
-                "Account/Login", "Error: Invalid email change confirmation link.", HttpContext);
+            RedirectManager.RedirectToWithStatus("Account/Email", "Error: Invalid email address change confirmation link.", HttpContext);
         }
-
-        var user = await UserManager.FindByIdAsync(UserId);
-        if (user is null)
+        else
         {
-            message = "Unable to find user with Id '{userId}'";
-            return;
-        }
+            await SignInManager.RefreshSignInAsync(user);
 
-        var code = Encoding.UTF8.GetString(WebEncoders.Base64UrlDecode(Code));
-        var result = await UserManager.ChangeEmailAsync(user, Email, code);
-        if (!result.Succeeded)
-        {
-            message = "Error changing email.";
-            return;
+            message = "Email address change confirmed successfully.";
         }
-
-        // In our UI email and user name are one and the same, so when we update the email
-        // we need to update the user name.
-        var setUserNameResult = await UserManager.SetUserNameAsync(user, Email);
-        if (!setUserNameResult.Succeeded)
-        {
-            message = "Error changing user name.";
-            return;
-        }
-
-        await SignInManager.RefreshSignInAsync(user);
-        message = "Thank you for confirming your email change.";
     }
 }

@@ -1,4 +1,5 @@
 using System.Diagnostics.CodeAnalysis;
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Http;
 
@@ -42,6 +43,20 @@ public sealed class IdentityRedirectManager(NavigationManager navigationManager)
     }
 
     [DoesNotReturn]
+    public void RedirectToWithReturnUrl(string uri, string? returnUrl) => RedirectTo(GetUriWithReturnUrl(uri, returnUrl));
+
+    public string GetUriWithReturnUrl(string uri, string? returnUrl)
+    {
+        var uriWithoutQuery = navigationManager.ToAbsoluteUri(uri).GetLeftPart(UriPartial.Path);
+        return returnUrl is null
+            ? uriWithoutQuery
+            : navigationManager.GetUriWithQueryParameters(uriWithoutQuery, new Dictionary<string, object?>
+            {
+                [CookieAuthenticationDefaults.ReturnUrlParameter] = returnUrl
+            });
+    }
+
+    [DoesNotReturn]
     public void RedirectToWithStatus(string uri, string message, HttpContext context)
     {
         context.Response.Cookies.Append(StatusCookieName, message, StatusCookieBuilder.Build(context));
@@ -54,6 +69,5 @@ public sealed class IdentityRedirectManager(NavigationManager navigationManager)
     public void RedirectToCurrentPage() => RedirectTo(CurrentPath);
 
     [DoesNotReturn]
-    public void RedirectToCurrentPageWithStatus(string message, HttpContext context)
-        => RedirectToWithStatus(CurrentPath, message, context);
+    public void RedirectToCurrentPageWithStatus(string message, HttpContext context) => RedirectToWithStatus(CurrentPath, message, context);
 }

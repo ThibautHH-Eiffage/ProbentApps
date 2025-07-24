@@ -8,48 +8,49 @@
 @inject NavigationManager NavigationManager
 @inject IdentityRedirectManager RedirectManager
 
-<PageTitle>Register</PageTitle>
-
-<MudText Typo="Typo.h3" GutterBottom="true">Register</MudText>
+<PageTitle Title="Register" />
 
 <MudGrid>
     <MudItem md="6">
-        <StatusMessage Message="@Message" />
-        <EditForm Model="Input" asp-route-returnUrl="@ReturnUrl" method="post" OnValidSubmit="RegisterUser" FormName="register">
+        <StatusMessage Message="@message" />
+        <EditForm Model="Input" OnValidSubmit="RegisterUser" FormName="register" method="post" asp-route-returnUrl="@ReturnUrl">
             <DataAnnotationsValidator />
 
-            <MudText Typo="Typo.body1" GutterBottom="true">Create a new account.</MudText>
+            <MudText GutterBottom>Create a new account.</MudText>
 
             <MudGrid>
                 <MudItem md="12">
                     <MudStaticTextField For="@(() => Input.Email)" @bind-Value="Input.Email"
-                                        Label="Email" Placeholder="name@example.com"
-                                        UserAttributes="@(new() { { "autocomplete", "username" }, { "aria-required", "true" } } )" />
+                        Label="Email" Placeholder="name@example.com"
+                        autocomplete="username" aria-required="true" />
                 </MudItem>
                 <MudItem md="12">
                     <MudStaticTextField For="@(() => Input.Password)" @bind-Value="Input.Password"
-                                        Label="Password" InputType="InputType.Password" Placeholder="password"
-                                        UserAttributes="@(new() { { "autocomplete", "new-password" }, { "aria-required", "true" } } )" />
+                        Label="Password" InputType="InputType.Password"
+                        autocomplete="new-password" aria-required="true" />
                 </MudItem>
                 <MudItem md="12">
                     <MudStaticTextField For="@(() => Input.ConfirmPassword)" @bind-Value="Input.ConfirmPassword"
-                                        Label="Confirm Password" InputType="InputType.Password" Placeholder="confirm password"
-                                        UserAttributes="@(new() { { "autocomplete", "new-password" }, { "aria-required", "true" } } )" />
+                        Label="Password confirmation" InputType="InputType.Password"
+                        autocomplete="new-password" aria-required="true" />
                 </MudItem>
                 <MudItem md="12">
-                    <MudStaticButton Variant="Variant.Filled" Color="Color.Primary" FullWidth="true" FormAction="FormAction.Submit">Register</MudStaticButton>
+                    <MudStaticButton Variant="Variant.Filled" Color="Color.Primary" FullWidth FormAction="FormAction.Submit">Register</MudStaticButton>
                 </MudItem>
             </MudGrid>
         </EditForm>
     </MudItem>
     <MudItem md="6">
-        <MudText Typo="Typo.body1" GutterBottom="true">Use another service to register.</MudText>
+        <MudText Typo="Typo.body1" GutterBottom>Use another service to register.</MudText>
         <ExternalLoginPicker />
     </MudItem>
 </MudGrid>
 
 @code {
-    private IEnumerable<IdentityError>? identityErrors;
+    private string? message;
+
+    [CascadingParameter]
+    private HttpContext HttpContext { get; set; } = default!;
 
     [SupplyParameterFromForm]
     private InputModel Input { get; set; } = new();
@@ -57,65 +58,42 @@
     [SupplyParameterFromQuery]
     private string? ReturnUrl { get; set; }
 
-    private string? Message => identityErrors is null ? null : $"Error: {string.Join(", ", identityErrors.Select(error => error.Description))}";
-
     public async Task RegisterUser(EditContext editContext)
     {
-        var user = CreateUser();
+        var user = new ApplicationUser() { ManagedStructures = null! };
 
         await UserStore.SetUserNameAsync(user, Input.Email, CancellationToken.None);
-        var emailStore = GetEmailStore();
-        await emailStore.SetEmailAsync(user, Input.Email, CancellationToken.None);
-        var result = await UserManager.CreateAsync(user, Input.Password);
+        await ((UserManager.SupportsUserEmail ? UserStore as IUserEmailStore<ApplicationUser> : null)
+            ?.SetEmailAsync(user, Input.Email, CancellationToken.None) ?? Task.CompletedTask);
 
+        var result = await UserManager.CreateAsync(user, Input.Password);
         if (!result.Succeeded)
         {
-            identityErrors = result.Errors;
+            message = $"Error: {string.Join(", ", result.Errors.Select(error => error.Description))}";
             return;
         }
 
-        Logger.LogInformation("User created a new account with password.");
+        Logger.LogInformation("User with ID '{UserId}' created with local password.", user.Id);
 
-        var userId = await UserManager.GetUserIdAsync(user);
-        var code = await UserManager.GenerateEmailConfirmationTokenAsync(user);
-        code = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(code));
         var callbackUrl = NavigationManager.GetUriWithQueryParameters(
             NavigationManager.ToAbsoluteUri("Account/ConfirmEmail").AbsoluteUri,
-            new Dictionary<string, object?> { ["userId"] = userId, ["code"] = code, ["returnUrl"] = ReturnUrl });
+            new Dictionary<string, object?>
+            {
+                ["userId"] = user.Id,
+                ["returnUrl"] = ReturnUrl,
+                ["code"] = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(
+                    await UserManager.GenerateEmailConfirmationTokenAsync(user)))
+            });
 
         await EmailSender.SendConfirmationLinkAsync(user, Input.Email, HtmlEncoder.Default.Encode(callbackUrl));
 
         if (UserManager.Options.SignIn.RequireConfirmedAccount)
         {
-            RedirectManager.RedirectTo(
-                "Account/RegisterConfirmation",
-                new() { ["email"] = Input.Email, ["returnUrl"] = ReturnUrl });
+            RedirectManager.RedirectToCurrentPageWithStatus("Verification email sent. Please check your email.", HttpContext);
         }
 
         await SignInManager.SignInAsync(user, isPersistent: false);
         RedirectManager.RedirectTo(ReturnUrl);
-    }
-
-    private static ApplicationUser CreateUser()
-    {
-        try
-        {
-            return Activator.CreateInstance<ApplicationUser>();
-        }
-        catch
-        {
-            throw new InvalidOperationException($"Can't create an instance of '{nameof(ApplicationUser)}'. " +
-                $"Ensure that '{nameof(ApplicationUser)}' is not an abstract class and has a parameterless constructor.");
-        }
-    }
-
-    private IUserEmailStore<ApplicationUser> GetEmailStore()
-    {
-        if (!UserManager.SupportsUserEmail)
-        {
-            throw new NotSupportedException("The default UI requires a user store with email support.");
-        }
-        return (IUserEmailStore<ApplicationUser>)UserStore;
     }
 
     private sealed class InputModel
@@ -126,7 +104,6 @@
         public string Email { get; set; } = "";
 
         [Required]
-        [StringLength(100, ErrorMessage = "The {0} must be at least {2} and at max {1} characters long.", MinimumLength = 6)]
         [DataType(DataType.Password)]
         [Display(Name = "Password")]
         public string Password { get; set; } = "";

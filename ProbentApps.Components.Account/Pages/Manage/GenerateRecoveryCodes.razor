@@ -5,34 +5,43 @@
 @inject IdentityRedirectManager RedirectManager
 @inject ILogger<GenerateRecoveryCodes> Logger
 
-<PageTitle>Generate two-factor authentication (2FA) recovery codes</PageTitle>
+<PageTitle Title="@(recoveryCodes is null ? "Generate two-factor authentication (2FA) recovery codes" : "Recovery codes")" SubPage />
 
+<StatusMessage Message="@message" />
+
+<MudAlert Severity="Severity.Warning" Variant="Variant.Text">
 @if (recoveryCodes is not null)
 {
-    <ShowRecoveryCodes RecoveryCodes="recoveryCodes.ToArray()" StatusMessage="@message" />
+    <MudText HtmlTag="strong">Put these codes in a safe place.</MudText>
+    <MudText>
+        If you lose your device and don't have the recovery codes you will lose access to your account.
+    </MudText>
 }
 else
 {
-    <h3>Generate two-factor authentication (2FA) recovery codes</h3>
-    <div class="alert alert-warning" role="alert">
-        <p>
-            <span class="glyphicon glyphicon-warning-sign"></span>
-            <strong>Put these codes in a safe place.</strong>
-        </p>
-        <p>
-            If you lose your device and don't have the recovery codes you will lose access to your account.
-        </p>
-        <p>
-            Generating new recovery codes does not change the keys used in authenticator apps. If you wish to change the key
-            used in an authenticator app you should <a href="Account/Manage/ResetAuthenticator">reset your authenticator keys.</a>
-        </p>
-    </div>
-    <div>
-        <form @formname="generate-recovery-codes" @onsubmit="OnSubmitAsync" method="post">
-            <AntiforgeryToken />
-            <button class="btn btn-danger" type="submit">Generate Recovery Codes</button>
-        </form>
-    </div>
+    <MudText>
+        Generating new recovery codes does not change the keys used in authenticator apps. If you wish to change the key
+        used in an authenticator app you should <MudLink Href="Account/Manage/ResetAuthenticator">reset your authenticator keys</MudLink>.
+    </MudText>
+}
+</MudAlert>
+
+@if (recoveryCodes is null)
+{
+    <PostForm FormName="generate-recovery-codes" OnSubmit="OnSubmitAsync">
+        <MudButton Color="Color.Error" ButtonType="ButtonType.Submit">Generate recovery codes</MudButton>
+    </PostForm>
+}
+else
+{
+    <MudGrid>
+        <MudItem md="12">
+            @foreach (var recoveryCode in recoveryCodes)
+            {
+                <MudText Typo="Typo.body1" HtmlTag="code">@recoveryCode</MudText>
+            }
+        </MudItem>
+    </MudGrid>
 }
 
 @code {
@@ -45,12 +54,9 @@ else
 
     protected override async Task OnInitializedAsync()
     {
-        user = await UserAccessor.GetRequiredUserAsync(HttpContext);
-
-        var isTwoFactorEnabled = await UserManager.GetTwoFactorEnabledAsync(user);
-        if (!isTwoFactorEnabled)
+        if (!await UserManager.GetTwoFactorEnabledAsync(await UserAccessor.GetRequiredUserAsync(HttpContext)))
         {
-            throw new InvalidOperationException("Cannot generate recovery codes for user because they do not have 2FA enabled.");
+            RedirectManager.RedirectTo("Account/Manage/EnableAuthenticator");
         }
     }
 
@@ -58,8 +64,9 @@ else
     {
         var userId = await UserManager.GetUserIdAsync(user);
         recoveryCodes = await UserManager.GenerateNewTwoFactorRecoveryCodesAsync(user, 10);
-        message = "You have generated new recovery codes.";
 
-        Logger.LogInformation("User with ID '{UserId}' has generated new 2FA recovery codes.", userId);
+        Logger.LogInformation("User with ID '{UserId}' generated new 2FA recovery codes.", userId);
+
+        message = "Recovery codes generated successfully.";
     }
 }
