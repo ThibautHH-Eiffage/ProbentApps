@@ -12,11 +12,11 @@ namespace ProbentApps.Services.Identity.Data;
 /// </summary>
 /// <typeparam name="TUser">A <see cref="IdentityUser{TKey}"/>-based user class implementing <see cref="IHashedNormalizationUser"/>.</typeparam>
 /// <inheritdoc/>
-public class LookupHashingUserStore<TUser, TRole, TConext, TKey>(TConext context, IdentityErrorDescriber? describer = null)
-    : UserStore<TUser, TRole, TConext, TKey>(context, describer)
+public class LookupHashingUserStore<TUser, TRole, TContext, TKey>(TContext context, IdentityErrorDescriber? describer = null)
+    : UserStore<TUser, TRole, TContext, TKey>(context, describer)
     where TUser : IdentityUser<TKey>, IHashedNormalizationUser
     where TRole : IdentityRole<TKey>
-    where TConext : DbContext
+    where TContext : DbContext
     where TKey : IEquatable<TKey>
 {
     public override Task<TUser?> FindByNameAsync(string normalizedUserName, CancellationToken cancellationToken = default)
@@ -39,6 +39,7 @@ public class LookupHashingUserStore<TUser, TRole, TConext, TKey>(TConext context
     {
         cancellationToken.ThrowIfCancellationRequested();
         ThrowIfDisposed();
+
         return Users.SingleOrDefaultAsync(u => u.NormalizedEmail != null
             && u.NormalizedEmail == (u.NormalizationSalt != null
                 ? Convert.ToBase64String(
