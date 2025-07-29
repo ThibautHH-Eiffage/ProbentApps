@@ -19,6 +19,6 @@ public sealed class IdentityUserAccessor(SignInManager<ApplicationUser> signInMa
         redirectManager.RedirectToWithStatus("Account/Login",
             $"Error: Invalid credentials, please log in again. (ID '{userManager.GetUserId(context.User)}')",
             context);
-        throw new InvalidOperationException($"{nameof(IdentityRedirectManager)} can only be used during static rendering.");
+        throw new InvalidOperationException($"{nameof(IdentityUserAccessor)} can only be used during static rendering.");
     }
 }
