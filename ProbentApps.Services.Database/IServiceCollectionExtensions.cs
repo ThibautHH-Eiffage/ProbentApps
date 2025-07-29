@@ -10,26 +10,27 @@ namespace ProbentApps.Services.Database;
 
 public static class IServiceCollectionExtensions
 {
-    private static void ConfigureDbContext<TContext>(this IHostApplicationBuilder builder, DbContextOptionsBuilder options)
+    private static string GetRequiredConnectionString(this IConfiguration configuration, string name) => configuration.GetConnectionString(name)
+        ?? throw new InvalidOperationException(name + ": No such connection string");
+
+    private static DbContextOptionsBuilder UseEnvironmentConfiguration(this DbContextOptionsBuilder options, IHostEnvironment environment) => options
+        .EnableSensitiveDataLogging(environment.IsDevelopment())
+        .ConfigureWarnings(warnings => { if (environment.IsDevelopment()) warnings.Ignore(CoreEventId.SensitiveDataLoggingEnabledWarning); });
+
+    private static void ConfigureDbContext<TContext>(this DbContextOptionsBuilder options, IHostEnvironment environment, IConfiguration configuration)
         where TContext : DbContext, IDbContext =>
-            builder.ConfigureDbContext<TContext>(options, nameof(ProbentApps));
-    private static void ConfigureDbContext<TContext>(this IHostApplicationBuilder builder, DbContextOptionsBuilder options, string connectionString)
+            ConfigureDbContext<TContext>(options.UseEnvironmentConfiguration(environment),
+                configuration.GetRequiredConnectionString(nameof(ProbentApps)));
+
+    private static void ConfigureDbContext<TContext>(DbContextOptionsBuilder options, string connectionString)
         where TContext : DbContext, IDbContext =>
             ((IDbContextOptionsBuilderInfrastructure)
-                options.UseSqlServer(builder.Configuration.GetConnectionString(connectionString)
-                    ?? throw new InvalidOperationException(connectionString + ": No such connection string"),
-                    options => options.MigrationsHistoryTable("MigrationsHistory", TContext.Schema))
-                .EnableSensitiveDataLogging(builder.Environment.IsDevelopment())
-                .ConfigureWarnings(warnings => warnings.Ignore(CoreEventId.SensitiveDataLoggingEnabledWarning)))
+                options.UseSqlServer(connectionString, builder => builder.MigrationsHistoryTable("MigrationsHistory", TContext.Schema)))
             .AddOrUpdateExtension(ProbentAppsDbContextOptionsExtension.Instance);
 
-    public static IServiceCollection AddDatabaseServices(this IHostApplicationBuilder builder)
-    {
-        builder.Services.AddDbContext<DataProtectionDbContext>(builder.ConfigureDbContext<DataProtectionDbContext>)
-            .AddDbContext<IdentityDbContext, IdentityDbContext<IdentityDbFunctions>>(builder.ConfigureDbContext<IdentityDbContext>)
-            .AddIdentityMigrationsDbContext(builder.ConfigureDbContext<IdentityDbContext>)
-            .AddDbContextFactory<ApplicationDbContext>(builder.ConfigureDbContext<ApplicationDbContext>);
-
-        return builder.Services;
-    }
+    public static IServiceCollection AddDatabaseServices(this IServiceCollection services, IHostEnvironment environment, IConfiguration configuration) => services
+        .AddDbContext<DataProtectionDbContext>(o => o.ConfigureDbContext<DataProtectionDbContext>(environment, configuration))
+        .AddDbContext<IdentityDbContext, IdentityDbContext<IdentityDbFunctions>>(o => o.ConfigureDbContext<IdentityDbContext>(environment, configuration))
+        .AddIdentityMigrationsDbContext(o => o.ConfigureDbContext<IdentityDbContext>(environment, configuration))
+        .AddDbContextFactory<ApplicationDbContext>(o => o.ConfigureDbContext<ApplicationDbContext>(environment, configuration));
 }
