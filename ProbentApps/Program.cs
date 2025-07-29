@@ -5,7 +5,7 @@ using ProbentApps.Services.Database;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.AddApplicationServices();
+builder.Services.AddApplicationServices(builder.Environment, builder.Configuration);
 
 var app = builder.Build();
 

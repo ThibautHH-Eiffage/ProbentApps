@@ -1,3 +1,4 @@
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using ProbentApps.Services.Components;
@@ -11,8 +12,9 @@ namespace ProbentApps.Services;
 
 public static class IServiceCollectionExtensions
 {
-    public static IServiceCollection AddApplicationServices(this IHostApplicationBuilder builder) => builder
-        .AddDatabaseServices()
+    public static IServiceCollection AddApplicationServices(this IServiceCollection services,
+        IHostEnvironment environment, IConfigurationManager configuration) => services
+        .AddDatabaseServices(environment, configuration)
         .AddEmailServices()
         .AddIdentityServices()
         .AddDataServices()
