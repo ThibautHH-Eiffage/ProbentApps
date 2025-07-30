@@ -66,6 +66,7 @@ public partial class CreateSchema : Migration
                 Id = table.Column<Guid>(),
                 Name = table.Column<string>(maxLength: 128),
                 Code = table.Column<string>(maxLength: 64, unicode: false),
+                IsArchived = table.Column<bool>(),
                 StructureId = table.Column<Guid>(),
                 ClientId = table.Column<Guid>()
             },

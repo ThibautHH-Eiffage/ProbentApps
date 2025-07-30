@@ -47,6 +47,7 @@
                   </xs:restriction>
                 </xs:simpleType>
               </xs:element>
+              <xs:element name="IsArchived" type="xs:boolean" />
               <xs:element name="StructureId" msdata:DataType="System.Guid" type="xs:string" />
               <xs:element name="ClientId" msdata:DataType="System.Guid" type="xs:string" />
             </xs:sequence>
@@ -253,7 +254,7 @@
       <msdata:Relationship name="FK_Affairs_Clients_ClientId" msdata:parent="Clients" msdata:child="Affairs" msdata:parentkey="Id" msdata:childkey="ClientId" />
       <msdata:Relationship name="FK_Affairs_Structures_StructureId" msdata:parent="Structures" msdata:child="Affairs" msdata:parentkey="Id" msdata:childkey="StructureId" />
       <msdata:Relationship name="FK_Invoices_Users_RequesterId" msdata:parent="Users" msdata:child="Invoices" msdata:parentkey="Id" msdata:childkey="RequesterId" />
-	  <msdata:Relationship name="FK_Orders_Clients_ClientId" msdata:parent="Clients" msdata:child="Orders" msdata:parentkey="Id" msdata:childkey="ClientId" />
+      <msdata:Relationship name="FK_Orders_Clients_ClientId" msdata:parent="Clients" msdata:child="Orders" msdata:parentkey="Id" msdata:childkey="ClientId" />
       <msdata:Relationship name="FK_Orders_Affairs_AffairId" msdata:parent="Affairs" msdata:child="Orders" msdata:parentkey="Id" msdata:childkey="AffairId" />
       <msdata:Relationship name="FK_Reports_Reports_PreviousReportId" msdata:parent="Reports" msdata:child="Reports" msdata:parentkey="Id" msdata:childkey="PreviousReportId" />
       <msdata:Relationship name="FK_StructureManagements_Structures_StructureId" msdata:parent="Structures" msdata:child="StructureManagements" msdata:parentkey="Id" msdata:childkey="StructureId" />
