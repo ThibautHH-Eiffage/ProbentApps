@@ -18,10 +18,10 @@ public partial class CreateSchema : Migration
             schema: ApplicationDbContext.Schema,
             columns: table => new
             {
-                Id = table.Column<Guid>(nullable: false),
-                Name = table.Column<string>(maxLength: 128, nullable: false),
+                Id = table.Column<Guid>(),
+                Name = table.Column<string>(maxLength: 128),
                 MainProviderId = table.Column<string>(maxLength: 64, nullable: true),
-                ExtraProviderIds = table.Column<string>(nullable: false)
+                ExtraProviderIds = table.Column<string>()
             },
             constraints: table =>
             {
@@ -33,10 +33,10 @@ public partial class CreateSchema : Migration
             schema: ApplicationDbContext.Schema,
             columns: table => new
             {
-                Id = table.Column<Guid>(nullable: false),
+                Id = table.Column<Guid>(),
                 ParentId = table.Column<Guid>(nullable: true),
-                Name = table.Column<string>(maxLength: 64, nullable: false),
-                Code = table.Column<string>(maxLength: 32, nullable: false, unicode: false),
+                Name = table.Column<string>(maxLength: 64),
+                Code = table.Column<string>(maxLength: 32, unicode: false),
                 ManagerId = table.Column<Guid>(nullable: true)
             },
             constraints: table =>
@@ -63,11 +63,11 @@ public partial class CreateSchema : Migration
             schema: ApplicationDbContext.Schema,
             columns: table => new
             {
-                Id = table.Column<Guid>(nullable: false),
-                Name = table.Column<string>(maxLength: 128, nullable: false),
-                ProviderId = table.Column<string>(maxLength: 64, nullable: false),
-                StructureId = table.Column<Guid>(nullable: false),
-                ClientId = table.Column<Guid>(nullable: false)
+                Id = table.Column<Guid>(),
+                Name = table.Column<string>(maxLength: 128),
+                ProviderId = table.Column<string>(maxLength: 64),
+                StructureId = table.Column<Guid>(),
+                ClientId = table.Column<Guid>()
             },
             constraints: table =>
             {
@@ -93,9 +93,9 @@ public partial class CreateSchema : Migration
             schema: ApplicationDbContext.Schema,
             columns: table => new
             {
-                ManagerId = table.Column<Guid>(nullable: false),
-                StructureId = table.Column<Guid>(nullable: false),
-                StartDate = table.Column<DateOnly>(nullable: false)
+                ManagerId = table.Column<Guid>(),
+                StructureId = table.Column<Guid>(),
+                StartDate = table.Column<DateOnly>()
             },
             constraints: table =>
             {
@@ -121,9 +121,9 @@ public partial class CreateSchema : Migration
             schema: ApplicationDbContext.Schema,
             columns: table => new
             {
-                Id = table.Column<Guid>(nullable: false),
-                Name = table.Column<string>(maxLength: 64, nullable: false),
-                RequesterId = table.Column<Guid>(nullable: false),
+                Id = table.Column<Guid>(),
+                Name = table.Column<string>(maxLength: 64),
+                RequesterId = table.Column<Guid>(),
                 RequestDate = table.Column<DateTimeOffset>(nullable: true),
                 ProviderId = table.Column<string>(maxLength: 64, nullable: true),
                 SubmissionDate = table.Column<DateTimeOffset>(nullable: true)
@@ -145,11 +145,11 @@ public partial class CreateSchema : Migration
             schema: ApplicationDbContext.Schema,
             columns: table => new
             {
-                Id = table.Column<Guid>(nullable: false),
-                Name = table.Column<string>(maxLength: 64, nullable: false),
+                Id = table.Column<Guid>(),
+                Name = table.Column<string>(maxLength: 64),
                 Intermediaries = table.Column<string>(maxLength: 128, nullable: true),
                 Notes = table.Column<string>(maxLength: 512, nullable: true),
-                IssuanceDate = table.Column<DateOnly>(nullable: false),
+                IssuanceDate = table.Column<DateOnly>(),
                 AcceptanceDate = table.Column<DateOnly>(nullable: true),
                 PreviousReportId = table.Column<Guid>(nullable: true)
             },
@@ -170,11 +170,11 @@ public partial class CreateSchema : Migration
             schema: ApplicationDbContext.Schema,
             columns: table => new
             {
-                Id = table.Column<Guid>(nullable: false),
-                AffairId = table.Column<Guid>(nullable: false),
-                ClientId = table.Column<Guid>(nullable: false),
-                Name = table.Column<string>(maxLength: 128, nullable: false),
-                ProviderId = table.Column<string>(maxLength: 64, nullable: false)
+                Id = table.Column<Guid>(),
+                AffairId = table.Column<Guid>(),
+                ClientId = table.Column<Guid>(),
+                Name = table.Column<string>(maxLength: 128),
+                ProviderId = table.Column<string>(maxLength: 64)
             },
             constraints: table =>
             {
@@ -200,12 +200,12 @@ public partial class CreateSchema : Migration
             schema: ApplicationDbContext.Schema,
             columns: table => new
             {
-                Id = table.Column<Guid>(nullable: false),
-                Name = table.Column<string>(maxLength: 64, nullable: false),
+                Id = table.Column<Guid>(),
+                Name = table.Column<string>(maxLength: 64),
                 Description = table.Column<string>(maxLength: 512, nullable: true),
-                Date = table.Column<DateOnly>(nullable: false),
-                Price = table.Column<decimal>(precision: 38, scale: 2, nullable: false),
-                OrderId = table.Column<Guid>(nullable: false),
+                Date = table.Column<DateOnly>(),
+                Price = table.Column<decimal>(precision: 38, scale: 2),
+                OrderId = table.Column<Guid>(),
                 ReportId = table.Column<Guid>(nullable: true),
                 InvoiceId = table.Column<Guid>(nullable: true)
             },
