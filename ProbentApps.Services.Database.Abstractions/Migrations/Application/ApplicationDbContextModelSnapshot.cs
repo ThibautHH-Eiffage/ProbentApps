@@ -64,6 +64,9 @@ class ApplicationDbContextModelSnapshot : ModelSnapshot
                 .HasMaxLength(64)
                 .IsUnicode(false);
 
+            b.Property(a => a.IsArchived)
+                .IsRequired();
+
             b.Property<Guid>("StructureId");
 
             b.HasKey(a => a.Id);

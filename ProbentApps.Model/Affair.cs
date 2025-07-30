@@ -14,6 +14,8 @@ public class Affair
     [Unicode(false)]
     public required string Code { get; set; }
 
+    public bool IsArchived { get; set; }
+
     [DeleteBehavior(DeleteBehavior.NoAction)]
     public required Structure Structure { get; set; }
 
