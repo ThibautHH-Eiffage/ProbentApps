@@ -20,8 +20,8 @@ public partial class CreateSchema : Migration
             {
                 Id = table.Column<Guid>(),
                 Name = table.Column<string>(maxLength: 128),
-                MainProviderId = table.Column<string>(maxLength: 64, nullable: true),
-                ExtraProviderIds = table.Column<string>()
+                Code = table.Column<string>(maxLength: 64, nullable: true, unicode: false),
+                ExtraCodes = table.Column<string>()
             },
             constraints: table =>
             {
@@ -65,7 +65,7 @@ public partial class CreateSchema : Migration
             {
                 Id = table.Column<Guid>(),
                 Name = table.Column<string>(maxLength: 128),
-                ProviderId = table.Column<string>(maxLength: 64),
+                Code = table.Column<string>(maxLength: 64, unicode: false),
                 StructureId = table.Column<Guid>(),
                 ClientId = table.Column<Guid>()
             },
@@ -125,7 +125,7 @@ public partial class CreateSchema : Migration
                 Name = table.Column<string>(maxLength: 64),
                 RequesterId = table.Column<Guid>(),
                 RequestDate = table.Column<DateTimeOffset>(nullable: true),
-                ProviderId = table.Column<string>(maxLength: 64, nullable: true),
+                Code = table.Column<string>(maxLength: 64, nullable: true, unicode: false),
                 SubmissionDate = table.Column<DateTimeOffset>(nullable: true)
             },
             constraints: table =>
@@ -174,7 +174,7 @@ public partial class CreateSchema : Migration
                 AffairId = table.Column<Guid>(),
                 ClientId = table.Column<Guid>(),
                 Name = table.Column<string>(maxLength: 128),
-                ProviderId = table.Column<string>(maxLength: 64)
+                Code = table.Column<string>(maxLength: 64, unicode: false)
             },
             constraints: table =>
             {

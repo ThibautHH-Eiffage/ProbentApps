@@ -11,7 +11,8 @@ public class Affair
     public required string Name { get; set; }
 
     [MaxLength(64)]
-    public required string ProviderId { get; set; }
+    [Unicode(false)]
+    public required string Code { get; set; }
 
     [DeleteBehavior(DeleteBehavior.NoAction)]
     public required Structure Structure { get; set; }

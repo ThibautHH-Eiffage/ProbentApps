@@ -59,9 +59,10 @@ class ApplicationDbContextModelSnapshot : ModelSnapshot
                 .IsRequired()
                 .HasMaxLength(128);
 
-            b.Property(s => s.ProviderId)
+            b.Property(a => a.Code)
                 .IsRequired()
-                .HasMaxLength(64);
+                .HasMaxLength(64)
+                .IsUnicode(false);
 
             b.Property<Guid>("StructureId");
 
@@ -86,11 +87,12 @@ class ApplicationDbContextModelSnapshot : ModelSnapshot
             b.Property(c => c.Id)
                 .ValueGeneratedOnAdd();
 
-            b.PrimitiveCollection(c => c.ExtraProviderIds)
+            b.PrimitiveCollection(c => c.ExtraCodes)
                 .IsRequired();
 
-            b.Property(c => c.MainProviderId)
-                .HasMaxLength(64);
+            b.Property(c => c.Code)
+                .HasMaxLength(64)
+                .IsUnicode(false);
 
             b.Property(c => c.Name)
                 .IsRequired()
@@ -110,8 +112,9 @@ class ApplicationDbContextModelSnapshot : ModelSnapshot
                 .IsRequired()
                 .HasMaxLength(64);
 
-            b.Property(i => i.ProviderId)
-                .HasMaxLength(64);
+            b.Property(i => i.Code)
+                .HasMaxLength(64)
+                .IsUnicode(false);
 
             b.Property(i => i.RequestDate);
 
@@ -139,9 +142,10 @@ class ApplicationDbContextModelSnapshot : ModelSnapshot
                 .IsRequired()
                 .HasMaxLength(128);
 
-            b.Property(o => o.ProviderId)
+            b.Property(o => o.Code)
                 .IsRequired()
-                .HasMaxLength(64);
+                .HasMaxLength(64)
+                .IsUnicode(false);
 
             b.HasKey(o => o.Id);
 

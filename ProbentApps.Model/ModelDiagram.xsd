@@ -40,7 +40,7 @@
                   </xs:restriction>
                 </xs:simpleType>
               </xs:element>
-              <xs:element name="ProviderId">
+              <xs:element name="Code">
                 <xs:simpleType>
                   <xs:restriction base="xs:string">
                     <xs:maxLength value="64" />
@@ -63,14 +63,14 @@
                   </xs:restriction>
                 </xs:simpleType>
               </xs:element>
-              <xs:element name="MainProviderId" minOccurs="0">
+              <xs:element name="Code" minOccurs="0">
                 <xs:simpleType>
                   <xs:restriction base="xs:string">
                     <xs:maxLength value="64" />
                   </xs:restriction>
                 </xs:simpleType>
               </xs:element>
-              <xs:element name="ExtraProviderIds" type="xs:string" />
+              <xs:element name="ExtraCodes" type="xs:string" />
             </xs:sequence>
           </xs:complexType>
         </xs:element>
@@ -87,7 +87,7 @@
               </xs:element>
               <xs:element name="RequesterId" msdata:DataType="System.Guid" type="xs:string" />
               <xs:element name="RequestDate" msdata:DataType="System.DateTimeOffset" type="xs:dateTime" minOccurs="0" />
-              <xs:element name="ProviderId" minOccurs="0">
+              <xs:element name="Code" minOccurs="0">
                 <xs:simpleType>
                   <xs:restriction base="xs:string">
                     <xs:maxLength value="64" />
@@ -111,7 +111,7 @@
                   </xs:restriction>
                 </xs:simpleType>
               </xs:element>
-              <xs:element name="ProviderId">
+              <xs:element name="Code">
                 <xs:simpleType>
                   <xs:restriction base="xs:string">
                     <xs:maxLength value="64" />
