@@ -16,5 +16,5 @@ public interface IInvoicingManager : IRepository<Invoice>
 
     Task<InvoiceRequestResult> RequestInvoiceAsync(Guid invoiceId, CancellationToken cancellationToken = default);
 
-    Task<InvoiceSubmissionResult> SubmitInvoiceAsync(Guid invoiceId, string providerId, CancellationToken cancellationToken = default);
+    Task<InvoiceSubmissionResult> SubmitInvoiceAsync(Guid invoiceId, string code, CancellationToken cancellationToken = default);
 }

@@ -1,5 +1,5 @@
-using Microsoft.EntityFrameworkCore;
 using System.ComponentModel.DataAnnotations;
+using Microsoft.EntityFrameworkCore;
 
 namespace ProbentApps.Model;
 
@@ -27,7 +27,8 @@ public class Order
     public required Client Client { get; set; }
 
     [MaxLength(64)]
-    public required string ProviderId { get; set; }
+    [Unicode(false)]
+    public required string Code { get; set; }
 
     public required IList<Advancement> Advancements { get; set; }
 
