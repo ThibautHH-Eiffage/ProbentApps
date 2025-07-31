@@ -175,7 +175,8 @@ public partial class CreateSchema : Migration
                 AffairId = table.Column<Guid>(),
                 ClientId = table.Column<Guid>(),
                 Name = table.Column<string>(maxLength: 128),
-                Code = table.Column<string>(maxLength: 64, unicode: false)
+                Code = table.Column<string>(maxLength: 64, unicode: false),
+                TotalPrice = table.Column<decimal>(precision: 38, scale: 2)
             },
             constraints: table =>
             {

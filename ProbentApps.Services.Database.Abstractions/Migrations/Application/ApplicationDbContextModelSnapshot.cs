@@ -150,6 +150,9 @@ class ApplicationDbContextModelSnapshot : ModelSnapshot
                 .HasMaxLength(64)
                 .IsUnicode(false);
 
+            b.Property(o => o.TotalPrice)
+                .HasPrecision(38, 2);
+
             b.HasKey(o => o.Id);
 
             b.HasIndex("AffairId");

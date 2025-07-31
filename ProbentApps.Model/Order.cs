@@ -30,6 +30,9 @@ public class Order
     [Unicode(false)]
     public required string Code { get; set; }
 
+    [Precision(38, 2)]
+    public decimal TotalPrice { get; set; }
+
     public required IList<Advancement> Advancements { get; set; }
 
     public required IList<Report> Reports { get; set; }
