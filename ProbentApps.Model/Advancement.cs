@@ -16,7 +16,7 @@ public class Advancement : IEntity
     public DateOnly Date { get; set; }
 
     [Precision(38, 2)]
-    public decimal Price { get; set; }
+    public decimal Value { get; set; }
 
     [DeleteBehavior(DeleteBehavior.NoAction)]
     public required Order Order { get; set; }

@@ -28,7 +28,7 @@ public class AdvancementManager(ApplicationDbContext context, TimeProvider timeP
             Name = data.Name,
             Description = data.Description,
             Date = data.Date ?? DateOnly.FromDateTime(timeProvider.GetLocalNow().Date),
-            Price = data.Price,
+            Value = data.Price,
             Order = order
         }).Entity;
 
@@ -87,7 +87,7 @@ public class AdvancementManager(ApplicationDbContext context, TimeProvider timeP
         if (data.Description is string description)
             advancement.Description = description;
         if (data.Price is decimal price)
-            advancement.Price = price;
+            advancement.Value = price;
 
         try
         {

@@ -1,20 +1,12 @@
-using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using Microsoft.EntityFrameworkCore;
 
 namespace ProbentApps.Model;
 
-public class Affair
+[Table("Affairs")]
+public class Affair : Structure
 {
-    public Guid Id { get; set; }
-
-    [MaxLength(128)]
-    public required string Name { get; set; }
-
-    [MaxLength(64)]
-    public required string ProviderId { get; set; }
-
-    [DeleteBehavior(DeleteBehavior.NoAction)]
-    public required Structure Structure { get; set; }
+    public bool IsArchived { get; set; }
 
     [DeleteBehavior(DeleteBehavior.NoAction)]
     public required Client Client { get; set; }

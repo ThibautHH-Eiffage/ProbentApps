@@ -1,5 +1,5 @@
-using Microsoft.EntityFrameworkCore;
 using System.ComponentModel.DataAnnotations;
+using Microsoft.EntityFrameworkCore;
 
 namespace ProbentApps.Model;
 
@@ -16,7 +16,8 @@ public class Invoice : IEntity
     public DateTimeOffset? RequestDate { get; set; }
 
     [MaxLength(64)]
-    public string? ProviderId { get; set; }
+    [Unicode(false)]
+    public string? Code { get; set; }
 
     public DateTimeOffset? SubmissionDate { get; set; }
 

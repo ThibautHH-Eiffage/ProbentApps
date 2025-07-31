@@ -172,7 +172,7 @@ public class InvoicingManager(ApplicationDbContext context, TimeProvider timePro
         return new InvoiceRequestResult(InvoiceRequestResult.Status.Success);
     }
 
-    public async Task<InvoiceSubmissionResult> SubmitInvoiceAsync(Guid invoiceId, string providerId, CancellationToken cancellationToken = default)
+    public async Task<InvoiceSubmissionResult> SubmitInvoiceAsync(Guid invoiceId, string code, CancellationToken cancellationToken = default)
     {
         if (await GetInvoiceWithOrders(Context, invoiceId, cancellationToken) is not Invoice invoice)
         {
@@ -189,18 +189,18 @@ public class InvoicingManager(ApplicationDbContext context, TimeProvider timePro
             return new InvoiceSubmissionResult(InvoiceSubmissionResult.Status.NotYetRequested);
         }
 
-        if (string.IsNullOrWhiteSpace(providerId))
+        if (string.IsNullOrWhiteSpace(code))
         {
             return new InvoiceSubmissionResult(InvoiceSubmissionResult.Status.InvalidData);
         }
 
-        if (invoice.Orders.Any(static o => o.Client.MainProviderId is null))
+        if (invoice.Orders.Any(static o => o.Client.Code is null))
         {
             return new InvoiceSubmissionResult(InvoiceSubmissionResult.Status.UnregisteredClient);
         }
 
         invoice.SubmissionDate = timeProvider.GetLocalNow();
-        invoice.ProviderId = providerId;
+        invoice.Code = code;
 
         try 
         {
