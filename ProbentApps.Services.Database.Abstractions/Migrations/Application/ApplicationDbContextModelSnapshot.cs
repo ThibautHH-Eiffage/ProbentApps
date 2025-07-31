@@ -50,30 +50,14 @@ class ApplicationDbContextModelSnapshot : ModelSnapshot
 
         modelBuilder.Entity<Affair>(b =>
         {
-            b.Property(a => a.Id)
-                .ValueGeneratedOnAdd();
+            b.HasBaseType<Structure>();
 
             b.Property<Guid>("ClientId");
-
-            b.Property(a => a.Name)
-                .IsRequired()
-                .HasMaxLength(128);
-
-            b.Property(a => a.Code)
-                .IsRequired()
-                .HasMaxLength(64)
-                .IsUnicode(false);
 
             b.Property(a => a.IsArchived)
                 .IsRequired();
 
-            b.Property<Guid>("StructureId");
-
-            b.HasKey(a => a.Id);
-
             b.HasIndex("ClientId");
-
-            b.HasIndex("StructureId");
 
             b.ToTable(nameof(ApplicationDbContext.Affairs));
         });
@@ -239,10 +223,10 @@ class ApplicationDbContextModelSnapshot : ModelSnapshot
                 .OnDelete(DeleteBehavior.NoAction)
                 .IsRequired();
 
-            b.HasOne(a => a.Structure)
-                .WithMany()
-                .HasForeignKey("StructureId")
-                .OnDelete(DeleteBehavior.NoAction)
+            b.HasOne<Structure>()
+                .WithOne()
+                .HasForeignKey<Affair>(a => a.Id)
+                .OnDelete(DeleteBehavior.Cascade)
                 .IsRequired();
         });
 

@@ -20,7 +20,5 @@ public class Structure
     [DeleteBehavior(DeleteBehavior.NoAction)]
     public ApplicationUser? Manager { get; set; }
 
-    public required IList<Affair> Affairs { get; set; }
-
     public bool IsActive => Manager is not null;
 }

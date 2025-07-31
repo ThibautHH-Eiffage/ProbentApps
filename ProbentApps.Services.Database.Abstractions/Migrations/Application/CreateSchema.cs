@@ -56,10 +56,7 @@ public partial class CreateSchema : Migration
             columns: table => new
             {
                 Id = table.Column<Guid>(),
-                Name = table.Column<string>(maxLength: 128),
-                Code = table.Column<string>(maxLength: 64, unicode: false),
                 IsArchived = table.Column<bool>(),
-                StructureId = table.Column<Guid>(),
                 ClientId = table.Column<Guid>()
             },
             constraints: table =>
@@ -73,12 +70,12 @@ public partial class CreateSchema : Migration
                     principalColumn: nameof(Client.Id),
                     onDelete: ReferentialAction.NoAction);
                 table.ForeignKey(
-                    name: $"FK_{nameof(ApplicationDbContext.Affairs)}_{nameof(ApplicationDbContext.Structures)}_{nameof(Affair.Structure)}{nameof(Structure.Id)}",
-                    column: x => x.StructureId,
+                    name: $"FK_{nameof(ApplicationDbContext.Affairs)}_{nameof(ApplicationDbContext.Structures)}_{nameof(Affair.Id)}",
+                    column: x => x.Id,
                     principalSchema: ApplicationDbContext.Schema,
                     principalTable: nameof(ApplicationDbContext.Structures),
                     principalColumn: nameof(Structure.Id),
-                    onDelete: ReferentialAction.NoAction);
+                    onDelete: ReferentialAction.Cascade);
             });
 
         migrationBuilder.CreateTable(
@@ -234,12 +231,6 @@ public partial class CreateSchema : Migration
             schema: ApplicationDbContext.Schema,
             table: nameof(ApplicationDbContext.Affairs),
             column: $"{nameof(Order.Client)}{nameof(Affair.Id)}");
-
-        migrationBuilder.CreateIndex(
-            name: $"IX_{nameof(ApplicationDbContext.Affairs)}_{nameof(Affair.Structure)}{nameof(Structure.Id)}",
-            schema: ApplicationDbContext.Schema,
-            table: nameof(ApplicationDbContext.Affairs),
-            column: $"{nameof(Affair.Structure)}{nameof(Structure.Id)}");
 
         migrationBuilder.CreateIndex(
             name: $"IX_{nameof(ApplicationDbContext.Advancements)}_{nameof(Advancement.Invoice)}{nameof(Invoice.Id)}",
