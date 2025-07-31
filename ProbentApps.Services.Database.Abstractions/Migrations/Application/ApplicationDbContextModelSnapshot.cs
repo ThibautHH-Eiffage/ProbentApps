@@ -12,7 +12,6 @@ class ApplicationDbContextModelSnapshot : ModelSnapshot
     {
         modelBuilder
             .HasDefaultSchema(ApplicationDbContext.Schema)
-            .HasAnnotation("ProductVersion", "9.0.4")
             .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
         modelBuilder.Entity<Advancement>(b =>
@@ -51,12 +50,12 @@ class ApplicationDbContextModelSnapshot : ModelSnapshot
 
         modelBuilder.Entity<Affair>(b =>
         {
-            b.Property(s => s.Id)
+            b.Property(a => a.Id)
                 .ValueGeneratedOnAdd();
 
             b.Property<Guid>("ClientId");
 
-            b.Property(s => s.Name)
+            b.Property(a => a.Name)
                 .IsRequired()
                 .HasMaxLength(128);
 
@@ -66,7 +65,7 @@ class ApplicationDbContextModelSnapshot : ModelSnapshot
 
             b.Property<Guid>("StructureId");
 
-            b.HasKey(s => s.Id);
+            b.HasKey(a => a.Id);
 
             b.HasIndex("ClientId");
 
