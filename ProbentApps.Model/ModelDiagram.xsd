@@ -119,6 +119,7 @@
                   </xs:restriction>
                 </xs:simpleType>
               </xs:element>
+              <xs:element name="TotalPrice" type="xs:decimal" />
             </xs:sequence>
           </xs:complexType>
         </xs:element>
