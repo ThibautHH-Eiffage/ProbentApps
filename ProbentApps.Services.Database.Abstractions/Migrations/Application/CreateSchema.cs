@@ -204,7 +204,7 @@ public partial class CreateSchema : Migration
                 Name = table.Column<string>(maxLength: 64),
                 Description = table.Column<string>(maxLength: 512, nullable: true),
                 Date = table.Column<DateOnly>(),
-                Price = table.Column<decimal>(precision: 38, scale: 2),
+                Value = table.Column<decimal>(precision: 38, scale: 2),
                 OrderId = table.Column<Guid>(),
                 ReportId = table.Column<Guid>(nullable: true),
                 InvoiceId = table.Column<Guid>(nullable: true)
