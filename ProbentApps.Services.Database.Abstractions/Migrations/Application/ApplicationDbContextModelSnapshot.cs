@@ -197,7 +197,7 @@ class ApplicationDbContextModelSnapshot : ModelSnapshot
 
             b.Property(s => s.Code)
                 .IsRequired()
-                .HasMaxLength(32)
+                .HasMaxLength(128)
                 .IsUnicode(false);
 
             b.Property<Guid?>("ManagerId");
@@ -206,13 +206,12 @@ class ApplicationDbContextModelSnapshot : ModelSnapshot
                 .IsRequired()
                 .HasMaxLength(64);
 
-            b.Property<Guid?>("ParentId");
-
             b.HasKey(s => s.Id);
 
             b.HasIndex("ManagerId");
 
-            b.HasIndex("ParentId");
+            b.HasIndex(nameof(Structure.Code))
+                .IsUnique();
 
             b.ToTable(nameof(ApplicationDbContext.Structures));
         });
@@ -303,11 +302,6 @@ class ApplicationDbContextModelSnapshot : ModelSnapshot
             b.HasOne(s => s.Manager)
                 .WithMany(u => u.ManagedStructures)
                 .HasForeignKey("ManagerId")
-                .OnDelete(DeleteBehavior.NoAction);
-
-            b.HasOne(s => s.Parent)
-                .WithMany()
-                .HasForeignKey("ParentId")
                 .OnDelete(DeleteBehavior.NoAction);
         });
 

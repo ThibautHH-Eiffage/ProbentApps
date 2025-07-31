@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace ProbentApps.Model;
 
+[Index(nameof(Code), IsUnique = true)]
 public class Structure
 {
     public Guid Id { get; set; }
@@ -10,14 +11,9 @@ public class Structure
     [MaxLength(64)]
     public required string Name { get; set; }
 
-    [MaxLength(32)]
+    [MaxLength(128)]
     [Unicode(false)]
     public required string Code { get; set; }
-
-    [DeleteBehavior(DeleteBehavior.NoAction)]
-    public required Structure? Parent { get; set; }
-
-    public required IList<Structure> Children { get; set; }
 
     public required IList<StructureManagement> Managements { get; set; }
 

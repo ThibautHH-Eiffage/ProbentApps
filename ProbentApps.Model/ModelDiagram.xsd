@@ -167,7 +167,6 @@
           <xs:complexType>
             <xs:sequence>
               <xs:element name="Id" msdata:DataType="System.Guid" type="xs:string" />
-              <xs:element name="ParentId" msdata:DataType="System.Guid" type="xs:string" minOccurs="0" />
               <xs:element name="Name">
                 <xs:simpleType>
                   <xs:restriction base="xs:string">
@@ -178,7 +177,7 @@
               <xs:element name="Code">
                 <xs:simpleType>
                   <xs:restriction base="xs:string">
-                    <xs:maxLength value="32" />
+                    <xs:maxLength value="128" />
                   </xs:restriction>
                 </xs:simpleType>
               </xs:element>
@@ -242,6 +241,10 @@
       <xs:selector xpath=".//mstns:Structures" />
       <xs:field xpath="mstns:Id" />
     </xs:unique>
+    <xs:unique name="IX_Structures_Code">
+      <xs:selector xpath=".//mstns:Structures" />
+      <xs:field xpath="mstns:Code" />
+    </xs:unique>
     <xs:unique name="PK_Users" msdata:PrimaryKey="true">
       <xs:selector xpath=".//mstns:Users" />
       <xs:field xpath="mstns:Id" />
@@ -260,7 +263,6 @@
       <msdata:Relationship name="FK_Reports_Reports_PreviousReportId" msdata:parent="Reports" msdata:child="Reports" msdata:parentkey="Id" msdata:childkey="PreviousReportId" />
       <msdata:Relationship name="FK_StructureManagements_Structures_StructureId" msdata:parent="Structures" msdata:child="StructureManagements" msdata:parentkey="Id" msdata:childkey="StructureId" />
       <msdata:Relationship name="FK_StructureManagements_Users_ManagerId" msdata:parent="Users" msdata:child="StructureManagements" msdata:parentkey="Id" msdata:childkey="ManagerId" />
-      <msdata:Relationship name="FK_Structures_Structures_ParentId" msdata:parent="Structures" msdata:child="Structures" msdata:parentkey="Id" msdata:childkey="ParentId" />
       <msdata:Relationship name="FK_Structures_Users_ManagerId" msdata:parent="Users" msdata:child="Structures" msdata:parentkey="Id" msdata:childkey="ManagerId" />
     </xs:appinfo>
   </xs:annotation>
