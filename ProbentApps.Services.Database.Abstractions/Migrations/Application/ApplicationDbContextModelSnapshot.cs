@@ -32,7 +32,7 @@ class ApplicationDbContextModelSnapshot : ModelSnapshot
 
             b.Property<Guid>("OrderId");
 
-            b.Property(a => a.Price)
+            b.Property(a => a.Value)
                 .HasPrecision(38, 2);
 
             b.Property<Guid?>("ReportId");

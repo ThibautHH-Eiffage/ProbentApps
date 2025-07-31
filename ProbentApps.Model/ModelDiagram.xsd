@@ -22,7 +22,7 @@
                 </xs:simpleType>
               </xs:element>
               <xs:element name="Date" type="xs:date" />
-              <xs:element name="Price" type="xs:decimal" />
+              <xs:element name="Value" type="xs:decimal" />
               <xs:element name="OrderId" msdata:DataType="System.Guid" type="xs:string" />
               <xs:element name="ReportId" msdata:DataType="System.Guid" type="xs:string" minOccurs="0" />
               <xs:element name="InvoiceId" msdata:DataType="System.Guid" type="xs:string" minOccurs="0" />
