@@ -14,7 +14,6 @@ partial class CreateSchema
     {
         modelBuilder
             .HasDefaultSchema(ApplicationDbContext.Schema)
-            .HasAnnotation("ProductVersion", "9.0.4")
             .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
         modelBuilder.Entity<Advancement>(b =>
@@ -35,7 +34,7 @@ partial class CreateSchema
 
             b.Property<Guid>("OrderId");
 
-            b.Property(a => a.Price)
+            b.Property(a => a.Value)
                 .HasPrecision(38, 2);
 
             b.Property<Guid?>("ReportId");
@@ -53,26 +52,14 @@ partial class CreateSchema
 
         modelBuilder.Entity<Affair>(b =>
         {
-            b.Property(s => s.Id)
-                .ValueGeneratedOnAdd();
+            b.HasBaseType<Structure>();
 
             b.Property<Guid>("ClientId");
 
-            b.Property(s => s.Name)
-                .IsRequired()
-                .HasMaxLength(128);
-
-            b.Property(s => s.ProviderId)
-                .IsRequired()
-                .HasMaxLength(64);
-
-            b.Property<Guid>("StructureId");
-
-            b.HasKey(s => s.Id);
+            b.Property(a => a.IsArchived)
+                .IsRequired();
 
             b.HasIndex("ClientId");
-
-            b.HasIndex("StructureId");
 
             b.ToTable(nameof(ApplicationDbContext.Affairs));
         });
@@ -89,11 +76,12 @@ partial class CreateSchema
             b.Property(c => c.Id)
                 .ValueGeneratedOnAdd();
 
-            b.PrimitiveCollection(c => c.ExtraProviderIds)
+            b.PrimitiveCollection(c => c.ExtraCodes)
                 .IsRequired();
 
-            b.Property(c => c.MainProviderId)
-                .HasMaxLength(64);
+            b.Property(c => c.Code)
+                .HasMaxLength(64)
+                .IsUnicode(false);
 
             b.Property(c => c.Name)
                 .IsRequired()
@@ -113,8 +101,9 @@ partial class CreateSchema
                 .IsRequired()
                 .HasMaxLength(64);
 
-            b.Property(i => i.ProviderId)
-                .HasMaxLength(64);
+            b.Property(i => i.Code)
+                .HasMaxLength(64)
+                .IsUnicode(false);
 
             b.Property(i => i.RequestDate);
 
@@ -142,9 +131,13 @@ partial class CreateSchema
                 .IsRequired()
                 .HasMaxLength(128);
 
-            b.Property(o => o.ProviderId)
+            b.Property(o => o.Code)
                 .IsRequired()
-                .HasMaxLength(64);
+                .HasMaxLength(64)
+                .IsUnicode(false);
+
+            b.Property(o => o.TotalPrice)
+                .HasPrecision(38, 2);
 
             b.HasKey(o => o.Id);
 
@@ -190,7 +183,7 @@ partial class CreateSchema
 
             b.Property(s => s.Code)
                 .IsRequired()
-                .HasMaxLength(32)
+                .HasMaxLength(128)
                 .IsUnicode(false);
 
             b.Property<Guid?>("ManagerId");
@@ -199,13 +192,12 @@ partial class CreateSchema
                 .IsRequired()
                 .HasMaxLength(64);
 
-            b.Property<Guid?>("ParentId");
-
             b.HasKey(s => s.Id);
 
             b.HasIndex("ManagerId");
 
-            b.HasIndex("ParentId");
+            b.HasIndex(nameof(Structure.Code))
+                .IsUnique();
 
             b.ToTable(nameof(ApplicationDbContext.Structures));
         });
@@ -233,10 +225,10 @@ partial class CreateSchema
                 .OnDelete(DeleteBehavior.NoAction)
                 .IsRequired();
 
-            b.HasOne(a => a.Structure)
-                .WithMany()
-                .HasForeignKey("StructureId")
-                .OnDelete(DeleteBehavior.NoAction)
+            b.HasOne<Structure>()
+                .WithOne()
+                .HasForeignKey<Affair>(a => a.Id)
+                .OnDelete(DeleteBehavior.Cascade)
                 .IsRequired();
         });
 
@@ -296,11 +288,6 @@ partial class CreateSchema
             b.HasOne(s => s.Manager)
                 .WithMany(u => u.ManagedStructures)
                 .HasForeignKey("ManagerId")
-                .OnDelete(DeleteBehavior.NoAction);
-
-            b.HasOne(s => s.Parent)
-                .WithMany()
-                .HasForeignKey("ParentId")
                 .OnDelete(DeleteBehavior.NoAction);
         });
 
