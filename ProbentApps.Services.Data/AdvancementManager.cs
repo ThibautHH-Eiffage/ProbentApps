@@ -14,7 +14,7 @@ public class AdvancementManager(ApplicationDbContext context, TimeProvider timeP
             .Include(static a => a.Invoice)
             .FirstOrDefault(a => a.Id == id));
 
-    public async Task<AdvancementCreationResult> CreateAdvancementAsync(AdvancementCreationData data, CancellationToken cancellationToken = default)
+    async Task<AdvancementCreationResult> IAdvancementManager.CreateAdvancementAsync(AdvancementCreationData data, CancellationToken cancellationToken)
     {
         if (await Context.Orders.FindAsync([data.OrderId], cancellationToken) is not Order order)
         {
@@ -44,7 +44,7 @@ public class AdvancementManager(ApplicationDbContext context, TimeProvider timeP
         return new AdvancementCreationResult(AdvancementCreationResult.Status.Success, advancement);
     }
 
-    public async Task<AdvancementDeletionResult> DeleteAdvancementAsync(Guid advancementId, CancellationToken cancellationToken = default)
+    async Task<AdvancementDeletionResult> IAdvancementManager.DeleteAdvancementAsync(Guid advancementId, CancellationToken cancellationToken)
     {
         if (await GetAdvancement(Context, advancementId, cancellationToken) is not Advancement advancement)
             return new AdvancementDeletionResult(AdvancementDeletionResult.Status.NotFound);
@@ -65,7 +65,7 @@ public class AdvancementManager(ApplicationDbContext context, TimeProvider timeP
         return new AdvancementDeletionResult(AdvancementDeletionResult.Status.Success);
     }
 
-    public async Task<AdvancementUpdateResult> UpdateAdvancementAsync(Guid advancementId, AdvancementUpdateData data, CancellationToken cancellationToken = default)
+    async Task<AdvancementUpdateResult> IAdvancementManager.UpdateAdvancementAsync(Guid advancementId, AdvancementUpdateData data, CancellationToken cancellationToken)
     {
         if (await GetAdvancement(Context, advancementId, cancellationToken) is not Advancement advancement)
             return new AdvancementUpdateResult(AdvancementUpdateResult.Status.NotFound);

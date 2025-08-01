@@ -9,8 +9,8 @@ public class DefaultRepository<T>(ApplicationDbContext context) : IRepository<T>
 {
     protected ApplicationDbContext Context { get; } = context;
 
-    public ValueTask<T?> FindAsync(Guid id, CancellationToken cancellationToken = default) =>
+    ValueTask<T?> IRepository<T>.FindAsync(Guid id, CancellationToken cancellationToken) =>
         Context.Set<T>().FindAsync([id], cancellationToken);
 
-    public IQueryable<T> Query() => Context.Set<T>();
+    IQueryable<T> IRepository<T>.Query() => Context.Set<T>();
 }

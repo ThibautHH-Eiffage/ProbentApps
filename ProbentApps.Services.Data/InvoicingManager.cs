@@ -24,7 +24,7 @@ public class InvoicingManager(ApplicationDbContext context, TimeProvider timePro
             .Include(static i => i.Orders).ThenInclude(static o => o.Client)
             .FirstOrDefault(i => i.Id == id));
 
-    public async Task<InvoiceCreationResult> CreateInvoiceAsync(InvoiceCreationData data, CancellationToken cancellationToken = default)
+    async Task<InvoiceCreationResult> IInvoicingManager.CreateInvoiceAsync(InvoiceCreationData data, CancellationToken cancellationToken)
     {
         var invoice = Context.Add(new Invoice
         {
@@ -47,7 +47,7 @@ public class InvoicingManager(ApplicationDbContext context, TimeProvider timePro
         return new InvoiceCreationResult(InvoiceCreationResult.Status.Success, invoice);
     }
 
-    public async Task<InvoiceDeletionResult> DeleteInvoiceAsync(Guid invoiceId, CancellationToken cancellationToken = default)
+    async Task<InvoiceDeletionResult> IInvoicingManager.DeleteInvoiceAsync(Guid invoiceId, CancellationToken cancellationToken)
     {
         if (await Context.Invoices.FindAsync([invoiceId], cancellationToken) is not Invoice invoice)
         {
@@ -65,7 +65,7 @@ public class InvoicingManager(ApplicationDbContext context, TimeProvider timePro
         return new InvoiceDeletionResult(InvoiceDeletionResult.Status.Success);
     }
 
-    public async Task<InvoiceUpdateResult> UpdateInvoiceAsync(Guid invoiceId, InvoiceUpdateData data, CancellationToken cancellationToken = default)
+    async Task<InvoiceUpdateResult> IInvoicingManager.UpdateInvoiceAsync(Guid invoiceId, InvoiceUpdateData data, CancellationToken cancellationToken)
     {
         if (await Context.Invoices.FindAsync([invoiceId], cancellationToken) is not Invoice invoice)
         {
@@ -92,7 +92,7 @@ public class InvoicingManager(ApplicationDbContext context, TimeProvider timePro
         return new InvoiceUpdateResult(InvoiceUpdateResult.Status.Success);
     }
 
-    public async Task<AdvancementInvoicingResult> InvoiceAdvancementAsync(Guid invoiceId, Guid advancementId, CancellationToken cancellationToken = default)
+    async Task<AdvancementInvoicingResult> IInvoicingManager.InvoiceAdvancementAsync(Guid invoiceId, Guid advancementId, CancellationToken cancellationToken)
     {
         if (await Context.Invoices.FindAsync([invoiceId], cancellationToken) is not Invoice invoice)
         {
@@ -121,7 +121,7 @@ public class InvoicingManager(ApplicationDbContext context, TimeProvider timePro
         return new AdvancementInvoicingResult(AdvancementInvoicingResult.Status.Success);
     }
 
-    public async Task<AdvancementRemovalFromInvoiceResult> RemoveAdvancementFromInvoiceAsync(Guid invoiceId, Guid advancementId, CancellationToken cancellationToken = default)
+    async Task<AdvancementRemovalFromInvoiceResult> IInvoicingManager.RemoveAdvancementFromInvoiceAsync(Guid invoiceId, Guid advancementId, CancellationToken cancellationToken)
     {
         if (await Context.Invoices.FindAsync([invoiceId], cancellationToken) is not Invoice invoice)
         {
@@ -149,7 +149,7 @@ public class InvoicingManager(ApplicationDbContext context, TimeProvider timePro
         return new AdvancementRemovalFromInvoiceResult(AdvancementRemovalFromInvoiceResult.Status.Success);
     }
 
-    public async Task<InvoiceRequestResult> RequestInvoiceAsync(Guid invoiceId, CancellationToken cancellationToken = default)
+    async Task<InvoiceRequestResult> IInvoicingManager.RequestInvoiceAsync(Guid invoiceId, CancellationToken cancellationToken)
     {
         if (await Context.Invoices.FindAsync([invoiceId], cancellationToken) is not Invoice invoice)
         {
@@ -172,7 +172,7 @@ public class InvoicingManager(ApplicationDbContext context, TimeProvider timePro
         return new InvoiceRequestResult(InvoiceRequestResult.Status.Success);
     }
 
-    public async Task<InvoiceSubmissionResult> SubmitInvoiceAsync(Guid invoiceId, string code, CancellationToken cancellationToken = default)
+    async Task<InvoiceSubmissionResult> IInvoicingManager.SubmitInvoiceAsync(Guid invoiceId, string code, CancellationToken cancellationToken)
     {
         if (await GetInvoiceWithOrders(Context, invoiceId, cancellationToken) is not Invoice invoice)
         {
