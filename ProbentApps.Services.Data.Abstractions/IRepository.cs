@@ -6,4 +6,6 @@ public interface IRepository<T>
     where T : class, IEntity
 {
     ValueTask<T?> FindAsync(Guid id, CancellationToken cancellationToken = default);
+
+    IQueryable<T> Query();
 }
