@@ -4,7 +4,7 @@ using Microsoft.EntityFrameworkCore;
 namespace ProbentApps.Model;
 
 [Index(nameof(Code), IsUnique = true)]
-public class Structure
+public class Structure : IEntity
 {
     public Guid Id { get; set; }
 

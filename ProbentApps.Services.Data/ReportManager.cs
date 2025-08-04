@@ -14,7 +14,7 @@ public class ReportManager(ApplicationDbContext context, TimeProvider timeProvid
             .Include(static r => r.Advancements)
             .FirstOrDefault(r => r.Id == id));
 
-    public async Task<ReportCreationResult> CreateReportAsync(ReportCreationData data, CancellationToken cancellationToken = default)
+    async Task<ReportCreationResult> IReportManager.CreateReportAsync(ReportCreationData data, CancellationToken cancellationToken)
     {
         Report? previousReport = null;
         
@@ -77,7 +77,7 @@ public class ReportManager(ApplicationDbContext context, TimeProvider timeProvid
         return new ReportDeletionResult(ReportDeletionResult.Status.Success);
     }
 
-    public async Task<ReportUpdateResult> UpdateReportAsync(Guid reportId, ReportUpdateData data, CancellationToken cancellationToken = default)
+    async Task<ReportUpdateResult> IReportManager.UpdateReportAsync(Guid reportId, ReportUpdateData data, CancellationToken cancellationToken)
     {
         if (await GetReport(Context, reportId, cancellationToken) is not Report report)
             return new ReportUpdateResult(ReportUpdateResult.Status.NotFound);
@@ -118,7 +118,7 @@ public class ReportManager(ApplicationDbContext context, TimeProvider timeProvid
         return new ReportUpdateResult(ReportUpdateResult.Status.Success);
     }
 
-    public async Task<AdvancementTrackingResult> TrackAdvancementInReportAsync(Guid reportId, Guid advancementId, CancellationToken cancellationToken = default)
+    async Task<AdvancementTrackingResult> IReportManager.TrackAdvancementInReportAsync(Guid reportId, Guid advancementId, CancellationToken cancellationToken)
     {
         if (await Context.Reports.FindAsync([reportId], cancellationToken) is not Report report)
         {
@@ -142,7 +142,7 @@ public class ReportManager(ApplicationDbContext context, TimeProvider timeProvid
         return new AdvancementTrackingResult(AdvancementTrackingResult.Status.Success);
     }
 
-    public async Task<AdvancementRemovalFromReportResult> RemoveAdvancementFromReportAsync(Guid reportId, Guid advancementId, CancellationToken cancellationToken = default)
+    async Task<AdvancementRemovalFromReportResult> IReportManager.RemoveAdvancementFromReportAsync(Guid reportId, Guid advancementId, CancellationToken cancellationToken)
     {
         if (await Context.Reports.FindAsync([reportId], cancellationToken) is not Report report)
         {
@@ -170,7 +170,7 @@ public class ReportManager(ApplicationDbContext context, TimeProvider timeProvid
         return new AdvancementRemovalFromReportResult(AdvancementRemovalFromReportResult.Status.Success);
     }
 
-    public async Task<ReportAcceptanceSubmissionResult> SubmitReportAcceptanceAsync(Guid reportId, DateOnly? acceptanceDate = null, CancellationToken cancellationToken = default)
+    async Task<ReportAcceptanceSubmissionResult> IReportManager.SubmitReportAcceptanceAsync(Guid reportId, DateOnly? acceptanceDate, CancellationToken cancellationToken)
     {
         if (await Context.Reports.FindAsync([reportId], cancellationToken) is not Report report)
         {
