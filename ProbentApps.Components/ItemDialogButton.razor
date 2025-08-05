@@ -6,7 +6,7 @@
 
 <MudButton OnClick=@(() => OpenDialogItemChanged.InvokeAsync(Item))>@ButtonText</MudButton>
 
-<MudDialog ContentClass="p-3" DialogContent=ChildContent(Item)
+<MudDialog DialogContent=ChildContent(Item) TitleClass="pb-0" ContentClass="py-1 mb-4"
     Visible=@object.ReferenceEquals(OpenDialogItem, Item) VisibleChanged=@(visible => { if (!visible) OpenDialogItemChanged.InvokeAsync(null); })>
     <TitleContent>
         @if (Title is not null)
