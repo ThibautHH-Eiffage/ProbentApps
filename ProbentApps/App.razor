@@ -8,12 +8,12 @@
     <head>
         <meta charset="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <HeadOutlet @rendermode="_pageRenderMode" />
+        <ImportMap />
         <base href="/" />
         <link href=@Assets["css/bootstrap-utilities.min.css"] rel="stylesheet" />
         <link href=@Assets["_content/MudBlazor/MudBlazor.min.css"] rel="stylesheet" />
         <link href=@Assets["ProbentApps.styles.css"] rel="stylesheet" />
-        <ImportMap />
-        <HeadOutlet @rendermode="_pageRenderMode" />
     </head>
     <body>
         <Routes @rendermode="_pageRenderMode" />
