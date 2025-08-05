@@ -117,37 +117,40 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="Affair" xml:space="preserve">
-    <value>Affaire</value>
+  <data name="Affair ID: {0}" xml:space="preserve">
+    <value>ID de l'affaire : {0}</value>
   </data>
-  <data name="Archived affairs" xml:space="preserve">
-    <value>Affaires archivées</value>
+  <data name="Archived" xml:space="preserve">
+    <value>Achivée</value>
   </data>
-  <data name="Client" xml:space="preserve">
-    <value>Client</value>
+  <data name="Fully invoiced" xml:space="preserve">
+    <value>Complètement facturée</value>
   </data>
-  <data name="Error" xml:space="preserve">
-    <value>Erreur</value>
+  <data name="In progress" xml:space="preserve">
+    <value>En cours de réalisation</value>
   </data>
-  <data name="Home" xml:space="preserve">
-    <value>Accueil</value>
+  <data name="Not started" xml:space="preserve">
+    <value>Non commencée</value>
   </data>
-  <data name="My affairs" xml:space="preserve">
-    <value>Mes affaires</value>
+  <data name="Client: {0}" xml:space="preserve">
+    <value>Client : {0}</value>
   </data>
-  <data name="Name" xml:space="preserve">
-    <value>Nom</value>
+  <data name="Completion" xml:space="preserve">
+    <value>Achèvement</value>
   </data>
-  <data name="Orders" xml:space="preserve">
-    <value>Commandes</value>
+  <data name="Last advancement" xml:space="preserve">
+    <value>Dernier avancement</value>
   </data>
-  <data name="Code" xml:space="preserve">
-    <value>Code</value>
+  <data name="Order name" xml:space="preserve">
+    <value>Nom de la commande</value>
   </data>
-  <data name="View details" xml:space="preserve">
-    <value>Voir les détails</value>
+  <data name="Provider ID: {0}" xml:space="preserve">
+    <value>Code : {0}</value>
   </data>
-  <data name="Overview" xml:space="preserve">
-    <value>Aperçu</value>
+  <data name="Structure: {0}" xml:space="preserve">
+    <value>Structure : {0}</value>
+  </data>
+  <data name="Show affair" xml:space="preserve">
+    <value>Voir l'affaire</value>
   </data>
 </root>

@@ -1,0 +1,102 @@
+@using Microsoft.JSInterop
+
+@inject IStringLocalizer<SharedResources> SharedLocalizer
+@inject IStringLocalizer<AffairCard> Localizer
+@inject IJSRuntime JSRuntime
+
+<MudCard Elevation=2>
+    <MudCardHeader>
+        <MudStack>
+            <MudText Typo="Typo.h5" Style="overflow-wrap: anywhere" GutterBottom>@Affair.Name</MudText>
+        </MudStack>
+    </MudCardHeader>
+    <MudCardContent Class="pt-0">
+        <MudStack AlignItems="AlignItems.Center">
+            <MudContainer Class="text-center w-100">
+                <MudChip T=string Icon="@Icons.Material.Filled.Domain" Color="Color.Primary">@Localizer["Structure: {0}", Affair.ParentCode]</MudChip>
+                <MudDivider Class="invisible" />
+                <MudChip T=string Icon="@Icons.Material.Filled.Code">@Localizer["Code: {0}", Affair.ShortCode]</MudChip>
+                <MudChip T=string Icon="@Icons.Material.Filled.Person">@Localizer["Client: {0}", Affair.Client.Name]</MudChip>
+                <MudDivider Class="invisible pb-2" />
+                <MudAlert Icon="@_status.icon" Severity=_status.severity Variant=Variant.Text>
+                    <MudText>@_status.text</MudText>
+                </MudAlert>
+            </MudContainer>
+            <MudTable Items="Affair.Orders" Elevation=2 Dense RowsPerPage=10>
+                <HeaderContent>
+                    <MudTh>@Localizer["Order name"]</MudTh>
+                    <MudTh>@Localizer["Completion"]</MudTh>
+                    <MudTh>@Localizer["Last advancement"]</MudTh>
+                </HeaderContent>
+                <RowTemplate Context="order">
+                    <MudTd DataLabel="@Localizer["Order name"]">@order.Name</MudTd>
+                    <MudTd DataLabel="@Localizer["Completion"]">
+                        @(order.TotalPrice != default
+                            ? SharedLocalizer["{0:F}%", order.Advancements.Sum(a => a.Value) / order.TotalPrice * 100]
+                            : SharedLocalizer["N/A"])
+                    </MudTd>
+                    <MudTd DataLabel="@Localizer["Last advancement"]">@(order.Advancements.Max<Advancement, DateOnly?>(a => a.Date)?.ToShortDateString() ?? SharedLocalizer["N/A"])</MudTd>
+                </RowTemplate>
+                <PagerContent>
+                    <MudTablePager HideRowsPerPage HorizontalAlignment="HorizontalAlignment.Center" />
+                </PagerContent>
+            </MudTable>
+            <MudChip T=string OnClick=@(async () => await JSRuntime.InvokeVoidAsync("navigator.clipboard.writeText", Affair.Id.ToString()))
+                Icon="@Icons.Material.Filled.Numbers" Size=Size.Small Text="@Localizer["Affair ID: {0}", Affair.Id]" />
+        </MudStack>
+    </MudCardContent>
+    <MudCardActions>
+        <MudStack Row Justify="Justify.FlexEnd" Class="w-100">
+            <MudButton Href="@($"/affair/{Affair.Id}")" Color="Color.Primary" Variant="Variant.Outlined">
+                @Localizer["Show affair"]
+            </MudButton>
+        </MudStack>
+    </MudCardActions>
+</MudCard>
+
+@code {
+    (string icon, Severity severity, string text) _status = default!;
+
+    readonly Order o = new()
+    {
+        Id = Guid.NewGuid(),
+        Name = "Order",
+        Affair = default!,
+        Client = default!,
+        Code = "order",
+        TotalPrice = 3000,
+        Advancements = [
+            new()
+            {
+                Id = Guid.NewGuid(),
+                Name = "Advancement 1",
+                Date = DateOnly.FromDateTime(DateTime.Now),
+                Order = default!,
+                Value = 1000
+            }
+        ],
+        Invoices = [],
+        Reports = [],
+    };
+
+    [Parameter, EditorRequired]
+    public Affair Affair { get; set; }
+
+    protected override void OnInitialized()
+    {
+        Affair.Orders.Add(o);
+        o.Affair = Affair;
+        o.Client = Affair.Client;
+        o.Advancements[0].Order = o;
+
+        _status = Affair.IsArchived
+            ? (Icons.Material.Filled.Archive, Severity.Warning, Localizer["Archived"])
+            : (!Affair.Orders.SelectMany(static o => o.Advancements).Any()
+                ? (Icons.Material.Filled.AccessTime, Severity.Normal, Localizer["Not started"])
+                : (!Affair.Orders.SelectMany(static o => o.Advancements).Any(static a => a.Invoice == null)
+                    ? (Icons.Material.Filled.CheckCircle, Severity.Success, Localizer["Fully invoiced"])
+                    : (Icons.Material.Filled.Build, Severity.Info, Localizer["In progress"])
+                )
+            );
+    }
+}
