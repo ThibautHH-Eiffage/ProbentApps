@@ -147,4 +147,7 @@
   <data name="View details" xml:space="preserve">
     <value>Voir les détails</value>
   </data>
+  <data name="Overview" xml:space="preserve">
+    <value>Aperçu</value>
+  </data>
 </root>

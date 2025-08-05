@@ -150,4 +150,7 @@
   <data name="Structure: {0}" xml:space="preserve">
     <value>Structure : {0}</value>
   </data>
+  <data name="Show affair" xml:space="preserve">
+    <value>Voir l'affaire</value>
+  </data>
 </root>

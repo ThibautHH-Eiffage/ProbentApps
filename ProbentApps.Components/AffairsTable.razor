@@ -22,12 +22,17 @@
                     Search="Search(clientAccessor, static c => c.Name)" Placeholder="@SharedLocalizer["Client"]" />
             </FilterTemplate>
         </PropertyColumn>
-        <TemplateColumn CellClass="text-end" Groupable="false" Filterable="false" HeaderStyle="width: 12%">
+        <TemplateColumn CellClass="text-end" Groupable="false" Filterable="false" HeaderStyle="width: 17%">
             <CellTemplate>
-                <ItemDialogButton Context="affair" Item="context.Item" @bind-OpenDialogItem="_openDialogItem"
-                    ButtonText="@SharedLocalizer["View details"]" Title="@Localizer["Affair details"]">
-                    <AffairCard Affair="@affair" />
-                </ItemDialogButton>
+                <MudStack Row Class="text-center">
+                    <ItemDialogButton Context="affair" Item="context.Item" @bind-OpenDialogItem="_openDialogItem"
+                        ButtonText="@SharedLocalizer["Overview"]" Title="@Localizer["Affair details"]">
+                        <AffairCard Affair="@affair" />
+                    </ItemDialogButton>
+                    <MudButton Href="@($"/affair/{context.Item.Id}")" Color="Color.Primary" Variant="Variant.Outlined">
+                        @Localizer["Show affair"]
+                    </MudButton>
+                </MudStack>
             </CellTemplate>
         </TemplateColumn>
     </Columns>

@@ -33,4 +33,7 @@
   <data name="Last advancement" xml:space="preserve">
     <value>Dernier advancement</value>
   </data>
+  <data name="Show affair" xml:space="preserve">
+    <value>Voir l'affaire</value>
+  </data>
 </root>
