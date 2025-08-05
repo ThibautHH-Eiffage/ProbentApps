@@ -120,8 +120,8 @@
   <data name="Affair" xml:space="preserve">
     <value>Affaire</value>
   </data>
-  <data name="Archived orders" xml:space="preserve">
-    <value>Commandes archivées</value>
+  <data name="Archived affairs" xml:space="preserve">
+    <value>Affaires archivées</value>
   </data>
   <data name="Client" xml:space="preserve">
     <value>Client</value>
@@ -132,8 +132,8 @@
   <data name="Home" xml:space="preserve">
     <value>Accueil</value>
   </data>
-  <data name="My orders" xml:space="preserve">
-    <value>Mes commandes</value>
+  <data name="My affairs" xml:space="preserve">
+    <value>Mes affaires</value>
   </data>
   <data name="Name" xml:space="preserve">
     <value>Nom</value>
