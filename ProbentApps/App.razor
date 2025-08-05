@@ -29,5 +29,5 @@
     [CascadingParameter]
     private HttpContext HttpContext { get; set; } = default!;
 
-    protected override void OnInitialized() => _pageRenderMode = HttpContext.AcceptsInteractiveRouting() ? RenderMode.InteractiveAuto : null;
+    protected override void OnInitialized() => _pageRenderMode = HttpContext.AcceptsInteractiveRouting() ? RenderMode.InteractiveServer : null;
 }
