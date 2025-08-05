@@ -1,0 +1,63 @@
+@inject IStringLocalizer<SharedResources> SharedLocalizer
+
+@typeparam T
+@typeparam TContext
+
+<MudAutocomplete T=T SearchFunc="Search" Value=Value ValueChanged="ValueChangedAsync"
+    Placeholder="@Placeholder" ResetValueOnEmptyText Clearable Disabled=Disabled />
+
+@code {
+    private IFilterDefinition<TContext> _filterDefinition = default!;
+
+    [Parameter]
+    public bool Disabled { get; set; }
+
+    [Parameter, EditorRequired]
+    public required Func<string, CancellationToken, Task<IEnumerable<T?>>> Search { get; set; }
+
+    [Parameter, EditorRequired]
+    public required Column<TContext> Column { get; set; }
+
+    [Parameter]
+    public string? Placeholder { get; set; }
+
+    [Parameter, EditorRequired]
+    public required Func<TContext, T?> FilteredProperty { get; set; }
+
+    [Parameter]
+    public T? Value { get; set; }
+
+    [Parameter]
+    public EventCallback<T?> ValueChanged { get; set; }
+
+    protected override void OnInitialized() => _filterDefinition = new FilterDefinition<TContext>
+        {
+            Title = typeof(FilterAutocomplete<T, TContext>).FullName,
+            FilterFunction = (TContext item) => EqualityComparer<T>.Default.Equals(FilteredProperty(item), Value),
+            Column = Column
+        };
+
+    private async Task ValueChangedAsync(T? v)
+    {
+        if (EqualityComparer<T>.Default.Equals(v, Value))
+            return;
+
+        await ValueChanged.InvokeAsync(Value = v);
+
+        await SetFilterAsync(v is not null);
+    }
+
+    public Task SetFilterAsync(bool set)
+    {
+        if (set)
+        {
+            return Column.DataGrid.AddFilterAsync(_filterDefinition);
+        }
+        else if (Column.DataGrid.FilterDefinitions.Remove(_filterDefinition))
+        {
+            Column.DataGrid.GroupItems();
+        }
+
+        return Task.CompletedTask;
+    }
+}

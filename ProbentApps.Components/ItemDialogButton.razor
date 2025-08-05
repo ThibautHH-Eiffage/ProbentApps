@@ -1,0 +1,37 @@
+@using Microsoft.Extensions.Logging
+
+@typeparam T where T : class
+
+@inject ILogger<ItemDialogButton<T>> Logger
+
+<MudButton OnClick=@(() => OpenDialogItemChanged.InvokeAsync(Item))>@ButtonText</MudButton>
+
+<MudDialog ContentClass="p-3" DialogContent=ChildContent(Item)
+    Visible=@object.ReferenceEquals(OpenDialogItem, Item) VisibleChanged=@(visible => { if (!visible) OpenDialogItemChanged.InvokeAsync(null); })>
+    <TitleContent>
+        @if (Title is not null)
+        {
+            <MudText Typo="Typo.h6">@Title</MudText>
+        }
+    </TitleContent>
+</MudDialog>
+
+@code {
+    [Parameter, EditorRequired]
+    public required string ButtonText { get; set; }
+
+    [Parameter]
+    public string? Title { get; set; }
+
+    [Parameter, EditorRequired]
+    public T Item { get; set; }
+
+    [Parameter, EditorRequired]
+    public required RenderFragment<T> ChildContent { get; set; } 
+
+    [Parameter, EditorRequired]
+    public required T? OpenDialogItem { get; set; }
+
+    [Parameter, EditorRequired]
+    public EventCallback<T?> OpenDialogItemChanged { get; set; }
+}

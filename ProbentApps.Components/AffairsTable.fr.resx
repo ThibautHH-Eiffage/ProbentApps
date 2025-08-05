@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="Group by client" xml:space="preserve">
+    <value>Grouper par client</value>
+  </data>
+  <data name="Invoiced client" xml:space="preserve">
+    <value>Client facturé</value>
+  </data>
+  <data name="List all" xml:space="preserve">
+    <value>Tout lister</value>
+  </data>
+  <data name="Affair name" xml:space="preserve">
+    <value>Nom de l'affaire</value>
+  </data>
+  <data name="Affair details" xml:space="preserve">
+    <value>Détails de l'affaire</value>
+  </data>
+  <data name="Completion" xml:space="preserve">
+    <value>Complétion</value>
+  </data>
+  <data name="Last advancement" xml:space="preserve">
+    <value>Dernier advancement</value>
+  </data>
+</root>
