@@ -141,7 +141,7 @@
   <data name="Orders" xml:space="preserve">
     <value>Commandes</value>
   </data>
-  <data name="Provider ID" xml:space="preserve">
+  <data name="Code" xml:space="preserve">
     <value>Code</value>
   </data>
 </root>
