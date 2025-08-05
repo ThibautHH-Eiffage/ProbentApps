@@ -10,7 +10,7 @@ internal class ProbentAppsDbContextOptionsExtension : IDbContextOptionsExtension
     {
         public override bool IsDatabaseProvider => false;
 
-        public override string LogFragment => "NoDefaultSqlServerIdentityColumns ";
+        public override string LogFragment => "NoDefaultSqlServerIdentityColumns UseSqlServerOptimizedUUIDv7UniqueIdentifiers ";
 
         public override int GetServiceProviderHashCode() => 0;
 
@@ -27,7 +27,8 @@ internal class ProbentAppsDbContextOptionsExtension : IDbContextOptionsExtension
     public DbContextOptionsExtensionInfo Info => _info ??= new ExtensionInfo(this);
 
     public void ApplyServices(IServiceCollection services) => new EntityFrameworkServicesBuilder(services)
-        .TryAdd<IConventionSetPlugin, ValueGenerationStrategyConventionRemoverConventionSetPlugin>();
+        .TryAdd<IConventionSetPlugin, ValueGenerationStrategyConventionRemoverConventionSetPlugin>()
+        .TryAdd<IModelCustomizer, ProbentAppsModelCustomizer>();
 
     public void Validate(IDbContextOptions options) { }
 }
