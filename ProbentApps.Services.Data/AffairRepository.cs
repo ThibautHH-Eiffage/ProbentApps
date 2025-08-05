@@ -12,6 +12,10 @@ public class AffairRepository(ApplicationDbContext context, UserManager<Applicat
     private Func<ApplicationDbContext, Guid, Guid[], bool, IAsyncEnumerable<Affair>>? _getAffairsFor;
     private Func<ApplicationDbContext, Guid, Guid[], bool, IAsyncEnumerable<Affair>> GetAffairsFor => _getAffairsFor ??=
         EF.CompileAsyncQuery((ApplicationDbContext context, Guid userId, Guid[] extraAffairIds, bool archived) => context.Affairs
+            .Include(a => a.Client)
+            .Include(a => a.Orders)
+            .ThenInclude(o => o.Advancements)
+            .ThenInclude(a => a.Invoice)
             .Where(a => a.IsArchived == archived
                 && (extraAffairIds.Contains(a.Id) || context.Structures
                     .Where(s => s.Manager!.Id == userId)
