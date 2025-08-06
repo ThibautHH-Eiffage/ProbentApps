@@ -18,6 +18,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\ProbentApps.Configuration\ProbentApps.Configuration.csproj" />
     <ProjectReference Include="..\ProbentApps.Services.Data.Abstractions\ProbentApps.Services.Data.Abstractions.csproj" />
     <ProjectReference Include="..\ProbentApps.Services.Database\ProbentApps.Services.Database.csproj" />
     <ProjectReference Include="..\ProbentApps.Services.Data\ProbentApps.Services.Data.csproj" />
