@@ -5,6 +5,7 @@ using ProbentApps.Services.Components;
 using ProbentApps.Services.Data;
 using ProbentApps.Services.Database;
 using ProbentApps.Services.Email;
+using ProbentApps.Services.Generic;
 using ProbentApps.Services.Identity;
 using ProbentApps.Services.Options;
 
@@ -19,5 +20,6 @@ public static class IServiceCollectionExtensions
         .AddIdentityServices()
         .AddDataServices()
         .AddComponentServices()
+        .AddGenericServices(environment)
         .ConfigureOptions();
 }
