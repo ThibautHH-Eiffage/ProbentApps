@@ -17,6 +17,8 @@ var app = builder.Build();
 
 await app.MigrateDatabaseAsync();
 
+app.UseHttpsRedirection();
+
 if (app.Environment.IsDevelopment())
     app.UseDevelopmentMiddleware();
 else

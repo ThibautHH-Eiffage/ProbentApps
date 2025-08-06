@@ -12,7 +12,6 @@ public static class IApplicationBuilderExtensions
 
     public static IApplicationBuilder UseApplicationMiddleware(this IApplicationBuilder app) => app
         .UseForwardedHeaders()
-        .UseHttpsRedirection()
         .UseAuthentication()
         .UseAuthorization()
         .UseAntiforgery()
