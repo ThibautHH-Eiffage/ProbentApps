@@ -6,6 +6,9 @@ public static class IApplicationBuilderExtensions
         .UseDeveloperExceptionPage()
         .UseWebAssemblyDebugging();
 
+    public static IApplicationBuilder UseStagingMiddleware(this IApplicationBuilder app) => app
+        .UseExceptionHandler(Routes.Error.Endpoint, createScopeForErrors: true);
+
     public static IApplicationBuilder UseProductionMiddleware(this IApplicationBuilder app) => app
         .UseExceptionHandler(Routes.Error.Endpoint, createScopeForErrors: true)
         .UseHsts();

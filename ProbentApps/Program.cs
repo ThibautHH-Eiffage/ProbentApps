@@ -8,6 +8,11 @@ var builder = WebApplication.CreateBuilder(args);
 
 if (builder.Environment.IsDevelopment())
     builder.Configuration.AddDevelopmentConfiguration();
+else if (builder.Environment.IsStaging())
+{
+    builder.WebHost.UseStaticWebAssets();
+    builder.Configuration.AddProductionConfiguration();
+}
 else
     builder.Configuration.AddProductionConfiguration();
 
@@ -21,6 +26,8 @@ app.UseHttpsRedirection();
 
 if (app.Environment.IsDevelopment())
     app.UseDevelopmentMiddleware();
+else if (app.Environment.IsStaging())
+    app.UseStagingMiddleware();
 else
     app.UseProductionMiddleware();
 
