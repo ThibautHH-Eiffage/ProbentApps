@@ -6,14 +6,17 @@ public static class IApplicationBuilderExtensions
         .UseDeveloperExceptionPage()
         .UseWebAssemblyDebugging();
 
+    public static IApplicationBuilder UseStagingMiddleware(this IApplicationBuilder app) => app
+        .UseExceptionHandler(Routes.Error.Endpoint, createScopeForErrors: true);
+
     public static IApplicationBuilder UseProductionMiddleware(this IApplicationBuilder app) => app
         .UseExceptionHandler(Routes.Error.Endpoint, createScopeForErrors: true)
         .UseHsts();
 
     public static IApplicationBuilder UseApplicationMiddleware(this IApplicationBuilder app) => app
-        .UseHttpsRedirection()
+        .UseForwardedHeaders()
         .UseAuthentication()
         .UseAuthorization()
         .UseAntiforgery()
-		.UseRequestLocalization("en", "fr");
+        .UseRequestLocalization("en", "fr");
 }
