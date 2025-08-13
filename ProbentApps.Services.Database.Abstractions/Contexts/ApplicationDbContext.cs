@@ -69,11 +69,7 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
             .UsingEntity<Advancement>(advancementReports, advancementInvoices);
 
         modelBuilder.Entity<ApplicationUser>()
-            .ToTable("Users", IdentityDbContext.Schema, static t => t.ExcludeFromMigrations())
-            .HasMany<Structure>().WithMany()
-            .UsingEntity<StructureManagement>(
-                static b => b.HasOne(static sm => sm.Structure).WithMany(static s => s.Managements),
-                static b => b.HasOne(static sm => sm.Manager).WithMany());
+            .ToTable("Users", IdentityDbContext.Schema, static t => t.ExcludeFromMigrations());
 
         modelBuilder.Entity<ApplicationUser>(b =>
         {

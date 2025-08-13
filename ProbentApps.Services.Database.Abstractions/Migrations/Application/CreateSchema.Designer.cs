@@ -211,15 +211,15 @@ partial class CreateSchema
 
         modelBuilder.Entity<StructureManagement>(b =>
         {
-            b.Property<Guid>("ManagerId");
+            b.Property<Guid?>("ManagerId");
 
             b.Property<Guid>("StructureId");
 
             b.Property(sm => sm.StartDate);
 
-            b.HasKey("ManagerId", "StructureId");
+            b.HasKey("StructureId", nameof(StructureManagement.StartDate));
 
-            b.HasIndex("StructureId");
+            b.HasIndex("ManagerId");
 
             b.ToTable(nameof(ApplicationDbContext.StructureManagements));
         });

@@ -84,13 +84,13 @@ public partial class CreateSchema : Migration
             schema: ApplicationDbContext.Schema,
             columns: table => new
             {
-                ManagerId = table.Column<Guid>(),
                 StructureId = table.Column<Guid>(),
-                StartDate = table.Column<DateOnly>()
+                StartDate = table.Column<DateOnly>(),
+                ManagerId = table.Column<Guid>(nullable: true)
             },
             constraints: table =>
             {
-                table.PrimaryKey($"PK_{nameof(ApplicationDbContext.StructureManagements)}", x => new { x.ManagerId, x.StructureId });
+                table.PrimaryKey($"PK_{nameof(ApplicationDbContext.StructureManagements)}", x => new { x.StructureId, x.StartDate });
                 table.ForeignKey(
                     name: $"FK_{nameof(ApplicationDbContext.StructureManagements)}_{nameof(ApplicationDbContext.Structures)}_{nameof(StructureManagement.Structure)}{nameof(Structure.Id)}",
                     column: x => x.StructureId,
@@ -295,10 +295,10 @@ public partial class CreateSchema : Migration
             column: $"{nameof(Structure.Manager)}{nameof(ApplicationUser.Id)}");
 
         migrationBuilder.CreateIndex(
-            name: $"IX_{nameof(ApplicationDbContext.StructureManagements)}_{nameof(StructureManagement.Structure)}{nameof(Structure.Id)}",
+            name: $"IX_{nameof(ApplicationDbContext.StructureManagements)}_{nameof(StructureManagement.Manager)}{nameof(ApplicationUser.Id)}",
             schema: ApplicationDbContext.Schema,
             table: nameof(ApplicationDbContext.StructureManagements),
-            column: $"{nameof(StructureManagement.Structure)}{nameof(Structure.Id)}");
+            column: $"{nameof(StructureManagement.Manager)}{nameof(ApplicationUser.Id)}");
     }
 
     /// <inheritdoc />
