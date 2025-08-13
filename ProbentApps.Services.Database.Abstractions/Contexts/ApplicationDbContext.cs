@@ -5,7 +5,6 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using ProbentApps.Model;
-using ProbentApps.Services.Database.Abstractions.ValueGeneration;
 
 namespace ProbentApps.Services.Database.Abstractions.Contexts;
 
@@ -66,7 +65,7 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
         modelBuilder.Entity<Invoice>().HasMany(static i => i.Reports).WithMany(static r => r.Invoices)
             .UsingEntity<Advancement>(advancementReports, advancementInvoices);
 
-        var structureManagements = modelBuilder.Entity<ApplicationUser>()
+        modelBuilder.Entity<ApplicationUser>()
             .ToTable("Users", IdentityDbContext.Schema, static t => t.ExcludeFromMigrations())
             .HasMany<Structure>().WithMany()
             .UsingEntity<StructureManagement>(
@@ -83,14 +82,5 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
                         s => dataProtector.Unprotect(s));
         });
 
-        const string ManagerIdPropertyName = $"{nameof(Structure.Manager)}{nameof(ApplicationUser.Id)}";
-
-        var structures = modelBuilder.Entity<Structure>();
-        structures.Property(ManagerIdPropertyName)
-            .HasComputedValue<StructureManagerValueGenerator>();
-        structures.HasOne(static s => s.Manager).WithMany(static s => s.ManagedStructures)
-            .HasForeignKey(ManagerIdPropertyName);
-
-        structureManagements.Navigation(static sm => sm.Manager).AutoInclude();
     }
 }
