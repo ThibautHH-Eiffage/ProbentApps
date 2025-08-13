@@ -44,10 +44,10 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
     #endregion
 
     private StoreOptions? GetStoreOptions() => this.GetService<IDbContextOptions>()
-                        .Extensions.OfType<CoreOptionsExtension>()
-                        .FirstOrDefault()?.ApplicationServiceProvider
-                        ?.GetService<IOptions<IdentityOptions>>()
-                        ?.Value?.Stores;
+        .Extensions.OfType<CoreOptionsExtension>().FirstOrDefault()
+        ?.ApplicationServiceProvider
+        ?.GetService<IOptions<IdentityOptions>>()?.Value
+        ?.Stores;
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
