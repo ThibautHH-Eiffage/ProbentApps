@@ -8,7 +8,7 @@ public class Report : IEntity
     public Guid Id { get; set; }
 
     [MaxLength(64)]
-    public required string Name { get; set; }
+    public string Name { get; set; } = default!;
 
     [MaxLength(128)]
     public string? Intermediaries { get; set; }
@@ -23,9 +23,9 @@ public class Report : IEntity
     [DeleteBehavior(DeleteBehavior.NoAction)]
     public Report? PreviousReport { get; set; }
 
-    public required IList<Advancement> Advancements { get; set; }
+    public IList<Advancement> Advancements { get; set; } = [];
 
-    public required IList<Order> Orders { get; set; }
+    public IList<Order> Orders { get; set; } = [];
 
-    public required IList<Invoice> Invoices { get; set; }
+    public IList<Invoice> Invoices { get; set; } = [];
 }

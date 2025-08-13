@@ -8,7 +8,7 @@ public class Advancement : IEntity
     public Guid Id { get; set; }
 
     [MaxLength(64)]
-    public required string Name { get; set; }
+    public string Name { get; set; } = default!;
 
     [MaxLength(512)]
     public string? Description { get; set; }
@@ -19,7 +19,7 @@ public class Advancement : IEntity
     public decimal Value { get; set; }
 
     [DeleteBehavior(DeleteBehavior.NoAction)]
-    public required Order Order { get; set; }
+    public Order Order { get; set; } = default!;
 
     [DeleteBehavior(DeleteBehavior.SetNull)]
     public Report? Report { get; set; }

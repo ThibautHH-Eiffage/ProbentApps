@@ -6,7 +6,7 @@ namespace ProbentApps.Model;
 public class StructureManagement
 {
     [DeleteBehavior(DeleteBehavior.NoAction)]
-    public required Structure Structure { get; set; }
+    public Structure Structure { get; set; } = default!;
 
     public DateOnly StartDate { get; set; }
 

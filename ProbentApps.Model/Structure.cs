@@ -12,18 +12,18 @@ public class Structure : IEntity
     public Guid Id { get; set; }
 
     [MaxLength(64)]
-    public required string Name { get; set; }
+    public string Name { get; set; } = default!;
 
     [MaxLength(128)]
     [Unicode(false)]
-    public required string Code { get; set; }
+    public string Code { get; set; } = default!;
 
     public string ParentCode => Code[..(Code.Length - ShortCode.Length - 1)];
 
     [Unicode(false)]
-    public required string ShortCode { get; set; }
+    public string ShortCode { get; set; } = default!;
 
-    public required IList<StructureManagement> Managements { get; set; }
+    public IList<StructureManagement> Managements { get; set; } = [];
 
     [DeleteBehavior(DeleteBehavior.NoAction)]
     public ApplicationUser? Manager { get; set; }

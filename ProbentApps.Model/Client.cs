@@ -8,7 +8,7 @@ public class Client : IEquatable<Client>
     public Guid Id { get; set; }
 
     [MaxLength(128)]
-    public required string Name { get; set; }
+    public string Name { get; set; } = default!;
 
     [MaxLength(64)]
     [Unicode(false)]

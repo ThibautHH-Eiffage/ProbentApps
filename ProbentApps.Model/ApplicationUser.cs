@@ -13,5 +13,5 @@ public class ApplicationUser : IdentityUser<Guid>, IHashedNormalizationUser
     [MaxLength(SHA512.HashSizeInBytes)]
     public byte[]? NormalizationSalt { get; set; }
 
-    public required IList<Structure> ManagedStructures { get; set; }
+    public IList<Structure> ManagedStructures { get; set; } = [];
 }
