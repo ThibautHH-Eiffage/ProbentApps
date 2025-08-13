@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 namespace ProbentApps.Model;
 
 [Index(nameof(Code), IsUnique = true)]
+[Index(nameof(ShortCode))]
 public class Structure : IEntity
 {
     public const char CodeSeparator = '|';
@@ -11,17 +12,18 @@ public class Structure : IEntity
     public Guid Id { get; set; }
 
     [MaxLength(64)]
-    public required string Name { get; set; }
+    public string Name { get; set; } = default!;
 
     [MaxLength(128)]
     [Unicode(false)]
-    public required string Code { get; set; }
+    public string Code { get; set; } = default!;
 
-    public string ParentCode => Code[..Code.LastIndexOf(CodeSeparator)];
+    public string ParentCode => Code[..(Code.Length - ShortCode.Length - 1)];
 
-    public string ShortCode => Code[(Code.LastIndexOf(CodeSeparator) + 1)..];
+    [Unicode(false)]
+    public string ShortCode { get; set; } = default!;
 
-    public required IList<StructureManagement> Managements { get; set; }
+    public IList<StructureManagement> Managements { get; set; } = [];
 
     [DeleteBehavior(DeleteBehavior.NoAction)]
     public ApplicationUser? Manager { get; set; }

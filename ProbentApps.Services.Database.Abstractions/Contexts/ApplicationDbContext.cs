@@ -1,13 +1,19 @@
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using ProbentApps.Services.Database.Abstractions.ValueGeneration;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
 using ProbentApps.Model;
 
 namespace ProbentApps.Services.Database.Abstractions.Contexts;
 
-public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : DbContext(options), IDbContext
+public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options, IPersonalDataProtector dataProtector) : DbContext(options), IDbContext
 {
     public static string Schema => "application";
+
+    internal const string ShortCodeColumnSql =
+        "(CASE WHEN charindex('|',[Code],(0))=(0) THEN [Code] ELSE RIGHT([Code],charindex('|',REVERSE([Code]),(0))-(1)) END)";
 
     #region Lazy DbSets
 
@@ -37,6 +43,12 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
 
     #endregion
 
+    private StoreOptions? GetStoreOptions() => this.GetService<IDbContextOptions>()
+        .Extensions.OfType<CoreOptionsExtension>().FirstOrDefault()
+        ?.ApplicationServiceProvider
+        ?.GetService<IOptions<IdentityOptions>>()?.Value
+        ?.Stores;
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.HasDefaultSchema(Schema);
@@ -56,21 +68,20 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
         modelBuilder.Entity<Invoice>().HasMany(static i => i.Reports).WithMany(static r => r.Invoices)
             .UsingEntity<Advancement>(advancementReports, advancementInvoices);
 
-        var structureManagements = modelBuilder.Entity<ApplicationUser>()
-            .ToTable("Users", IdentityDbContext.Schema, static t => t.ExcludeFromMigrations())
-            .HasMany<Structure>().WithMany()
-            .UsingEntity<StructureManagement>(
-                static b => b.HasOne(static sm => sm.Structure).WithMany(static s => s.Managements),
-                static b => b.HasOne(static sm => sm.Manager).WithMany());
+        modelBuilder.Entity<ApplicationUser>()
+            .ToTable("Users", IdentityDbContext.Schema, static t => t.ExcludeFromMigrations());
 
-        const string ManagerIdPropertyName = $"{nameof(Structure.Manager)}{nameof(ApplicationUser.Id)}";
+        modelBuilder.Entity<ApplicationUser>(b =>
+        {
+            if (GetStoreOptions()?.ProtectPersonalData ?? false)
+                foreach (var personalDataProperty in typeof(ApplicationUser).GetProperties().Where(
+                    prop => Attribute.IsDefined(prop, typeof(ProtectedPersonalDataAttribute))))
+                    b.Property<string>(personalDataProperty.Name).HasConversion(
+                        s => dataProtector.Protect(s),
+                        s => dataProtector.Unprotect(s));
+        });
 
-        var structures = modelBuilder.Entity<Structure>();
-        structures.Property(ManagerIdPropertyName)
-            .HasComputedValue<StructureManagerValueGenerator>();
-        structures.HasOne(static s => s.Manager).WithMany(static s => s.ManagedStructures)
-            .HasForeignKey(ManagerIdPropertyName);
-
-        structureManagements.Navigation(static sm => sm.Manager).AutoInclude();
+        modelBuilder.Entity<Structure>()
+            .Property(static s => s.ShortCode).HasComputedColumnSql(ShortCodeColumnSql, true);
     }
 }

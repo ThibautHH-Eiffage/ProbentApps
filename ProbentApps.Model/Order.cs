@@ -8,10 +8,10 @@ public class Order
     public Guid Id { get; set; }
 
     [MaxLength(128)]
-    public required string Name { get; set; }
+    public string Name { get; set; } = default!;
 
     [DeleteBehavior(DeleteBehavior.NoAction)]
-    public required Affair Affair { get; set; }
+    public Affair Affair { get; set; } = default!;
 
     /// <summary>
     /// The order's <see cref="Client"/>, as imported from the external provider.
@@ -24,18 +24,18 @@ public class Order
     /// <see cref="Client"/>.
     /// </remarks>
     [DeleteBehavior(DeleteBehavior.NoAction)]
-    public required Client Client { get; set; }
+    public Client Client { get; set; } = default!;
 
     [MaxLength(64)]
     [Unicode(false)]
-    public required string Code { get; set; }
+    public string Code { get; set; } = default!;
 
     [Precision(38, 2)]
     public decimal TotalPrice { get; set; }
 
-    public required IList<Advancement> Advancements { get; set; }
+    public IList<Advancement> Advancements { get; set; } = [];
 
-    public required IList<Report> Reports { get; set; }
+    public IList<Report> Reports { get; set; } = [];
 
-    public required IList<Invoice> Invoices { get; set; }
+    public IList<Invoice> Invoices { get; set; } = [];
 }

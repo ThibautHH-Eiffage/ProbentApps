@@ -8,10 +8,10 @@ public class Invoice : IEntity
     public Guid Id { get; set; }
 
     [MaxLength(64)]
-    public required string Name { get; set; }
+    public string Name { get; set; } = default!;
 
     [DeleteBehavior(DeleteBehavior.NoAction)]
-    public required ApplicationUser Requester { get; set; }
+    public ApplicationUser Requester { get; set; } = default!;
 
     public DateTimeOffset? RequestDate { get; set; }
 
@@ -21,9 +21,9 @@ public class Invoice : IEntity
 
     public DateTimeOffset? SubmissionDate { get; set; }
 
-    public required IList<Advancement> Advancements { get; set; }
+    public IList<Advancement> Advancements { get; set; } = [];
 
-    public required IList<Order> Orders { get; set; }
+    public IList<Order> Orders { get; set; } = [];
 
-    public required IList<Report> Reports { get; set; }
+    public IList<Report> Reports { get; set; } = [];
 }

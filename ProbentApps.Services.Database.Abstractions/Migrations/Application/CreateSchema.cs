@@ -36,6 +36,7 @@ public partial class CreateSchema : Migration
                 Id = table.Column<Guid>(),
                 Name = table.Column<string>(maxLength: 64),
                 Code = table.Column<string>(maxLength: 128, unicode: false),
+                ShortCode = table.Column<string>(unicode: false, computedColumnSql: ApplicationDbContext.ShortCodeColumnSql, stored: true),
                 ManagerId = table.Column<Guid>(nullable: true)
             },
             constraints: table =>
@@ -83,13 +84,13 @@ public partial class CreateSchema : Migration
             schema: ApplicationDbContext.Schema,
             columns: table => new
             {
-                ManagerId = table.Column<Guid>(),
                 StructureId = table.Column<Guid>(),
-                StartDate = table.Column<DateOnly>()
+                StartDate = table.Column<DateOnly>(),
+                ManagerId = table.Column<Guid>(nullable: true)
             },
             constraints: table =>
             {
-                table.PrimaryKey($"PK_{nameof(ApplicationDbContext.StructureManagements)}", x => new { x.ManagerId, x.StructureId });
+                table.PrimaryKey($"PK_{nameof(ApplicationDbContext.StructureManagements)}", x => new { x.StructureId, x.StartDate });
                 table.ForeignKey(
                     name: $"FK_{nameof(ApplicationDbContext.StructureManagements)}_{nameof(ApplicationDbContext.Structures)}_{nameof(StructureManagement.Structure)}{nameof(Structure.Id)}",
                     column: x => x.StructureId,
@@ -282,16 +283,22 @@ public partial class CreateSchema : Migration
             unique: true);
 
         migrationBuilder.CreateIndex(
+            name: $"IX_{nameof(ApplicationDbContext.Structures)}_{nameof(Structure.ShortCode)}",
+            schema: ApplicationDbContext.Schema,
+            table: nameof(ApplicationDbContext.Structures),
+            column: nameof(Structure.ShortCode));
+
+        migrationBuilder.CreateIndex(
             name: $"IX_{nameof(ApplicationDbContext.Structures)}_{nameof(Structure.Manager)}{nameof(ApplicationUser.Id)}",
             schema: ApplicationDbContext.Schema,
             table: nameof(ApplicationDbContext.Structures),
             column: $"{nameof(Structure.Manager)}{nameof(ApplicationUser.Id)}");
 
         migrationBuilder.CreateIndex(
-            name: $"IX_{nameof(ApplicationDbContext.StructureManagements)}_{nameof(StructureManagement.Structure)}{nameof(Structure.Id)}",
+            name: $"IX_{nameof(ApplicationDbContext.StructureManagements)}_{nameof(StructureManagement.Manager)}{nameof(ApplicationUser.Id)}",
             schema: ApplicationDbContext.Schema,
             table: nameof(ApplicationDbContext.StructureManagements),
-            column: $"{nameof(StructureManagement.Structure)}{nameof(Structure.Id)}");
+            column: $"{nameof(StructureManagement.Manager)}{nameof(ApplicationUser.Id)}");
     }
 
     /// <inheritdoc />

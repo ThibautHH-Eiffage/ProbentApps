@@ -9,9 +9,9 @@ public class Affair : Structure, IEquatable<Affair>
     public bool IsArchived { get; set; }
 
     [DeleteBehavior(DeleteBehavior.NoAction)]
-    public required Client Client { get; set; }
+    public Client Client { get; set; } = default!;
 
-    public required IList<Order> Orders { get; set; }
+    public IList<Order> Orders { get; set; } = [];
 
     public bool Equals(Affair? other) => other is not null
         && (Id.Equals(other.Id)
