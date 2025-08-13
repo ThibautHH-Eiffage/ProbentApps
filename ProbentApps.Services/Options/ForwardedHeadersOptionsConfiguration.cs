@@ -13,20 +13,18 @@ internal class ForwardedHeadersOptionsConfiguration(IOptions<HostFilteringOption
 {
     public void Configure(ForwardedHeadersOptions options)
     {
-        var forwardedHeaders = configuration.GetRequiredSection(nameof(ForwardedHeaders));
+        var forwardedHeaders = configuration.GetSection(nameof(ForwardedHeaders));
 
-        foreach (string host in forwardedHeaders[nameof(options.AllowedHosts)]?
-            .Split(';', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
-            ?? [])
+        foreach (string host in forwardedHeaders?[nameof(options.AllowedHosts)]
+            ?.Split(';', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries) ?? [])
             options.AllowedHosts.Add(host);
 
         if (!options.AllowedHosts.Any())
             options.AllowedHosts = hostFilteringOptions.Value.AllowedHosts;
 
         bool cleared = false;
-        foreach (string ip in forwardedHeaders[nameof(options.KnownProxies)]?
-            .Split(';', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
-            ?? [])
+        foreach (string ip in forwardedHeaders?[nameof(options.KnownProxies)]
+            ?.Split(';', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries) ?? [])
         {
             if (!cleared)
             {
