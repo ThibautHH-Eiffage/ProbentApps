@@ -184,6 +184,11 @@ class ApplicationDbContextModelSnapshot : ModelSnapshot
                 .HasMaxLength(128)
                 .IsUnicode(false);
 
+            b.Property(s => s.ShortCode)
+                .IsRequired()
+                .IsUnicode(false)
+                .HasComputedColumnSql(ApplicationDbContext.ShortCodeColumnSql, true);
+
             b.Property<Guid?>("ManagerId");
 
             b.Property(s => s.Name)
@@ -196,6 +201,8 @@ class ApplicationDbContextModelSnapshot : ModelSnapshot
 
             b.HasIndex(nameof(Structure.Code))
                 .IsUnique();
+
+            b.HasIndex(nameof(Structure.ShortCode));
 
             b.ToTable(nameof(ApplicationDbContext.Structures));
         });

@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 namespace ProbentApps.Model;
 
 [Index(nameof(Code), IsUnique = true)]
+[Index(nameof(ShortCode))]
 public class Structure : IEntity
 {
     public const char CodeSeparator = '|';
@@ -17,9 +18,10 @@ public class Structure : IEntity
     [Unicode(false)]
     public required string Code { get; set; }
 
-    public string ParentCode => Code[..Code.LastIndexOf(CodeSeparator)];
+    public string ParentCode => Code[..(Code.Length - ShortCode.Length - 1)];
 
-    public string ShortCode => Code[(Code.LastIndexOf(CodeSeparator) + 1)..];
+    [Unicode(false)]
+    public required string ShortCode { get; set; }
 
     public required IList<StructureManagement> Managements { get; set; }
 

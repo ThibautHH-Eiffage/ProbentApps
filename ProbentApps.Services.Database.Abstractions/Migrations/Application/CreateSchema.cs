@@ -36,6 +36,7 @@ public partial class CreateSchema : Migration
                 Id = table.Column<Guid>(),
                 Name = table.Column<string>(maxLength: 64),
                 Code = table.Column<string>(maxLength: 128, unicode: false),
+                ShortCode = table.Column<string>(unicode: false, computedColumnSql: ApplicationDbContext.ShortCodeColumnSql, stored: true),
                 ManagerId = table.Column<Guid>(nullable: true)
             },
             constraints: table =>
@@ -280,6 +281,12 @@ public partial class CreateSchema : Migration
             table: nameof(ApplicationDbContext.Structures),
             column: nameof(Structure.Code),
             unique: true);
+
+        migrationBuilder.CreateIndex(
+            name: $"IX_{nameof(ApplicationDbContext.Structures)}_{nameof(Structure.ShortCode)}",
+            schema: ApplicationDbContext.Schema,
+            table: nameof(ApplicationDbContext.Structures),
+            column: nameof(Structure.ShortCode));
 
         migrationBuilder.CreateIndex(
             name: $"IX_{nameof(ApplicationDbContext.Structures)}_{nameof(Structure.Manager)}{nameof(ApplicationUser.Id)}",

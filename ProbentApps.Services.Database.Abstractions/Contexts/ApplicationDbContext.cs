@@ -12,6 +12,9 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
 {
     public static string Schema => "application";
 
+    internal const string ShortCodeColumnSql =
+        "(CASE WHEN charindex('|',[Code],(0))=(0) THEN [Code] ELSE RIGHT([Code],charindex('|',REVERSE([Code]),(0))-(1)) END)";
+
     #region Lazy DbSets
 
     private DbSet<Structure>? _structures;
@@ -82,5 +85,7 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
                         s => dataProtector.Unprotect(s));
         });
 
+        modelBuilder.Entity<Structure>()
+            .Property(static s => s.ShortCode).HasComputedColumnSql(ShortCodeColumnSql, true);
     }
 }
