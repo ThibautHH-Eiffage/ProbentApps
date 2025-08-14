@@ -11,9 +11,9 @@
             FilterOperators="FilterOperators.KeyColumn" />
         <PropertyColumn Property="static a => a.Name" Title=@Localizer["Affair name"] Groupable="false"
             FilterOperators="FilterOperators.NameColumn" />
-        <PropertyColumn T="Affair" TProperty="Client" @ref=_clientColumn Groupable=@(!_initialized || _clientFilter.Value is null)
-            Property="static a => a.Client" Title=@SharedLocalizer["Client"] HeaderStyle="width: 30%"
-            Grouping GroupExpanded GroupBy="clientAccessor">
+        <PropertyColumn @ref=_clientColumn Property="static a => a.Client" Title=@SharedLocalizer["Client"]
+            Groupable=@(!_initialized || _clientFilter.Value is null) Grouping GroupExpanded GroupBy="clientAccessor"
+            HeaderStyle="width: 30%">
             <GroupTemplate>
                 <MudText>@context.Grouping.Key</MudText>
             </GroupTemplate>
@@ -44,7 +44,6 @@
     private bool _initialized;
     private Affair? _openDialogItem;
     private Column<Affair> _clientColumn = default!;
-
     private FilterAutocomplete<Client, Affair> _clientFilter = default!;
 
     [Parameter]
