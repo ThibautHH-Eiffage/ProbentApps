@@ -22,7 +22,7 @@
                     Search="Search(clientAccessor, static c => c.Name)" Placeholder="@SharedLocalizer["Client"]" />
             </FilterTemplate>
         </PropertyColumn>
-        <TemplateColumn CellClass="text-end" Groupable="false" Filterable="false" HeaderStyle="width: 17%">
+        <TemplateColumn CellClass="text-end" Groupable="false" Filterable="false" Sortable="false" HeaderStyle="width: 17%">
             <CellTemplate>
                 <MudStack Row Class="text-center">
                     <ItemDialogButton Context="affair" Item="context.Item" @bind-OpenDialogItem="_openDialogItem"
