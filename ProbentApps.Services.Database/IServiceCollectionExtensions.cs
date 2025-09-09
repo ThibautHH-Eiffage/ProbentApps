@@ -15,7 +15,12 @@ public static class IServiceCollectionExtensions
 
     private static DbContextOptionsBuilder UseEnvironmentConfiguration(this DbContextOptionsBuilder options, IHostEnvironment environment) => options
         .EnableSensitiveDataLogging(environment.IsDevelopment())
-        .ConfigureWarnings(warnings => { if (environment.IsDevelopment()) warnings.Ignore(CoreEventId.SensitiveDataLoggingEnabledWarning); });
+        .ConfigureWarnings(warnings =>
+		{
+			if (environment.IsDevelopment())
+				warnings.Ignore(CoreEventId.SensitiveDataLoggingEnabledWarning);
+			warnings.Ignore(RelationalEventId.MultipleCollectionIncludeWarning);
+		});
 
     private static void ConfigureDbContext<TContext>(this DbContextOptionsBuilder options, IHostEnvironment environment, IConfiguration configuration)
         where TContext : DbContext, IDbContext =>
