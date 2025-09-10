@@ -2,13 +2,14 @@
 
 @inject IStringLocalizer<SharedResources> SharedLocalizer
 
-@attribute [Authorize]
+@inherits AffairListPage
 
 <PageTitle Title=@SharedLocalizer["My affairs"] />
 
-<AffairsTable Affairs="[]" />
+<AffairsTable Affairs="TableDataLoader" />
 
 <MudNavLink Href="archived-affairs" Match="All" Icon="@Icons.Material.Filled.Archive" Class="mt-3">@SharedLocalizer["Archived affairs"]</MudNavLink>
 
 @code {
+    protected override bool ArchivedOnly => false;
 }
