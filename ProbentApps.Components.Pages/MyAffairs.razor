@@ -1,24 +1,14 @@
 @page "/my-affairs"
 
-@using Microsoft.AspNetCore.Components.Authorization
-
 @inject IStringLocalizer<SharedResources> SharedLocalizer
-@inject IAffairRepository AffairRepository
 
 @attribute [Authorize]
 
 <PageTitle Title=@SharedLocalizer["My affairs"] />
 
-<AffairsTable Affairs="_affairs"/>
+<AffairsTable Affairs="[]" />
 
 <MudNavLink Href="archived-affairs" Match="All" Icon="@Icons.Material.Filled.Archive" Class="mt-3">@SharedLocalizer["Archived affairs"]</MudNavLink>
 
 @code {
-    private IEnumerable<Affair> _affairs = default!;
-
-    [CascadingParameter]
-    private Task<AuthenticationState?> AuthenticationState { get; set; } = default!;
-
-    protected override async Task OnInitializedAsync() =>
-        _affairs = AffairRepository.GetAffairsFor((await AuthenticationState)!.User, false).ToBlockingEnumerable();
 }
