@@ -42,11 +42,11 @@
         if (EqualityComparer<T>.Default.Equals(v, Value))
             return;
 
-        await ValueChanged.InvokeAsync(Value = v);
-
         _filterDefinition.Value = v;
 
         await SetFilterAsync(v is not null);
+
+        await ValueChanged.InvokeAsync(Value = v);
     }
 
     public Task SetFilterAsync(bool set)
