@@ -12,13 +12,13 @@
         <PropertyColumn Property="static a => a.Name" Title=@Localizer["Affair name"] Groupable="false"
             FilterOperators="FilterOperators.NameColumn" />
         <PropertyColumn @ref=_clientColumn Property="static a => a.Client" Title=@SharedLocalizer["Client"]
-            Groupable=@(!_initialized || _clientFilter.Value is null) Grouping GroupExpanded GroupBy="clientAccessor"
+            Groupable=@(!_initialized || _filteredClient is null) Grouping GroupExpanded GroupBy="clientAccessor"
             HeaderStyle="width: 30%">
             <GroupTemplate>
                 <MudText>@context.Grouping.Key</MudText>
             </GroupTemplate>
             <FilterTemplate>
-                <FilterAutocomplete @ref=_clientFilter Column=_clientColumn FilteredProperty="clientAccessor"
+                <FilterAutocomplete Column="_clientColumn" FilteredProperty="clientAccessor" @bind-Value="_filteredClient"
                     Search="Search(clientAccessor, static c => c.Name)" Placeholder="@SharedLocalizer["Client"]" />
             </FilterTemplate>
         </PropertyColumn>
@@ -47,7 +47,7 @@
     private bool _initialized;
     private Affair? _openDialogItem;
     private Column<Affair> _clientColumn = default!;
-    private FilterAutocomplete<Client, Affair> _clientFilter = default!;
+    private Client? _filteredClient;
 
     [Parameter]
     public required IEnumerable<Affair> Affairs { get; init; }
