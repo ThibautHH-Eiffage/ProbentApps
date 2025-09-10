@@ -4,7 +4,7 @@
 @inject IStringLocalizer<SharedResources> SharedLocalizer
 @inject IStringLocalizer<AffairsTable> Localizer
 
-<MudDataGrid @ref=_grid ServerData="Affairs" Groupable Filterable FilterMode="@DataGridFilterMode.ColumnFilterRow">
+<MudDataGrid @ref=_grid ServerData="Affairs" Groupable Filterable FilterMode="@DataGridFilterMode.ColumnFilterRow" RowsPerPage=25>
     <Columns>
         <PropertyColumn Property="static a => a.ShortCode" Title=@SharedLocalizer["Code"] Groupable="false"
             InitialDirection="SortDirection.Ascending" HeaderStyle="width: 15%"
