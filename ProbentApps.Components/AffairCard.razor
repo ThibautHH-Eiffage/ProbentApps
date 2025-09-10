@@ -57,46 +57,17 @@
 @code {
     (string icon, Severity severity, string text) _status = default!;
 
-    readonly Order o = new()
-    {
-        Id = Guid.NewGuid(),
-        Name = "Order",
-        Affair = default!,
-        Client = default!,
-        Code = "order",
-        TotalPrice = 3000,
-        Advancements = [
-            new()
-            {
-                Id = Guid.NewGuid(),
-                Name = "Advancement 1",
-                Date = DateOnly.FromDateTime(DateTime.Now),
-                Order = default!,
-                Value = 1000
-            }
-        ],
-        Invoices = [],
-        Reports = [],
-    };
-
     [Parameter, EditorRequired]
     public Affair Affair { get; set; }
 
-    protected override void OnInitialized()
-    {
-        Affair.Orders.Add(o);
-        o.Affair = Affair;
-        o.Client = Affair.Client;
-        o.Advancements[0].Order = o;
-
-        _status = Affair.IsArchived
+    protected override void OnInitialized() => _status =
+    	Affair.IsArchived
             ? (Icons.Material.Filled.Archive, Severity.Warning, Localizer["Archived"])
             : (!Affair.Orders.SelectMany(static o => o.Advancements).Any()
                 ? (Icons.Material.Filled.AccessTime, Severity.Normal, Localizer["Not started"])
-                : (!Affair.Orders.SelectMany(static o => o.Advancements).Any(static a => a.Invoice == null)
+                : (!Affair.Orders.SelectMany(static o => o.Advancements).Any(static a => a.Invoice is null)
                     ? (Icons.Material.Filled.CheckCircle, Severity.Success, Localizer["Fully invoiced"])
                     : (Icons.Material.Filled.Build, Severity.Info, Localizer["In progress"])
                 )
             );
-    }
 }

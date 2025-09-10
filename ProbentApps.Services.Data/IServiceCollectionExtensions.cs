@@ -7,7 +7,6 @@ namespace ProbentApps.Services.Data;
 public static class IServiceCollectionExtensions
 {
     public static IServiceCollection AddDataServices(this IServiceCollection services) => services
-        .AddScoped<IAffairRepository, AffairRepository>()
         .AddScoped<IRepository<Affair>, AffairRepository>()
         .AddScoped<IAdvancementManager, AdvancementManager>()
         .AddScoped<IRepository<Advancement>, AdvancementManager>()

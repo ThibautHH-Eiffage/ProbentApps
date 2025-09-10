@@ -42,22 +42,30 @@
         if (EqualityComparer<T>.Default.Equals(v, Value))
             return;
 
-        await ValueChanged.InvokeAsync(Value = v);
+        _filterDefinition.Value = v;
 
         await SetFilterAsync(v is not null);
+
+        await ValueChanged.InvokeAsync(Value = v);
     }
 
     public Task SetFilterAsync(bool set)
     {
+        Task task;
+
         if (set)
         {
-            return Column.DataGrid.AddFilterAsync(_filterDefinition);
+            task = Column.DataGrid.AddFilterAsync(_filterDefinition);
         }
         else if (Column.DataGrid.FilterDefinitions.Remove(_filterDefinition))
         {
-            Column.DataGrid.GroupItems();
+            if (Column.DataGrid.ServerData is null && Column.DataGrid.VirtualizeServerData is null)
+                Column.DataGrid.GroupItems();
+            task = Column.DataGrid.ReloadServerData();
         }
+        else
+            task = Task.CompletedTask;
 
-        return Task.CompletedTask;
+        return task;
     }
 }

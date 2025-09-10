@@ -4,25 +4,25 @@
 @inject IStringLocalizer<SharedResources> SharedLocalizer
 @inject IStringLocalizer<AffairsTable> Localizer
 
-<MudDataGrid Items="Affairs" Groupable Filterable FilterMode="@DataGridFilterMode.ColumnFilterRow">
+<MudDataGrid @ref=_grid ServerData="Affairs" Groupable Filterable FilterMode="@DataGridFilterMode.ColumnFilterRow" RowsPerPage=25>
     <Columns>
         <PropertyColumn Property="static a => a.ShortCode" Title=@SharedLocalizer["Code"] Groupable="false"
             InitialDirection="SortDirection.Ascending" HeaderStyle="width: 15%"
             FilterOperators="FilterOperators.KeyColumn" />
         <PropertyColumn Property="static a => a.Name" Title=@Localizer["Affair name"] Groupable="false"
             FilterOperators="FilterOperators.NameColumn" />
-        <PropertyColumn T="Affair" TProperty="Client" @ref=_clientColumn Groupable=@(!_initialized || _clientFilter.Value is null)
-            Property="static a => a.Client" Title=@SharedLocalizer["Client"] HeaderStyle="width: 30%"
-            Grouping GroupExpanded GroupBy="clientAccessor">
+        <PropertyColumn @ref=_clientColumn Property="static a => a.Client" Title=@SharedLocalizer["Client"]
+            Groupable=@(!_initialized || _filteredClient is null) Grouping GroupExpanded GroupBy="clientAccessor"
+            HeaderStyle="width: 30%">
             <GroupTemplate>
                 <MudText>@context.Grouping.Key</MudText>
             </GroupTemplate>
             <FilterTemplate>
-                <FilterAutocomplete @ref=_clientFilter Column=_clientColumn FilteredProperty="clientAccessor"
+                <FilterAutocomplete Column="_clientColumn" FilteredProperty="clientAccessor" @bind-Value="_filteredClient"
                     Search="Search(clientAccessor, static c => c.Name)" Placeholder="@SharedLocalizer["Client"]" />
             </FilterTemplate>
         </PropertyColumn>
-        <TemplateColumn CellClass="text-end" Groupable="false" Filterable="false" HeaderStyle="width: 17%">
+        <TemplateColumn CellClass="text-end" Groupable="false" Filterable="false" Sortable="false" HeaderStyle="width: 17%">
             <CellTemplate>
                 <MudStack Row Class="text-center">
                     <ItemDialogButton Context="affair" Item="context.Item" @bind-OpenDialogItem="_openDialogItem"
@@ -36,6 +36,9 @@
             </CellTemplate>
         </TemplateColumn>
     </Columns>
+    <PagerContent>
+        <MudDataGridPager T=Affair />
+    </PagerContent>
 </MudDataGrid>
 
 @code {
@@ -43,17 +46,20 @@
 
     private bool _initialized;
     private Affair? _openDialogItem;
+    private MudDataGrid<Affair> _grid = default!;
     private Column<Affair> _clientColumn = default!;
+    private Client? _filteredClient;
 
-    private FilterAutocomplete<Client, Affair> _clientFilter = default!;
+    [Parameter, EditorRequired]
+    public required Func<GridState<Affair>, Task<GridData<Affair>>> Affairs { get; init; }
 
     [Parameter]
-    public required IEnumerable<Affair> Affairs { get; init; }
+    public bool ArchivedOnly { get; init; }
 
     protected override void OnAfterRender(bool firstRender) => _initialized = true;
 
     private Func<string, CancellationToken, Task<IEnumerable<T?>>> Search<T>(Func<Affair, T> propertyAccessor, Func<T, string> textAccessor) =>
-        (searchText, cancellationToken) => Task.FromResult(Affairs.Select(propertyAccessor)
+        (searchText, cancellationToken) => Task.FromResult(_grid.ServerItems.Select(propertyAccessor)
             .Where(p => string.IsNullOrWhiteSpace(searchText) || textAccessor(p).Contains(searchText, StringComparison.CurrentCultureIgnoreCase))
             .Distinct()
             .AsEnumerable<T?>());
