@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Identity;
 namespace ProbentApps.Model;
 
 [Table("Users", Schema = "identity")]
-public class ApplicationUser : IdentityUser<Guid>, IHashedNormalizationUser
+public class ApplicationUser : IdentityUser<Guid>, IEntity, IHashedNormalizationUser
 {
     public static readonly Guid RootId = new(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1);
 
