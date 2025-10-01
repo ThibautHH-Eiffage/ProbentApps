@@ -5,7 +5,8 @@ using ProbentApps.Services.Database.Abstractions.Contexts;
 
 namespace ProbentApps.Services.Data;
 
-public class InvoicingManager(ApplicationDbContext context, TimeProvider timeProvider) : DefaultRepository<Invoice>(context), IInvoicingManager
+public class InvoicingManager(IDbContextFactory<ApplicationDbContext> contextFactory, TimeProvider timeProvider)
+    : DefaultRepository<Invoice>(contextFactory), IInvoicingManager
 {
     private Func<ApplicationDbContext, Guid, CancellationToken, Task<Advancement?>>? _getAdvancementQuery;
     private Func<ApplicationDbContext, Guid, CancellationToken, Task<Advancement?>> GetAdvancement => _getAdvancementQuery ??=

@@ -10,7 +10,9 @@ public interface IRepository<T>
 {
     ValueTask<T?> FindAsync(Guid id, CancellationToken cancellationToken = default);
 
-    Task<(IEnumerable<T> data, int count)> GetTableDataForAsync(QueryParameters<T> parameters, CancellationToken cancellationToken = default);
+    Task<TResult[]> Query<TResult>(QueryParameters<T, TResult> parameters, CancellationToken cancellationToken = default) where TResult : class;
+    
+    Task<(IEnumerable<T> data, int count)> GetTableDataForAsync(QueryParameters<T, T> parameters, CancellationToken cancellationToken = default);
 
     IQueryable<T> ApplyEntityFilter(IQueryable<T> query, IEntity entity, LambdaExpression targetEntityExpression);
 }

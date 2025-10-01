@@ -10,7 +10,7 @@ using ProbentApps.Services.Database.Abstractions.Contexts;
 
 namespace ProbentApps.Services.Data;
 
-public class DefaultRepository<T>(ApplicationDbContext context) : IRepository<T>
+public class DefaultRepository<T>(IDbContextFactory<ApplicationDbContext> contextFactory) : IRepository<T>
     where T : class, IEntity
 {
     private static readonly MethodInfo QueryParameterMarkerMethodInfo = typeof(EF).GetTypeInfo()
@@ -20,7 +20,15 @@ public class DefaultRepository<T>(ApplicationDbContext context) : IRepository<T>
     private static readonly PropertyInfo EntityIdPropertyInfo = typeof(IEntity).GetTypeInfo()
         .GetDeclaredProperty(nameof(IEntity.Id))!;
 
-    protected ApplicationDbContext Context { get; } = context;
+    private AsyncLocal<ApplicationDbContext> _context = new();
+
+    protected ApplicationDbContext Context => _context.Value!;
+
+    protected IAsyncDisposable MakeQueryScope()
+    {
+        _context.Value = contextFactory.CreateDbContext();
+        return Context;
+    }
 
     protected virtual IQueryable<T> ApplyIdentityFilter(IQueryable<T> query, ClaimsPrincipal user) => query;
 
@@ -29,8 +37,21 @@ public class DefaultRepository<T>(ApplicationDbContext context) : IRepository<T>
     ValueTask<T?> IRepository<T>.FindAsync(Guid id, CancellationToken cancellationToken) =>
         Context.Set<T>().FindAsync([id], cancellationToken);
 
-    async Task<(IEnumerable<T> data, int count)> IRepository<T>.GetTableDataForAsync(QueryParameters<T> parameters, CancellationToken cancellationToken)
+    async Task<TResult[]> IRepository<T>.Query<TResult>(QueryParameters<T, TResult> parameters, CancellationToken cancellationToken) where TResult : class
     {
+        await using var scope = MakeQueryScope();
+
+        var q = parameters.Filter(ApplyIdentityFilter(Context.Set<T>().AsNoTrackingWithIdentityResolution(), parameters.User));
+
+        var query = parameters.Select is not null ? parameters.Select(q) : q.Where(static e => e is TResult).Select(static e => (e as TResult)!);
+
+        return await parameters.SortAndPaginate(query).ToArrayAsync(cancellationToken);
+    }
+
+    async Task<(IEnumerable<T> data, int count)> IRepository<T>.GetTableDataForAsync(QueryParameters<T, T> parameters, CancellationToken cancellationToken)
+    {
+        await using var scope = MakeQueryScope();
+
         var query = (parameters.Select ?? ApplyDefaultDataSelection)(parameters.Filter(ApplyIdentityFilter(Context.Set<T>().AsNoTrackingWithIdentityResolution(), parameters.User)));
 
         return (await parameters.SortAndPaginate(query).ToArrayAsync(cancellationToken), await query.CountAsync(cancellationToken));
