@@ -7,19 +7,19 @@
 <MudDataGrid @ref=_grid ServerData="Affairs" Groupable Filterable FilterMode="@DataGridFilterMode.ColumnFilterRow" RowsPerPage=25>
     <Columns>
         <PropertyColumn Property="static a => a.ShortCode" Title=@SharedLocalizer["Code"] Groupable="false"
-            InitialDirection="SortDirection.Ascending" HeaderStyle="width: 15%"
+            InitialDirection="SortDirection.Descending" HeaderStyle="width: 15%"
             FilterOperators="FilterOperators.KeyColumn" />
         <PropertyColumn Property="static a => a.Name" Title=@Localizer["Affair name"] Groupable="false"
             FilterOperators="FilterOperators.NameColumn" />
         <PropertyColumn @ref=_clientColumn Property="static a => a.Client" Title=@SharedLocalizer["Client"]
-            Groupable=@(!_initialized || _filteredClient is null) Grouping GroupExpanded GroupBy="clientAccessor"
+            Groupable=@(!_initialized || _filteredClient is null) GroupExpanded GroupBy="clientAccessor"
             HeaderStyle="width: 30%">
             <GroupTemplate>
                 <MudText>@context.Grouping.Key</MudText>
             </GroupTemplate>
             <FilterTemplate>
                 <FilterAutocomplete Column="_clientColumn" FilteredProperty="clientAccessor" @bind-Value="_filteredClient"
-                    Search="Search(clientAccessor, static c => c.Name)" Placeholder="@SharedLocalizer["Client"]" />
+                    Search=Search Placeholder="@SharedLocalizer["Client"]" />
             </FilterTemplate>
         </PropertyColumn>
         <TemplateColumn CellClass="text-end" Groupable="false" Filterable="false" Sortable="false" HeaderStyle="width: 17%">
@@ -48,19 +48,35 @@
     private Affair? _openDialogItem;
     private MudDataGrid<Affair> _grid = default!;
     private Column<Affair> _clientColumn = default!;
+    private Client[] _filterClients = default!;
     private Client? _filteredClient;
 
     [Parameter, EditorRequired]
     public required Func<GridState<Affair>, Task<GridData<Affair>>> Affairs { get; init; }
 
+    [Parameter, EditorRequired]
+    public required Func<GridState<Affair>, Task<Client[]>> FilterClients { get; init; }
+
     [Parameter]
     public bool ArchivedOnly { get; init; }
 
-    protected override void OnAfterRender(bool firstRender) => _initialized = true;
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        await UpdateFilterClients();
+        _initialized = true;
+    }
 
-    private Func<string, CancellationToken, Task<IEnumerable<T?>>> Search<T>(Func<Affair, T> propertyAccessor, Func<T, string> textAccessor) =>
-        (searchText, cancellationToken) => Task.FromResult(_grid.ServerItems.Select(propertyAccessor)
-            .Where(p => string.IsNullOrWhiteSpace(searchText) || textAccessor(p).Contains(searchText, StringComparison.CurrentCultureIgnoreCase))
+    private async Task UpdateFilterClients() =>
+        _filterClients = await FilterClients(new GridState<Affair> {
+            Page = _grid.CurrentPage,
+            PageSize = _grid.RowsPerPage,
+            SortDefinitions = _grid.SortDefinitions.Values.OrderBy(sd => sd.Index).ToList(),
+            FilterDefinitions = _grid.FilterDefinitions.ToList()
+        });
+
+    private Task<IEnumerable<Client?>> Search(string searchText, CancellationToken cancellationToken) =>
+        Task.FromResult(_filterClients
+            .Where(c => string.IsNullOrWhiteSpace(searchText) || c.Name.Contains(searchText, StringComparison.CurrentCultureIgnoreCase))
             .Distinct()
-            .AsEnumerable<T?>());
+            .AsEnumerable<Client?>());
 }
