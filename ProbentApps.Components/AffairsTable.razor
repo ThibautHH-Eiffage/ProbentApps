@@ -7,12 +7,12 @@
 <MudDataGrid @ref=_grid ServerData="Affairs" Groupable Filterable FilterMode="@DataGridFilterMode.ColumnFilterRow" RowsPerPage=25>
     <Columns>
         <PropertyColumn Property="static a => a.ShortCode" Title=@SharedLocalizer["Code"] Groupable="false"
-            InitialDirection="SortDirection.Ascending" HeaderStyle="width: 15%"
+            InitialDirection="SortDirection.Descending" HeaderStyle="width: 15%"
             FilterOperators="FilterOperators.KeyColumn" />
         <PropertyColumn Property="static a => a.Name" Title=@Localizer["Affair name"] Groupable="false"
             FilterOperators="FilterOperators.NameColumn" />
         <PropertyColumn @ref=_clientColumn Property="static a => a.Client" Title=@SharedLocalizer["Client"]
-            Groupable=@(!_initialized || _filteredClient is null) Grouping GroupExpanded GroupBy="clientAccessor"
+            Groupable=@(!_initialized || _filteredClient is null) GroupExpanded GroupBy="clientAccessor"
             HeaderStyle="width: 30%">
             <GroupTemplate>
                 <MudText>@context.Grouping.Key</MudText>
