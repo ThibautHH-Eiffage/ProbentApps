@@ -41,7 +41,17 @@ public abstract class AffairListPage : AuthenticatedPage
             }).ToList()
         });
 
+    private IQueryable<Client> SelectFilterClients(IQueryable<Affair> query) => query
+        .Where(a => a.IsArchived == ArchivedOnly)
+        .Select(static a => new Client
+        {
+            Id = a.Client.Id,
+            Name = a.Client.Name
+        });
+
     protected Func<GridState<Affair>, Task<GridData<Affair>>> TableDataLoader { get; private set; } = default!;
+
+    protected Func<GridState<Affair>, Task<Client[]>> FilterClientsLoader { get; private set; } = default!;
 
     protected abstract bool ArchivedOnly { get; }
 
@@ -53,5 +63,7 @@ public abstract class AffairListPage : AuthenticatedPage
         await base.OnInitializedAsync();
 
         TableDataLoader = AffairRepository.LoadTableDataFor(User, SelectAffairListData);
+
+        FilterClientsLoader = state => AffairRepository.Query<Client>(AffairRepository.MakeQueryParametersFor(User, SelectFilterClients)(state));
     }
 }
