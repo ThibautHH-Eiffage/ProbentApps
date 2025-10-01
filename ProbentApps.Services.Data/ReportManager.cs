@@ -5,7 +5,8 @@ using ProbentApps.Services.Database.Abstractions.Contexts;
 
 namespace ProbentApps.Services.Data;
 
-public class ReportManager(ApplicationDbContext context, TimeProvider timeProvider) : DefaultRepository<Report>(context), IReportManager
+public class ReportManager(IDbContextFactory<ApplicationDbContext> contextFactory, TimeProvider timeProvider)
+    : DefaultRepository<Report>(contextFactory), IReportManager
 {
     private Func<ApplicationDbContext, Guid, CancellationToken, Task<Report?>>? _getReport;
     private Func<ApplicationDbContext, Guid, CancellationToken, Task<Report?>> GetReport => _getReport ??=
