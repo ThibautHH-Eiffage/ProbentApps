@@ -8,13 +8,13 @@ using ProbentApps.Services.Database.Abstractions.Contexts;
 
 namespace ProbentApps.Services.Data;
 
-public class AffairRepository(IDbContextFactory<ApplicationDbContext> contextFactory, UserManager<ApplicationUser> userManager)
+internal class AffairRepository(IDbContextFactory<ApplicationDbContext> contextFactory, UserManager<ApplicationUser> userManager)
 	: DefaultRepository<Affair>(contextFactory)
 {
     protected override IQueryable<Affair> ApplyIdentityFilter(IQueryable<Affair> query, ClaimsPrincipal user) => query
-        .WhereStructureIsAdministeredBy(Context.Structures,
-            Guid.Parse(userManager.GetUserId(user)!),
-            user.GetExtraManagedStructures());
+        .WhereStructureIsAdministeredBy(Guid.Parse(userManager.GetUserId(user)!),
+            user.GetExtraManagedStructures(),
+            Context.Structures);
 
     protected override IQueryable<Affair> ApplyDefaultDataSelection(IQueryable<Affair> query) => query
         .Select(static a => new Affair

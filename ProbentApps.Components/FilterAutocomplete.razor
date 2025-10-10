@@ -46,7 +46,7 @@
 
         await SetFilterAsync(v is not null);
 
-        await ValueChanged.InvokeAsync(Value = v);
+        await ValueChanged.InvokeAsync(v);
     }
 
     public Task SetFilterAsync(bool set)
@@ -59,8 +59,7 @@
         }
         else if (Column.DataGrid.FilterDefinitions.Remove(_filterDefinition))
         {
-            if (Column.DataGrid.ServerData is null && Column.DataGrid.VirtualizeServerData is null)
-                Column.DataGrid.GroupItems();
+            Column.DataGrid.GroupItems();
             task = Column.DataGrid.ReloadServerData();
         }
         else

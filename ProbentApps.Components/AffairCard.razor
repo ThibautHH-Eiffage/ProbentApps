@@ -35,7 +35,12 @@
                             ? SharedLocalizer["{0:F}%", order.Advancements.Sum(a => a.Value) / order.TotalPrice * 100]
                             : SharedLocalizer["N/A"])
                     </MudTd>
-                    <MudTd DataLabel="@Localizer["Last advancement"]">@(order.Advancements.Max<Advancement, DateOnly?>(a => a.Date)?.ToShortDateString() ?? SharedLocalizer["N/A"])</MudTd>
+                    <MudTd DataLabel="@Localizer["Last advancement"]">
+                        @(order.Advancements.Any()
+                            ? order.Advancements.Max(static a => a.Date)
+                            : SharedLocalizer["N/A"]
+                        )
+                    </MudTd>
                 </RowTemplate>
                 <PagerContent>
                     <MudTablePager HideRowsPerPage HorizontalAlignment="HorizontalAlignment.Center" />

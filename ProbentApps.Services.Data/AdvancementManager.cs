@@ -1,11 +1,15 @@
+using System.Security.Claims;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using ProbentApps.Services.Data.Abstractions;
-using ProbentApps.Services.Database.Abstractions.Contexts;
 using ProbentApps.Model;
+using ProbentApps.Services.Data.Abstractions;
+using ProbentApps.Services.Data.Abstractions.Querying;
+using ProbentApps.Services.Database.Abstractions.Contexts;
 
 namespace ProbentApps.Services.Data;
 
-public class AdvancementManager(IDbContextFactory<ApplicationDbContext> contextFactory, TimeProvider timeProvider)
+internal class AdvancementManager(IDbContextFactory<ApplicationDbContext> contextFactory, UserManager<ApplicationUser> userManager,
+    TimeProvider timeProvider)
     : DefaultRepository<Advancement>(contextFactory), IAdvancementManager
 {
     private Func<ApplicationDbContext, Guid, CancellationToken, Task<Advancement?>>? _getAdvancement;
@@ -15,8 +19,16 @@ public class AdvancementManager(IDbContextFactory<ApplicationDbContext> contextF
             .Include(static a => a.Invoice)
             .FirstOrDefault(a => a.Id == id));
 
+    protected override IQueryable<Advancement> ApplyIdentityFilter(IQueryable<Advancement> query, ClaimsPrincipal user) => query
+        .WhereStructureIsAdministeredBy(Guid.Parse(userManager.GetUserId(user)!),
+            user.GetExtraManagedStructures(),
+            Context.Structures,
+            static a => a.Order.Affair);
+
     async Task<AdvancementCreationResult> IAdvancementManager.CreateAdvancementAsync(AdvancementCreationData data, CancellationToken cancellationToken)
     {
+        await using var scope = MakeQueryScope();
+
         if (await Context.Orders.FindAsync([data.OrderId], cancellationToken) is not Order order)
         {
             return new AdvancementCreationResult(AdvancementCreationResult.Status.OrderNotFound);
@@ -47,6 +59,8 @@ public class AdvancementManager(IDbContextFactory<ApplicationDbContext> contextF
 
     async Task<AdvancementDeletionResult> IAdvancementManager.DeleteAdvancementAsync(Guid advancementId, CancellationToken cancellationToken)
     {
+        await using var scope = MakeQueryScope();
+
         if (await GetAdvancement(Context, advancementId, cancellationToken) is not Advancement advancement)
             return new AdvancementDeletionResult(AdvancementDeletionResult.Status.NotFound);
 
@@ -68,6 +82,8 @@ public class AdvancementManager(IDbContextFactory<ApplicationDbContext> contextF
 
     async Task<AdvancementUpdateResult> IAdvancementManager.UpdateAdvancementAsync(Guid advancementId, AdvancementUpdateData data, CancellationToken cancellationToken)
     {
+        await using var scope = MakeQueryScope();
+
         if (await GetAdvancement(Context, advancementId, cancellationToken) is not Advancement advancement)
             return new AdvancementUpdateResult(AdvancementUpdateResult.Status.NotFound);
 

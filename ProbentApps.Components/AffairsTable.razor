@@ -1,6 +1,3 @@
-@using Microsoft.Extensions.Logging
-@using System.Linq.Expressions
-
 @inject IStringLocalizer<SharedResources> SharedLocalizer
 @inject IStringLocalizer<AffairsTable> Localizer
 
@@ -11,8 +8,8 @@
             FilterOperators="FilterOperators.KeyColumn" />
         <PropertyColumn Property="static a => a.Name" Title=@Localizer["Affair name"] Groupable="false"
             FilterOperators="FilterOperators.NameColumn" />
-        <PropertyColumn @ref=_clientColumn Property="static a => a.Client" Title=@SharedLocalizer["Client"]
-            Groupable=@(!_initialized || _filteredClient is null) GroupExpanded GroupBy="clientAccessor"
+        <PropertyColumn @ref=_clientColumn Property="static a => a.Client" Title=@SharedLocalizer["Client"] Sortable="false"
+            Groupable=@(_filteredClient is null) GroupExpanded GroupBy="clientAccessor"
             HeaderStyle="width: 30%">
             <GroupTemplate>
                 <MudText>@context.Grouping.Key</MudText>
@@ -44,27 +41,22 @@
 @code {
     private static readonly Func<Affair, Client> clientAccessor = static a => a.Client;
 
-    private bool _initialized;
     private Affair? _openDialogItem;
     private MudDataGrid<Affair> _grid = default!;
     private Column<Affair> _clientColumn = default!;
-    private Client[] _filterClients = default!;
+    private IList<Client> _filterClients = default!;
     private Client? _filteredClient;
 
     [Parameter, EditorRequired]
     public required Func<GridState<Affair>, Task<GridData<Affair>>> Affairs { get; init; }
 
     [Parameter, EditorRequired]
-    public required Func<GridState<Affair>, Task<Client[]>> FilterClients { get; init; }
+    public required Func<GridState<Affair>, Task<IList<Client>>> FilterClients { get; init; }
 
     [Parameter]
     public bool ArchivedOnly { get; init; }
 
-    protected override async Task OnAfterRenderAsync(bool firstRender)
-    {
-        await UpdateFilterClients();
-        _initialized = true;
-    }
+    protected override Task OnAfterRenderAsync(bool firstRender) => UpdateFilterClients();
 
     private async Task UpdateFilterClients() =>
         _filterClients = await FilterClients(new GridState<Affair> {

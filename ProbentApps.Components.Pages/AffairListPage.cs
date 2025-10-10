@@ -35,6 +35,7 @@ public abstract class AffairListPage : AuthenticatedPage
                 Advancements = o.Advancements.Select(a => new Advancement
                 {
                     Id = a.Id,
+                    Date = a.Date,
                     Value = a.Value,
                     Invoice = a.Invoice == null ? null : new Invoice { Id = a.Invoice!.Id }
                 }).ToList()
@@ -51,7 +52,7 @@ public abstract class AffairListPage : AuthenticatedPage
 
     protected Func<GridState<Affair>, Task<GridData<Affair>>> TableDataLoader { get; private set; } = default!;
 
-    protected Func<GridState<Affair>, Task<Client[]>> FilterClientsLoader { get; private set; } = default!;
+    protected Func<GridState<Affair>, Task<IList<Client>>> FilterClientsLoader { get; private set; } = default!;
 
     protected abstract bool ArchivedOnly { get; }
 
