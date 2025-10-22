@@ -10,6 +10,16 @@ namespace ProbentApps.Components.Pages;
 
 internal static class IRepositoryExtensions
 {
+    /// <summary>
+    /// Construction du jeux de paramètres nécessaires à l'utilisation de <see cref="IRepository{T}.Query{TResult}" />
+    /// à partir de l'état du tableau (<see cref="GridState{T}"/>)
+    /// </summary>
+    /// <typeparam name="T">Type d'enregistrements ciblé dans la base de données</typeparam>
+    /// <typeparam name="TResult">Type d'enregistrements retourné par la requête</typeparam>
+    /// <param name="repository">Base de données</param>
+    /// <param name="user">Utilisateur (nécessaire pour autoriser l'accès aux données)</param>
+    /// <param name="select">Spécification des instructions pour retourner les données voulues à la place de celles par défaut</param>
+    /// <returns>Paramètres requis pour obtenir les enregistrements associés à une Query ()</returns>
     private static Func<IQueryable<T>, IQueryable<T>> MakeFilter<T>(this IRepository<T> repository, GridState<T> state)
         where T : class, IEntity => query =>
         {
@@ -47,6 +57,14 @@ internal static class IRepositoryExtensions
         Func<IQueryable<T>, IQueryable<TResult>> select)
         where T : class, IEntity => repository.MakeSingularQueryParametersFor<T, TResult>(user, (q, r) => select(q));
 
+    /// <summary>
+    /// Chargement des enregistrements nécessaire à la construction d'une table
+    /// </summary>
+    /// <typeparam name="T">Type d'enregistrements</typeparam>
+    /// <param name="repository">Base de données</param>
+    /// <param name="user">Utilisateur (nécessaire pour autoriser l'accès aux données)</param>
+    /// <param name="select">Spécification des instructions pour retourner les données voulues à la place de celles par défaut</param>
+    /// <returns>Jeux d'enregistrements</returns>
     public static Func<GridState<T>, Task<GridData<T>>> LoadTableDataFor<T>(this IRepository<T> repository, ClaimsPrincipal user,
         Func<IQueryable<T>, IQueryable<T>>? filter,
         Func<IQueryable<T>, IQueryRoot, IQueryable<T>>? select,
