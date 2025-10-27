@@ -48,14 +48,14 @@
     private Affair? _openDialogItem;
     private MudDataGrid<Affair> _grid = default!;
     private Column<Affair> _clientColumn = default!;
-    private Client[] _filterClients = default!;
+    private IList<Client> _filterClients = default!;
     private Client? _filteredClient;
 
     [Parameter, EditorRequired]
     public required Func<GridState<Affair>, Task<GridData<Affair>>> Affairs { get; init; }
 
     [Parameter, EditorRequired]
-    public required Func<GridState<Affair>, Task<Client[]>> FilterClients { get; init; }
+    public required Func<GridState<Affair>, Task<IEnumerable<Client>>> FilterClients { get; init; }
 
     [Parameter]
     public bool ArchivedOnly { get; init; }
@@ -67,7 +67,7 @@
     }
 
     private async Task UpdateFilterClients() =>
-        _filterClients = await FilterClients(new GridState<Affair> {
+        _filterClients = (IList<Client>)await FilterClients(new GridState<Affair> {
             Page = _grid.CurrentPage,
             PageSize = _grid.RowsPerPage,
             SortDefinitions = _grid.SortDefinitions.Values.OrderBy(sd => sd.Index).ToList(),

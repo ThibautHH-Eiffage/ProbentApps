@@ -6,6 +6,6 @@ public record struct QueryParameters<T, TResult>(
     Func<IQueryable<T>, IQueryable<T>> Filter,
     Func<IQueryable<T>, IQueryable<TResult>>? Select,
     Func<IQueryable<TResult>, IQueryable<TResult>> SortAndPaginate,
-    ClaimsPrincipal User)
-    where T : class
-    where TResult : class;
+    ClaimsPrincipal User,
+    bool ToList = false)
+    where T : class;

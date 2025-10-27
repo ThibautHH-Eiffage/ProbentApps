@@ -51,7 +51,7 @@ public abstract class AffairListPage : AuthenticatedPage
 
     protected Func<GridState<Affair>, Task<GridData<Affair>>> TableDataLoader { get; private set; } = default!;
 
-    protected Func<GridState<Affair>, Task<Client[]>> FilterClientsLoader { get; private set; } = default!;
+    protected Func<GridState<Affair>, Task<IEnumerable<Client>>> FilterClientsLoader { get; private set; } = default!;
 
     protected abstract bool ArchivedOnly { get; }
 
