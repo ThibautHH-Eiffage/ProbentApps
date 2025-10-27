@@ -34,9 +34,6 @@ internal class DefaultRepository<T>(IDbContextFactory<ApplicationDbContext> cont
 
     protected virtual IQueryable<T> ApplyDefaultDataSelection(IQueryable<T> query) => query;
 
-    ValueTask<T?> IRepository<T>.FindAsync(Guid id, CancellationToken cancellationToken) =>
-        Context.Set<T>().FindAsync([id], cancellationToken);
-
     async Task<TResult[]> IRepository<T>.Query<TResult>(QueryParameters<T, TResult> parameters, CancellationToken cancellationToken) where TResult : class
     {
         await using var scope = MakeQueryScope();

@@ -8,8 +8,6 @@ namespace ProbentApps.Services.Data.Abstractions;
 public interface IRepository<T>
     where T : class, IEntity
 {
-    ValueTask<T?> FindAsync(Guid id, CancellationToken cancellationToken = default);
-
     Task<TResult[]> Query<TResult>(QueryParameters<T, TResult> parameters, CancellationToken cancellationToken = default) where TResult : class;
     
     Task<(IEnumerable<T> data, int count)> GetTableDataForAsync(QueryParameters<T, T> parameters, CancellationToken cancellationToken = default);
