@@ -5,7 +5,8 @@ using ProbentApps.Model;
 
 namespace ProbentApps.Services.Data;
 
-public class AdvancementManager(IDbContextFactory<ApplicationDbContext> contextFactory, TimeProvider timeProvider)
+internal class AdvancementManager(IDbContextFactory<ApplicationDbContext> contextFactory,
+    TimeProvider timeProvider)
     : DefaultRepository<Advancement>(contextFactory), IAdvancementManager
 {
     private Func<ApplicationDbContext, Guid, CancellationToken, Task<Advancement?>>? _getAdvancement;

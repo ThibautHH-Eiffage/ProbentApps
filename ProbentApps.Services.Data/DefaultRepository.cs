@@ -10,7 +10,7 @@ using ProbentApps.Services.Database.Abstractions.Contexts;
 
 namespace ProbentApps.Services.Data;
 
-public class DefaultRepository<T>(IDbContextFactory<ApplicationDbContext> contextFactory) : IRepository<T>
+internal class DefaultRepository<T>(IDbContextFactory<ApplicationDbContext> contextFactory) : IRepository<T>
     where T : class, IEntity
 {
     private static readonly MethodInfo QueryParameterMarkerMethodInfo = typeof(EF).GetTypeInfo()
