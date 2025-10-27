@@ -117,40 +117,13 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="Affair" xml:space="preserve">
-    <value>Affaire</value>
-  </data>
-  <data name="Archived affairs" xml:space="preserve">
-    <value>Affaires archivées</value>
-  </data>
-  <data name="Client" xml:space="preserve">
-    <value>Client</value>
-  </data>
-  <data name="Error" xml:space="preserve">
-    <value>Erreur</value>
-  </data>
-  <data name="Home" xml:space="preserve">
-    <value>Accueil</value>
-  </data>
-  <data name="My affairs" xml:space="preserve">
-    <value>Mes affaires</value>
-  </data>
-  <data name="Name" xml:space="preserve">
-    <value>Nom</value>
-  </data>
-  <data name="Orders" xml:space="preserve">
-    <value>Commandes</value>
-  </data>
-  <data name="Code" xml:space="preserve">
+  <data name="Codes" xml:space="preserve">
     <value>Code</value>
   </data>
-  <data name="View details" xml:space="preserve">
-    <value>Voir les détails</value>
+  <data name="Manager" xml:space="preserve">
+    <value>Respnsable</value>
   </data>
-  <data name="Overview" xml:space="preserve">
-    <value>Aperçu</value>
-  </data>
-  <data name="Structures" xml:space="preserve">
-    <value>Structures</value>
+  <data name="Structure name" xml:space="preserve">
+    <value>Nom de structure</value>
   </data>
 </root>

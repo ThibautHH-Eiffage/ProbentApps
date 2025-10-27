@@ -12,6 +12,7 @@
     <AuthorizeView>
         <Authorized>
             <MudNavLink Href="my-affairs" Match="NavLinkMatch.All" Icon="@Icons.Material.Filled.List">@SharedLocalizer["My affairs"]</MudNavLink>
+            <MudNavLink Href="structures" Match="NavLinkMatch.All" Icon="@Icons.Material.Filled.Domain">@SharedLocalizer["Structures"]</MudNavLink>
             <MudNavLink Href="Account/Manage" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.Person">@context.User.Identity?.Name</MudNavLink>
             <PostForm Action="Account/Logout">
                 <input type="hidden" name="ReturnUrl" value="@currentUrl" />

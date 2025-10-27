@@ -1,0 +1,50 @@
+@page "/structures"
+
+@inject IStringLocalizer<SharedResources> SharedLocalizer
+@inject IRepository<Structure> StructureRepository
+
+@inherits AuthenticatedPage
+
+<PageTitle Title=@SharedLocalizer["Structures"] />
+<StructuresTable StructuresLoader="TableDataLoader" FilterManagers="FilterManagersLoader" />
+
+@code {
+    private IQueryable<Structure> SelectStructureListData(IQueryable<Structure> query) => query
+        // .Where(s => s.IsArchived == ArchivedOnly)
+        .Select(static s => new Structure
+        {
+            Id = s.Id,
+            Name = s.Name,
+            Code = s.Code,
+            ShortCode = s.ShortCode,
+            Manager = s.Manager == null ? null : new ApplicationUser
+            {
+                Id = s.Manager.Id,
+                UserName = s.Manager.UserName,
+                Email = s.Manager.Email
+            }
+        });
+
+    private IQueryable<ApplicationUser> SelectFilterManagers(IQueryable<Structure> query) => query
+        .Where(static s => s.Manager != null)
+        .Select(static s => new ApplicationUser
+        {
+            Id = s.Manager!.Id,
+            UserName = s.Manager.UserName,
+            Email = s.Manager.Email
+        });
+
+    protected Func<GridState<Structure>, Task<GridData<Structure>>> TableDataLoader { get; private set; } = default!;
+
+    protected Func<GridState<Structure>, Task<ApplicationUser[]>> FilterManagersLoader { get; private set; } = default!;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+
+        TableDataLoader = StructureRepository.LoadTableDataFor(User, SelectStructureListData);
+
+        FilterManagersLoader = state => StructureRepository.Query<ApplicationUser>(StructureRepository.MakeQueryParametersFor(User, SelectFilterManagers)(state));
+    }
+
+}

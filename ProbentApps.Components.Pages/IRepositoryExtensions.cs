@@ -58,7 +58,7 @@ internal static class IRepositoryExtensions
         where T : class, IEntity => repository.MakeSingularQueryParametersFor<T, TResult>(user, (q, r) => select(q));
 
     /// <summary>
-    /// Chargement des enregistrements nécessaire à la construction d'une table
+    /// Chargement des enregistrements nécessaires à la construction d'une table
     /// </summary>
     /// <typeparam name="T">Type d'enregistrements</typeparam>
     /// <param name="repository">Base de données</param>

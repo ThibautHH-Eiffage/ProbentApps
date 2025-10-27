@@ -1,0 +1,83 @@
+@using Microsoft.Extensions.Logging
+@using System.Linq.Expressions
+
+@inject IStringLocalizer<SharedResources> SharedLocalizer
+@inject IStringLocalizer<StructuresTable> Localizer
+
+<MudDataGrid @ref=_grid ServerData="StructuresLoader" Groupable Filterable FilterMode="@DataGridFilterMode.ColumnFilterRow" RowsPerPage=25>
+    <Columns>
+
+        <PropertyColumn Property="static s => s.Code" Title=@SharedLocalizer["Code"] Groupable="false"
+                        InitialDirection="SortDirection.Ascending" HeaderStyle="width: 15%"
+                        FilterOperators="FilterOperators.KeyColumn" />
+        <PropertyColumn Property="static s => s.Name" Title=@Localizer["Structure name"] Groupable="false"
+            FilterOperators="FilterOperators.NameColumn" />
+        <PropertyColumn @ref=_managerColumn Property="static s => s.Manager" Title=@SharedLocalizer["Manager"]
+            Groupable=@(!_initialized || _filteredManager is null) GroupExpanded GroupBy="managerAccessor"
+            HeaderStyle="width: 30%">
+            <GroupTemplate>
+                <MudText>@context.Grouping.Key</MudText>
+            </GroupTemplate>
+            <FilterTemplate>
+                <FilterAutocomplete Column="_managerColumn" FilteredProperty="managerAccessor" @bind-Value="_filteredManager"
+                    Search=Search Placeholder="@SharedLocalizer["Manager"]" />
+            </FilterTemplate>
+        </PropertyColumn>
+@*         <TemplateColumn CellClass="text-end" Groupable="false" Filterable="false" Sortable="false" HeaderStyle="width: 17%">
+            <CellTemplate>
+                <MudStack Row Class="text-center">
+                    <ItemDialogButton Context="affair" Item="context.Item" @bind-OpenDialogItem="_openDialogItem"
+                        ButtonText="@SharedLocalizer["Overview"]" Title="@Localizer["Affair details"]">
+                        <AffairCard Affair="@affair" />
+                    </ItemDialogButton>
+                    <MudButton Href="@($"/affair/{context.Item.Id}")" Color="Color.Primary" Variant="Variant.Outlined">
+                        @Localizer["Show affair"]
+                    </MudButton>
+                </MudStack>
+            </CellTemplate>
+        </TemplateColumn>
+ *@    </Columns>
+    <PagerContent>
+        <MudDataGridPager T=Affair />
+    </PagerContent>
+</MudDataGrid>
+
+@code {
+    private static readonly Func<Structure, ApplicationUser?> managerAccessor = static s => s.Manager;
+
+    private bool _initialized;
+    private Affair? _openDialogItem;
+    private MudDataGrid<Structure> _grid = default!;
+    private Column<Structure> _managerColumn = default!;
+    private ApplicationUser[] _filterManagers = default!;
+    private ApplicationUser? _filteredManager;
+
+    [Parameter, EditorRequired]
+    public required Func<GridState<Structure>, Task<GridData<Structure>>> StructuresLoader { get; init; }
+
+    [Parameter, EditorRequired]
+    public required Func<GridState<Structure>, Task<ApplicationUser[]>> FilterManagers { get; init; }
+
+    [Parameter]
+    public bool ArchivedOnly { get; init; }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        await UpdateFilterManagers();
+        _initialized = true;
+    }
+
+    private async Task UpdateFilterManagers() =>
+        _filterManagers = await FilterManagers(new GridState<Structure> {
+            Page = _grid.CurrentPage,
+            PageSize = _grid.RowsPerPage,
+            SortDefinitions = _grid.SortDefinitions.Values.OrderBy(sd => sd.Index).ToList(),
+            FilterDefinitions = _grid.FilterDefinitions.ToList()
+        });
+
+    private Task<IEnumerable<ApplicationUser?>> Search(string searchText, CancellationToken cancellationToken) =>
+        Task.FromResult(_filterManagers
+            .Where(m => string.IsNullOrWhiteSpace(searchText) || $"{m.UserName} <{m.Email}>".Contains(searchText, StringComparison.CurrentCultureIgnoreCase))
+            .Distinct()
+            .AsEnumerable<ApplicationUser?>());
+}
