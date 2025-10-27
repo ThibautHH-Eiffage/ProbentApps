@@ -60,4 +60,7 @@
   <data name="Delete" xml:space="preserve">
     <value>Supprimer</value>
   </data>
+  <data name="Structures" xml:space="preserve">
+    <value>Structures</value>
+  </data>
 </root>

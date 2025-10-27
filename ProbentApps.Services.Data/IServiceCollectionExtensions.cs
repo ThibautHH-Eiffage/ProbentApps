@@ -8,6 +8,7 @@ public static class IServiceCollectionExtensions
 {
     public static IServiceCollection AddDataServices(this IServiceCollection services) => services
         .AddScoped<IRepository<Affair>, AffairRepository>()
+        .AddScoped<IRepository<Structure>, StructureRepository>()
         .AddScoped<IAdvancementManager, AdvancementManager>()
         .AddScoped<IRepository<Advancement>, AdvancementManager>()
         .AddScoped<IReportManager, ReportManager>()
