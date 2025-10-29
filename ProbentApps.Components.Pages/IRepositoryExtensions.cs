@@ -29,11 +29,16 @@ internal static class IRepositoryExtensions
     
     public static Func<GridState<T>, QueryParameters<T, TResult>> MakeQueryParametersFor<T, TResult>(this IRepository<T> repository,
         ClaimsPrincipal user,
-        Func<IQueryable<T>, IQueryable<TResult>>? select = null)
+        Func<IQueryable<T>, IQueryRoot, IQueryable<TResult>>? select = null)
         where T : class, IEntity => state => new(repository.MakeFilter(state), select, static q => q, user);
 
+    public static Func<GridState<T>, QueryParameters<T, TResult>> MakeQueryParametersFor<T, TResult>(this IRepository<T> repository,
+        ClaimsPrincipal user,
+        Func<IQueryable<T>, IQueryable<TResult>>? select = null)
+        where T : class, IEntity => repository.MakeQueryParametersFor<T, TResult>(user, select is null ? null : (q, r) => select(q));
+
     public static Func<GridState<T>, Task<GridData<T>>> LoadTableDataFor<T>(this IRepository<T> repository, ClaimsPrincipal user,
-        Func<IQueryable<T>, IQueryable<T>>? select = null,
+        Func<IQueryable<T>, IQueryRoot, IQueryable<T>>? select = null,
         bool toList = false)
         where T : class, IEntity =>
         async state =>
@@ -51,4 +56,10 @@ internal static class IRepositoryExtensions
 
             return data;
         };
+
+    public static Func<GridState<T>, Task<GridData<T>>> LoadTableDataFor<T>(this IRepository<T> repository,
+        ClaimsPrincipal user,
+        Func<IQueryable<T>, IQueryable<T>>? select = null,
+        bool toList = false)
+        where T : class, IEntity => repository.LoadTableDataFor(user, select is null ? null : (q, r) => select(q), toList);
 }

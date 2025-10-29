@@ -30,6 +30,12 @@ internal class DefaultRepository<T>(IDbContextFactory<ApplicationDbContext> cont
         return Context;
     }
 
+    private readonly struct QueryRoot(ApplicationDbContext context) : IQueryRoot
+    {
+        IQueryable<TEntity> IQueryRoot.GetEntitySet<TEntity>() => context.Set<TEntity>()
+            .AsNoTrackingWithIdentityResolution();
+    }
+
     protected virtual IQueryable<T> ApplyIdentityFilter(IQueryable<T> query, ClaimsPrincipal user) => query;
 
     protected virtual IQueryable<T> ApplyDefaultDataSelection(IQueryable<T> query) => query;
@@ -43,7 +49,7 @@ internal class DefaultRepository<T>(IDbContextFactory<ApplicationDbContext> cont
 
         var query = parameters.SortAndPaginate(
             (parameters.Select ?? throw new ArgumentException("Query parameters are missing a select expression", nameof(parameters)))(
-                GetQueryBase(parameters)));
+                GetQueryBase(parameters), new QueryRoot(Context)));
 
         return parameters.ToList
             ? await query.ToListAsync(cancellationToken)
@@ -56,7 +62,7 @@ internal class DefaultRepository<T>(IDbContextFactory<ApplicationDbContext> cont
 
         var query = GetQueryBase(parameters);
 
-        query = parameters.Select is not null ? parameters.Select(query) : ApplyDefaultDataSelection(query);
+        query = parameters.Select is not null ? parameters.Select(query, new QueryRoot(Context)) : ApplyDefaultDataSelection(query);
 
         var count = await query.CountAsync(cancellationToken);
 
