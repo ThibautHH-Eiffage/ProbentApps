@@ -1,14 +1,18 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
-using ProbentApps.Services.Database.Abstractions.Contexts;
+using Microsoft.EntityFrameworkCore.Migrations;
+using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using ProbentApps.Model;
+using ProbentApps.Services.Database.Abstractions.Contexts;
 
 namespace ProbentApps.Services.Database.Abstractions.Migrations.Application;
 
 [DbContext(typeof(ApplicationDbContext))]
-class ApplicationDbContextModelSnapshot : ModelSnapshot
+[Migration("01_AddStructureTypes")]
+partial class AddStructureTypes
 {
-    protected override void BuildModel(ModelBuilder modelBuilder)
+    /// <inheritdoc />
+    protected override void BuildTargetModel(ModelBuilder modelBuilder)
     {
         modelBuilder
             .HasDefaultSchema(ApplicationDbContext.Schema)

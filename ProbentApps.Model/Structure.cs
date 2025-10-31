@@ -29,4 +29,7 @@ public class Structure : IEntity
     public ApplicationUser? Manager { get; set; }
 
     public bool IsActive => Manager is not null;
+
+    [DeleteBehavior(DeleteBehavior.NoAction)]
+    public StructureType StructureType { get; set; } = default!;
 }
