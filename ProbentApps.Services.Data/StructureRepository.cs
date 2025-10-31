@@ -8,7 +8,7 @@ using ProbentApps.Services.Database.Abstractions.Contexts;
 
 namespace ProbentApps.Services.Data;
 
-public class StructureRepository(IDbContextFactory<ApplicationDbContext> contextFactory, UserManager<ApplicationUser> userManager)
+internal class StructureRepository(IDbContextFactory<ApplicationDbContext> contextFactory, UserManager<ApplicationUser> userManager)
 	: DefaultRepository<Structure>(contextFactory)
 {
     protected override IQueryable<Structure> ApplyIdentityFilter(IQueryable<Structure> query, ClaimsPrincipal user) => query

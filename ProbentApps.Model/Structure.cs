@@ -30,6 +30,9 @@ public class Structure : IEntity, IEquatable<Structure>
 
     public bool IsActive => Manager is not null;
 
+    [DeleteBehavior(DeleteBehavior.NoAction)]
+    public StructureType StructureType { get; set; } = default!;
+
     public bool Equals(Structure? other) => other is not null
         && (Id.Equals(other.Id)
             || ((Id.Equals(default) || other.Id.Equals(default))
