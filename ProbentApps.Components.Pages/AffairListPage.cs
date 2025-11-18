@@ -7,8 +7,7 @@ namespace ProbentApps.Components.Pages;
 
 public abstract class AffairListPage : AuthenticatedPage
 {
-    private IQueryable<Affair> SelectAffairListData(IQueryable<Affair> query) => query
-        .Where(a => a.IsArchived == ArchivedOnly)
+    private static IQueryable<Affair> SelectAffairListData(IQueryable<Affair> query) => query
         .Select(static a => new Affair
         {
             Id = a.Id,
@@ -62,7 +61,7 @@ public abstract class AffairListPage : AuthenticatedPage
     {
         await base.OnInitializedAsync();
 
-        TableDataLoader = AffairRepository.LoadTableDataFor(User, SelectAffairListData);
+        TableDataLoader = AffairRepository.LoadTableDataFor(User, filter: q => q.Where(a => a.IsArchived == ArchivedOnly), select: SelectAffairListData);
 
         FilterClientsLoader = state => AffairRepository.Query<Client>(AffairRepository.MakeQueryParametersFor(User, SelectFilterClients)(state));
     }

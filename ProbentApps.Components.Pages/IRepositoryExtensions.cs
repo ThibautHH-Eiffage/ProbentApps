@@ -26,7 +26,7 @@ internal static class IRepositoryExtensions
 
             return query;
         };
-    
+
     public static Func<GridState<T>, QueryParameters<T, TResult>> MakeQueryParametersFor<T, TResult>(this IRepository<T> repository,
         ClaimsPrincipal user,
         Func<IQueryable<T>, IQueryRoot, IQueryable<TResult>>? select = null)
@@ -38,16 +38,20 @@ internal static class IRepositoryExtensions
         where T : class, IEntity => repository.MakeQueryParametersFor<T, TResult>(user, select is null ? null : (q, r) => select(q));
 
     public static Func<GridState<T>, Task<GridData<T>>> LoadTableDataFor<T>(this IRepository<T> repository, ClaimsPrincipal user,
-        Func<IQueryable<T>, IQueryRoot, IQueryable<T>>? select = null,
+        Func<IQueryable<T>, IQueryable<T>>? filter,
+        Func<IQueryable<T>, IQueryRoot, IQueryable<T>>? select,
         bool toList = false)
         where T : class, IEntity =>
         async state =>
         {
             GridData<T> data = new();
 
+            var parameters = repository.MakeQueryParametersFor(user, select)(state);
+
             (data.Items, data.TotalItems) = await repository.GetTableDataForAsync(
-                repository.MakeQueryParametersFor(user, select)(state) with
+                parameters with
                 {
+                    Filter = filter is null ? parameters.Filter : q => parameters.Filter(filter(q)),
                     SortAndPaginate = query => query
                         .OrderBy(state.SortDefinitions)
                         .Skip(state.PageSize * state.Page).Take(state.PageSize),
@@ -59,7 +63,8 @@ internal static class IRepositoryExtensions
 
     public static Func<GridState<T>, Task<GridData<T>>> LoadTableDataFor<T>(this IRepository<T> repository,
         ClaimsPrincipal user,
+        Func<IQueryable<T>, IQueryable<T>>? filter = null,
         Func<IQueryable<T>, IQueryable<T>>? select = null,
         bool toList = false)
-        where T : class, IEntity => repository.LoadTableDataFor(user, select is null ? null : (q, r) => select(q), toList);
+        where T : class, IEntity => repository.LoadTableDataFor(user, filter, select is null ? null : (q, r) => select(q), toList);
 }
