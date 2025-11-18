@@ -12,9 +12,9 @@ internal class AffairRepository(IDbContextFactory<ApplicationDbContext> contextF
 	: DefaultRepository<Affair>(contextFactory)
 {
     protected override IQueryable<Affair> ApplyIdentityFilter(IQueryable<Affair> query, ClaimsPrincipal user) => query
-        .WhereStructureIsAdministeredBy(Context.Structures,
-            Guid.Parse(userManager.GetUserId(user)!),
-            user.GetExtraManagedStructures());
+        .WhereStructureIsAdministeredBy(Guid.Parse(userManager.GetUserId(user)!),
+            user.GetExtraManagedStructures(),
+            Context.Structures);
 
     protected override IQueryable<Affair> ApplyDefaultDataSelection(IQueryable<Affair> query) => query
         .Select(static a => new Affair
