@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace ProbentApps.Model;
 
-public class Order
+public class Order : IEntity
 {
     public Guid Id { get; set; }
 
@@ -38,4 +38,15 @@ public class Order
     public IList<Report> Reports { get; set; } = [];
 
     public IList<Invoice> Invoices { get; set; } = [];
+
+    public bool Equals(Order? other) => other is not null
+        && (Id.Equals(other.Id)
+            || ((Id.Equals(default) || other.Id.Equals(default))
+                && Code.Equals(other.Code, StringComparison.Ordinal)));
+
+    public override bool Equals(object? obj) => Equals(obj as Order);
+
+    public override int GetHashCode() => Id.GetHashCode();
+
+    public override string ToString() => Name;
 }

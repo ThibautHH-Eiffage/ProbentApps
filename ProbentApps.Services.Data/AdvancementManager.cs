@@ -1,22 +1,35 @@
+using System.Security.Claims;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
+using ProbentApps.Model;
 using ProbentApps.Services.Data.Abstractions;
 using ProbentApps.Services.Database.Abstractions.Contexts;
-using ProbentApps.Model;
 
 namespace ProbentApps.Services.Data;
 
-public class AdvancementManager(IDbContextFactory<ApplicationDbContext> contextFactory, TimeProvider timeProvider)
+internal class AdvancementManager(IDbContextFactory<ApplicationDbContext> contextFactory,
+    UserManager<ApplicationUser> userManager,
+    TimeProvider timeProvider,
+    ILogger<AdvancementManager> logger)
     : DefaultRepository<Advancement>(contextFactory), IAdvancementManager
 {
-    private Func<ApplicationDbContext, Guid, CancellationToken, Task<Advancement?>>? _getAdvancement;
-    private Func<ApplicationDbContext, Guid, CancellationToken, Task<Advancement?>> GetAdvancement => _getAdvancement ??=
-        EF.CompileAsyncQuery((ApplicationDbContext context, Guid id, CancellationToken _) => context.Advancements
-            .Include(static a => a.Report)
-            .Include(static a => a.Invoice)
-            .FirstOrDefault(a => a.Id == id));
+    protected override IQueryable<Advancement> ApplyIdentityFilter(IQueryable<Advancement> query, ClaimsPrincipal user) => query
+        .WhereStructureIsAdministeredBy(Guid.Parse(userManager.GetUserId(user)!),
+            user.GetExtraManagedStructures(),
+            Context.Structures,
+            static a => a.Order.Affair);
+
+    protected override IQueryable<Advancement> ApplyDefaultDataSelection(IQueryable<Advancement> query) => query
+        .Include(static a => a.Order)
+        .ThenInclude(static o => o.Advancements)
+        .Include(static a => a.Report)
+        .Include(static a => a.Invoice);
 
     async Task<AdvancementCreationResult> IAdvancementManager.CreateAdvancementAsync(AdvancementCreationData data, CancellationToken cancellationToken)
     {
+        await using var scope = MakeQueryScope();
+
         if (await Context.Orders.FindAsync([data.OrderId], cancellationToken) is not Order order)
         {
             return new AdvancementCreationResult(AdvancementCreationResult.Status.OrderNotFound);
@@ -42,13 +55,25 @@ public class AdvancementManager(IDbContextFactory<ApplicationDbContext> contextF
             return new AdvancementCreationResult(AdvancementCreationResult.Status.InvalidData);
         }
 
+        logger.LogDebug("Created advancement with ID: {Id} on order with ID: {OrderId}", advancement.Id, advancement.Order.Id);
+
         return new AdvancementCreationResult(AdvancementCreationResult.Status.Success, advancement);
     }
 
     async Task<AdvancementDeletionResult> IAdvancementManager.DeleteAdvancementAsync(Guid advancementId, CancellationToken cancellationToken)
     {
-        if (await GetAdvancement(Context, advancementId, cancellationToken) is not Advancement advancement)
+        await using var scope = MakeQueryScope();
+
+        if (await Context.Advancements.Select(static a => new Advancement
+                {
+                    Id = a.Id,
+                    Report = a.Report == null ? null : new Report { AcceptanceDate = a.Report.AcceptanceDate },
+                    Invoice = a.Invoice == null ? null : new Invoice { RequestDate = a.Invoice.RequestDate }
+                })
+                .FirstOrDefaultAsync(a => a.Id == advancementId, cancellationToken) is not Advancement advancement)
+        {
             return new AdvancementDeletionResult(AdvancementDeletionResult.Status.NotFound);
+        }
 
         if (advancement.Report?.AcceptanceDate is not null)
         {
@@ -63,13 +88,29 @@ public class AdvancementManager(IDbContextFactory<ApplicationDbContext> contextF
         Context.Remove(advancement);
         await Context.SaveChangesAsync(cancellationToken);
 
+        logger.LogDebug("Deleted advancement with ID: {Id}", advancement.Id);
+
         return new AdvancementDeletionResult(AdvancementDeletionResult.Status.Success);
     }
 
     async Task<AdvancementUpdateResult> IAdvancementManager.UpdateAdvancementAsync(Guid advancementId, AdvancementUpdateData data, CancellationToken cancellationToken)
     {
-        if (await GetAdvancement(Context, advancementId, cancellationToken) is not Advancement advancement)
+        await using var scope = MakeQueryScope();
+
+        if (await Context.Advancements.Select(static a => new Advancement
+                {
+                    Id = a.Id,
+                    Name = a.Name,
+                    Date = a.Date,
+                    Description = a.Description,
+                    Value = a.Value,
+                    Report = a.Report == null ? null : new Report { AcceptanceDate = a.Report.AcceptanceDate },
+                    Invoice = a.Invoice == null ? null : new Invoice { RequestDate = a.Invoice.RequestDate }
+                })
+                .FirstOrDefaultAsync(a => a.Id == advancementId, cancellationToken) is not Advancement advancement)
+        {
             return new AdvancementUpdateResult(AdvancementUpdateResult.Status.NotFound);
+        }
 
         if (advancement.Report?.AcceptanceDate is not null)
         {
@@ -98,6 +139,8 @@ public class AdvancementManager(IDbContextFactory<ApplicationDbContext> contextF
         {
             return new AdvancementUpdateResult(AdvancementUpdateResult.Status.InvalidData);
         }
+
+        logger.LogDebug("Created advancement with ID: {Id}", advancement.Id);
 
         return new AdvancementUpdateResult(AdvancementUpdateResult.Status.Success);
     }

@@ -10,7 +10,7 @@ using ProbentApps.Services.Database.Abstractions.Contexts;
 
 namespace ProbentApps.Services.Data;
 
-public class DefaultRepository<T>(IDbContextFactory<ApplicationDbContext> contextFactory) : IRepository<T>
+internal class DefaultRepository<T>(IDbContextFactory<ApplicationDbContext> contextFactory) : IRepository<T>
     where T : class, IEntity
 {
     private static readonly MethodInfo QueryParameterMarkerMethodInfo = typeof(EF).GetTypeInfo()
@@ -30,31 +30,59 @@ public class DefaultRepository<T>(IDbContextFactory<ApplicationDbContext> contex
         return Context;
     }
 
+    private readonly struct QueryRoot(ApplicationDbContext context) : IQueryRoot
+    {
+        IQueryable<TEntity> IQueryRoot.GetEntitySet<TEntity>() => context.Set<TEntity>()
+            .AsNoTrackingWithIdentityResolution();
+    }
+
     protected virtual IQueryable<T> ApplyIdentityFilter(IQueryable<T> query, ClaimsPrincipal user) => query;
 
     protected virtual IQueryable<T> ApplyDefaultDataSelection(IQueryable<T> query) => query;
 
-    ValueTask<T?> IRepository<T>.FindAsync(Guid id, CancellationToken cancellationToken) =>
-        Context.Set<T>().FindAsync([id], cancellationToken);
+    private IQueryable<T> GetQueryBase<TResult>(QueryParameters<T, TResult> parameters) =>
+        parameters.Filter(ApplyIdentityFilter(Context.Set<T>().AsNoTrackingWithIdentityResolution(), parameters.User));
 
-    async Task<TResult[]> IRepository<T>.Query<TResult>(QueryParameters<T, TResult> parameters, CancellationToken cancellationToken) where TResult : class
+    private IQueryable<T> GetQueryBase<TResult>(SingularQueryParameters<T, TResult> parameters) =>
+        parameters.Filter(ApplyIdentityFilter(Context.Set<T>().AsNoTrackingWithIdentityResolution(), parameters.User));
+
+    async Task<IEnumerable<TResult>> IRepository<T>.Query<TResult>(QueryParameters<T, TResult> parameters, CancellationToken cancellationToken)
     {
         await using var scope = MakeQueryScope();
 
-        var q = parameters.Filter(ApplyIdentityFilter(Context.Set<T>().AsNoTrackingWithIdentityResolution(), parameters.User));
+        var query = parameters.SortAndPaginate(
+            (parameters.Select ?? throw new ArgumentException("Query parameters are missing a select expression", nameof(parameters)))(
+                GetQueryBase(parameters), new QueryRoot(Context)));
 
-        var query = parameters.Select is not null ? parameters.Select(q) : q.Where(static e => e is TResult).Select(static e => (e as TResult)!);
+        return parameters.ToList
+            ? await query.ToListAsync(cancellationToken)
+            : await query.ToArrayAsync(cancellationToken);
+    }
 
-        return await parameters.SortAndPaginate(query).ToArrayAsync(cancellationToken);
+    async ValueTask<TResult> IRepository<T>.Query<TResult>(SingularQueryParameters<T, TResult> parameters, CancellationToken cancellationToken)
+    {
+        await using var scope = MakeQueryScope();
+        return await parameters.Select(GetQueryBase(parameters), new QueryRoot(Context)).FirstAsync(cancellationToken);
     }
 
     async Task<(IEnumerable<T> data, int count)> IRepository<T>.GetTableDataForAsync(QueryParameters<T, T> parameters, CancellationToken cancellationToken)
     {
         await using var scope = MakeQueryScope();
 
-        var query = (parameters.Select ?? ApplyDefaultDataSelection)(parameters.Filter(ApplyIdentityFilter(Context.Set<T>().AsNoTrackingWithIdentityResolution(), parameters.User)));
+        var query = GetQueryBase(parameters);
 
-        return (await parameters.SortAndPaginate(query).ToArrayAsync(cancellationToken), await query.CountAsync(cancellationToken));
+        query = parameters.Select is not null ? parameters.Select(query, new QueryRoot(Context)) : ApplyDefaultDataSelection(query);
+
+        var count = await query.CountAsync(cancellationToken);
+
+        query = parameters.SortAndPaginate(query);
+
+        return (
+            parameters.ToList
+                ? await query.ToListAsync(cancellationToken)
+                : await query.ToArrayAsync(cancellationToken),
+            count
+        );
     }
 
     IQueryable<T> IRepository<T>.ApplyEntityFilter(IQueryable<T> query, IEntity entity, LambdaExpression targetEntityExpression) => query
