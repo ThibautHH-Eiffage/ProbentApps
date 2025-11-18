@@ -6,7 +6,8 @@ using ProbentApps.Model;
 namespace ProbentApps.Services.Data;
 
 internal class AdvancementManager(IDbContextFactory<ApplicationDbContext> contextFactory,
-    TimeProvider timeProvider)
+    TimeProvider timeProvider,
+    ILogger<AdvancementManager> logger)
     : DefaultRepository<Advancement>(contextFactory), IAdvancementManager
 {
     private Func<ApplicationDbContext, Guid, CancellationToken, Task<Advancement?>>? _getAdvancement;
@@ -43,6 +44,8 @@ internal class AdvancementManager(IDbContextFactory<ApplicationDbContext> contex
             return new AdvancementCreationResult(AdvancementCreationResult.Status.InvalidData);
         }
 
+        logger.LogDebug("Created advancement with ID: {Id} on order with ID: {OrderId}", advancement.Id, advancement.Order.Id);
+
         return new AdvancementCreationResult(AdvancementCreationResult.Status.Success, advancement);
     }
 
@@ -63,6 +66,8 @@ internal class AdvancementManager(IDbContextFactory<ApplicationDbContext> contex
 
         Context.Remove(advancement);
         await Context.SaveChangesAsync(cancellationToken);
+
+        logger.LogDebug("Deleted advancement with ID: {Id}", advancement.Id);
 
         return new AdvancementDeletionResult(AdvancementDeletionResult.Status.Success);
     }
@@ -99,6 +104,8 @@ internal class AdvancementManager(IDbContextFactory<ApplicationDbContext> contex
         {
             return new AdvancementUpdateResult(AdvancementUpdateResult.Status.InvalidData);
         }
+
+        logger.LogDebug("Created advancement with ID: {Id}", advancement.Id);
 
         return new AdvancementUpdateResult(AdvancementUpdateResult.Status.Success);
     }
