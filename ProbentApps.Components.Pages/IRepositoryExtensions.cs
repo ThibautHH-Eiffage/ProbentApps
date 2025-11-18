@@ -37,6 +37,16 @@ internal static class IRepositoryExtensions
         Func<IQueryable<T>, IQueryable<TResult>>? select = null)
         where T : class, IEntity => repository.MakeQueryParametersFor<T, TResult>(user, select is null ? null : (q, r) => select(q));
 
+    public static Func<GridState<T>, SingularQueryParameters<T, TResult>> MakeSingularQueryParametersFor<T, TResult>(this IRepository<T> repository,
+        ClaimsPrincipal user,
+        Func<IQueryable<T>, IQueryRoot, IQueryable<TResult>> select)
+        where T : class, IEntity => state => new(repository.MakeFilter(state), select, user);
+
+    public static Func<GridState<T>, SingularQueryParameters<T, TResult>> MakeSingularQueryParametersFor<T, TResult>(this IRepository<T> repository,
+        ClaimsPrincipal user,
+        Func<IQueryable<T>, IQueryable<TResult>> select)
+        where T : class, IEntity => repository.MakeSingularQueryParametersFor<T, TResult>(user, (q, r) => select(q));
+
     public static Func<GridState<T>, Task<GridData<T>>> LoadTableDataFor<T>(this IRepository<T> repository, ClaimsPrincipal user,
         Func<IQueryable<T>, IQueryable<T>>? filter,
         Func<IQueryable<T>, IQueryRoot, IQueryable<T>>? select,

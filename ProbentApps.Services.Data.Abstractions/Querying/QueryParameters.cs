@@ -9,3 +9,9 @@ public record struct QueryParameters<T, TResult>(
     ClaimsPrincipal User,
     bool ToList = false)
     where T : class;
+
+public record struct SingularQueryParameters<T, TResult>(
+    Func<IQueryable<T>, IQueryable<T>> Filter,
+    Func<IQueryable<T>, IQueryRoot, IQueryable<TResult>> Select,
+    ClaimsPrincipal User)
+    where T : class;

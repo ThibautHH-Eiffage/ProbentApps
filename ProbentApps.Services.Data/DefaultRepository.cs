@@ -43,6 +43,9 @@ internal class DefaultRepository<T>(IDbContextFactory<ApplicationDbContext> cont
     private IQueryable<T> GetQueryBase<TResult>(QueryParameters<T, TResult> parameters) =>
         parameters.Filter(ApplyIdentityFilter(Context.Set<T>().AsNoTrackingWithIdentityResolution(), parameters.User));
 
+    private IQueryable<T> GetQueryBase<TResult>(SingularQueryParameters<T, TResult> parameters) =>
+        parameters.Filter(ApplyIdentityFilter(Context.Set<T>().AsNoTrackingWithIdentityResolution(), parameters.User));
+
     async Task<IEnumerable<TResult>> IRepository<T>.Query<TResult>(QueryParameters<T, TResult> parameters, CancellationToken cancellationToken)
     {
         await using var scope = MakeQueryScope();
@@ -54,6 +57,12 @@ internal class DefaultRepository<T>(IDbContextFactory<ApplicationDbContext> cont
         return parameters.ToList
             ? await query.ToListAsync(cancellationToken)
             : await query.ToArrayAsync(cancellationToken);
+    }
+
+    async ValueTask<TResult> IRepository<T>.Query<TResult>(SingularQueryParameters<T, TResult> parameters, CancellationToken cancellationToken)
+    {
+        await using var scope = MakeQueryScope();
+        return await parameters.Select(GetQueryBase(parameters), new QueryRoot(Context)).FirstAsync(cancellationToken);
     }
 
     async Task<(IEnumerable<T> data, int count)> IRepository<T>.GetTableDataForAsync(QueryParameters<T, T> parameters, CancellationToken cancellationToken)
