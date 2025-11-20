@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace ProbentApps.Model;
 
-public class Order : IEntity
+public class Order : IEntity, IEquatable<Order>
 {
     public Guid Id { get; set; }
 

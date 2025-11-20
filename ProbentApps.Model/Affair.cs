@@ -15,8 +15,8 @@ public class Affair : Structure, IEquatable<Affair>
 
     public bool Equals(Affair? other) => other is not null
         && (Id.Equals(other.Id)
-            || (Code?.Equals(other?.Code, StringComparison.Ordinal)
-                ?? Name.Equals(other?.Name, StringComparison.CurrentCultureIgnoreCase)));
+            || ((Id.Equals(default) || other.Id.Equals(default))
+                && Code.Equals(other.Code, StringComparison.Ordinal)));
 
     public override bool Equals(object? obj) => Equals(obj as Affair);
 

@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace ProbentApps.Model;
 
-public class Client : IEquatable<Client>, IEntity
+public class Client : IEntity, IEquatable<Client>
 {
     public Guid Id { get; set; }
 

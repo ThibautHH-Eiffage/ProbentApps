@@ -5,7 +5,7 @@ namespace ProbentApps.Model;
 
 [Index(nameof(Code), IsUnique = true)]
 [Index(nameof(ShortCode))]
-public class Structure : IEntity
+public class Structure : IEntity, IEquatable<Structure>
 {
     public const char CodeSeparator = '|';
 
@@ -29,4 +29,15 @@ public class Structure : IEntity
     public ApplicationUser? Manager { get; set; }
 
     public bool IsActive => Manager is not null;
+
+    public bool Equals(Structure? other) => other is not null
+        && (Id.Equals(other.Id)
+            || ((Id.Equals(default) || other.Id.Equals(default))
+                && Code.Equals(other.Code, StringComparison.Ordinal)));
+
+    public override bool Equals(object? obj) => Equals(obj as Structure);
+
+    public override int GetHashCode() => Id.GetHashCode();
+
+    public override string ToString() => Name;
 }

@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace ProbentApps.Model;
 
-public class Advancement : IEntity
+public class Advancement : IEntity, IEquatable<Advancement>
 {
     public Guid Id { get; set; }
 
@@ -26,4 +26,12 @@ public class Advancement : IEntity
 
     [DeleteBehavior(DeleteBehavior.SetNull)]
     public Invoice? Invoice { get; set; }
+
+    public bool Equals(Advancement? other) => other is not null && Id.Equals(other.Id);
+
+    public override bool Equals(object? obj) => Equals(obj as Advancement);
+
+    public override int GetHashCode() => Id.GetHashCode();
+
+    public override string ToString() => Name;
 }
