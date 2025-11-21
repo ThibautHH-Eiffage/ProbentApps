@@ -34,6 +34,7 @@ public abstract class AffairListPage : AuthenticatedPage
                 Advancements = o.Advancements.Select(a => new Advancement
                 {
                     Id = a.Id,
+                    Date = a.Date,
                     Value = a.Value,
                     Invoice = a.Invoice == null ? null : new Invoice { Id = a.Invoice!.Id }
                 }).ToList()
