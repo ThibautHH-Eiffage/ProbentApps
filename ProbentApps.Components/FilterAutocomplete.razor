@@ -53,7 +53,7 @@
 
         await SetFilterAsync(v is not null);
 
-        await ValueChanged.InvokeAsync(Value = v);
+        await ValueChanged.InvokeAsync(v);
     }
 
     public Task SetFilterAsync(bool set)
