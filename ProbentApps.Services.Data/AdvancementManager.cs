@@ -35,8 +35,6 @@ internal class AdvancementManager(IDbContextFactory<ApplicationDbContext> contex
             return new AdvancementCreationResult(AdvancementCreationResult.Status.OrderNotFound);
         }
 
-        Context.Attach(order);
-
         var advancement = Context.Add(new Advancement
         {
             Name = data.Name,
@@ -121,6 +119,8 @@ internal class AdvancementManager(IDbContextFactory<ApplicationDbContext> contex
         {
             return new AdvancementUpdateResult(AdvancementUpdateResult.Status.InvoiceAlreadyRequested);
         }
+
+        Context.Attach(advancement);
 
         if (data.Name is string name)
             advancement.Name = name;
