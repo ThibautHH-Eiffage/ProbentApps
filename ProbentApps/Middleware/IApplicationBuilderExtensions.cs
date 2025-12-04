@@ -20,5 +20,5 @@ public static class IApplicationBuilderExtensions
         .UseAuthentication()
         .UseAuthorization()
         .UseAntiforgery()
-        .UseRequestLocalization("en", "fr");
+        .UseRequestLocalization("en", "fr", "fr-FR");
 }

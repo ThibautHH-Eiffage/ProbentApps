@@ -19,4 +19,23 @@ public class FilterOperators
             FilterOperator.String.StartsWith,
             FilterOperator.String.NotContains
         ];
+
+    public static readonly HashSet<string> TextColumn =
+        [
+            FilterOperator.String.Contains,
+            FilterOperator.String.StartsWith,
+            FilterOperator.String.NotContains,
+            FilterOperator.String.Empty,
+            FilterOperator.String.NotEmpty
+        ];
+
+    public static readonly HashSet<string> DateColumn =
+        [
+            FilterOperator.DateOnly.Is,
+            FilterOperator.DateOnly.IsNot,
+            FilterOperator.DateOnly.After,
+            FilterOperator.DateOnly.Before,
+            FilterOperator.DateOnly.OnOrAfter,
+            FilterOperator.DateOnly.OnOrBefore
+        ];
 }

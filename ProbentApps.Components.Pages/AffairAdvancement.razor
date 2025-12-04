@@ -1,0 +1,172 @@
+@page "/affair/{AffairId:guid}"
+
+@using ProbentApps.Services.Data.Abstractions.Querying;
+@using Microsoft.JSInterop
+
+@inject IStringLocalizer<SharedResources> SharedLocalizer
+@inject IStringLocalizer<AffairAdvancement> Localizer
+@inject IStringLocalizer<AffairCard> CardLocalizer
+@inject IJSRuntime JSRuntime
+@inject IAdvancementManager AdvancementManager
+@inject IRepository<Affair> AffairRepository
+
+@inherits AuthenticatedPage
+
+<PageTitle Title=@Localizer["Affair advancement"] />
+
+@if (_initialized)
+{
+    @if (_affair is null)
+    {
+        <AuthorizationRedirect IsAuthenticated />
+    }
+    else
+    {
+        <MudContainer Class="text-center w-100 pb-3">
+            <MudText GutterBottom Typo="Typo.h5">@_affair.Name</MudText>
+            <MudChip T=string Icon="@Icons.Material.Filled.Domain" Color="Color.Primary">@CardLocalizer["Structure: {0}", _affair.ParentCode]</MudChip>
+            <MudDivider Class="invisible" />
+            <MudChip T=string Icon="@Icons.Material.Filled.Code">@CardLocalizer["Code: {0}", _affair.ShortCode]</MudChip>
+            <MudChip T=string Icon="@Icons.Material.Filled.Person">@CardLocalizer["Client: {0}", _affair.Client.Name]</MudChip>
+            <MudDivider Class="invisible pb-2" />
+            <MudAlert Icon="@Status.icon" Severity=Status.severity Variant=Variant.Text>
+                <MudText>@Status.text</MudText>
+            </MudAlert>
+        </MudContainer>
+        <AffairAdvancementTable Affair="_affair" Advancements="_tableDataLoader"
+            FilterOrders="_filterOrdersLoader"
+            FilterReports="_filterReportsLoader"
+            FilterInvoices="_filterInvoicesLoader"
+            OnSave=SaveAdvancement
+            OnDelete=DeleteAdvancement />
+        <MudChip T=string Class="mt-3" OnClick=@(async () => await JSRuntime.InvokeVoidAsync("navigator.clipboard.writeText", _affair.Id.ToString()))
+            Icon="@Icons.Material.Filled.Numbers" Size=Size.Small Text="@CardLocalizer["Affair ID: {0}", _affair.Id]" />
+    }
+}
+
+@code {
+    private bool _initialized;
+    private Affair? _affair;
+    private Func<GridState<Advancement>, Task<GridData<Advancement>>> _tableDataLoader = default!;
+    private Func<GridState<Advancement>, Task<IEnumerable<Order>>> _filterOrdersLoader = default!;
+    private Func<GridState<Advancement>, Task<IEnumerable<Report>>> _filterReportsLoader = default!;
+    private Func<GridState<Advancement>, Task<IEnumerable<Invoice>>> _filterInvoicesLoader = default!;
+
+    private string NewAdvancementName => Localizer["New advancement..."];
+
+    private (string icon, Severity severity, string text) Status => _affair is null
+        ? throw new InvalidOperationException("Cannot obtain affair status when it is not loaded")
+        : (_affair.IsArchived
+            ? (Icons.Material.Filled.Archive, Severity.Warning, CardLocalizer["Archived"])
+            : (!_affair.Orders.SelectMany(static o => o.Advancements).Any()
+                ? (Icons.Material.Filled.AccessTime, Severity.Normal, CardLocalizer["Not started"])
+                : (!_affair.Orders.SelectMany(static o => o.Advancements).Any(static a => a.Invoice is null)
+                    ? (Icons.Material.Filled.CheckCircle, Severity.Success, CardLocalizer["Fully invoiced"])
+                    : (Icons.Material.Filled.Build, Severity.Info, CardLocalizer["In progress"])
+                )
+            )
+        );
+
+    [Parameter]
+    public Guid AffairId { get; init; }
+
+    private IList<Advancement> GetOrderAdvancements(Guid orderId) =>
+        _affair!.Orders.Single(o => o.Id == orderId).Advancements;
+
+    private IQueryable<Order> SelectFilterOrders(IQueryable<Advancement> query) => query
+        .Where(a => a.Order.Affair.Id == AffairId)
+        .Select(static a => new Order
+        {
+            Id = a.Order.Id,
+            Name = a.Order.Name,
+            Code = a.Order.Code
+        })
+        .Distinct();
+
+    private IQueryable<Report> SelectFilterReports(IQueryable<Advancement> query) => query
+        .Where(a => a.Order.Affair.Id == AffairId && a.Report != null)
+        .Select(static a => new Report
+        {
+            Id = a.Report!.Id,
+            Name = a.Report!.Name
+        });
+
+    private IQueryable<Invoice> SelectFilterInvoices(IQueryable<Advancement> query) => query
+        .Where(a => a.Order.Affair.Id == AffairId && a.Invoice != null)
+        .Select(static a => new Invoice
+        {
+            Id = a.Invoice!.Id,
+            Name = a.Invoice!.Name,
+            Code = a.Invoice!.Code
+        });
+
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+
+        _affair = await AffairRepository.Query(new SingularQueryParameters<Affair, Affair>(q => q.Where(a => a.Id == AffairId),
+            (q, r) => q.Select(static a => new Affair
+            {
+                Id = a.Id,
+                Name = a.Name,
+                Code = a.Code,
+                ShortCode = a.ShortCode,
+                Client = new Client
+                {
+                    Name = a.Client.Name
+                },
+                IsArchived = a.IsArchived,
+                Manager = a.Manager == null ? null : new ApplicationUser
+                {
+                    UserName = a.Manager.UserName,
+                    Email = a.Manager.Email
+                },
+                Orders = a.Orders.Select(static o => new Order
+                {
+                    Id = o.Id,
+                    Name = o.Name,
+                    Client = o.Client,
+                    Code = o.Code,
+                    Advancements = o.Advancements.Select(static a => new Advancement
+                    {
+                        Id = a.Id,
+                        Invoice = a.Invoice == null ? null : new Invoice
+                        {
+                            Id = a.Invoice.Id
+                        }
+                    }).ToList(),
+                    TotalPrice = o.TotalPrice
+                }).ToList()
+            }), User));
+
+        _initialized = true;
+
+        _tableDataLoader = AdvancementManager.LoadTableDataFor(User, filter: q => q.Where(a => a.Order.Affair.Id == AffairId), toList: true);
+
+        _filterOrdersLoader = state => AdvancementManager.Query<Order>(AdvancementManager.MakeQueryParametersFor(User, SelectFilterOrders)(state));
+        _filterReportsLoader = state => AdvancementManager.Query<Report>(AdvancementManager.MakeQueryParametersFor(User, SelectFilterReports)(state));
+        _filterInvoicesLoader = state => AdvancementManager.Query<Invoice>(AdvancementManager.MakeQueryParametersFor(User, SelectFilterInvoices)(state));
+    }
+
+    private async Task SaveAdvancement(Advancement a)
+    {
+        var advancements = GetOrderAdvancements(a.Order.Id);
+        if (a.Id == Guid.Empty)
+        {
+            if ((await AdvancementManager.CreateAdvancementAsync(new(a.Name, a.Order.Id, a.Value, a.Date, a.Description))).Entity is Advancement adv)
+                advancements.Add(adv);
+            return;
+        }
+
+        var idx = advancements.IndexOf(a);
+        advancements.RemoveAt(idx);
+        advancements.Insert(idx, a);
+        await AdvancementManager.UpdateAdvancementAsync(a.Id, new(a.Name, a.Value, a.Date, a.Description));
+    }
+
+    private Task DeleteAdvancement(Advancement a)
+    {
+        GetOrderAdvancements(a.Order.Id).Remove(a);
+        return AdvancementManager.DeleteAdvancementAsync(a.Id);
+    }
+}

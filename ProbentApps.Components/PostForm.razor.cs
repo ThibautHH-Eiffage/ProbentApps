@@ -39,11 +39,11 @@ public class PostForm : ComponentBase
         }
         __builder.AddMultipleAttributes(4, AdditionalAttributes.Where(p => p.Value is not null)!);
         __builder.AddNamedEvent("onsubmit", FormName ?? Action ?? nameof(PostForm));
-        __builder.OpenComponent<AntiforgeryToken>(4);
+        __builder.OpenComponent<AntiforgeryToken>(5);
         __builder.CloseComponent();
         if (ChildContent is not null)
         {
-            __builder.AddContent(5, ChildContent);
+            __builder.AddContent(6, ChildContent);
         }
         __builder.CloseElement();
     }

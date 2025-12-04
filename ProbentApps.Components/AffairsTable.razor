@@ -1,6 +1,3 @@
-@using Microsoft.Extensions.Logging
-@using System.Linq.Expressions
-
 @inject IStringLocalizer<SharedResources> SharedLocalizer
 @inject IStringLocalizer<AffairsTable> Localizer
 
@@ -11,8 +8,8 @@
             FilterOperators="FilterOperators.KeyColumn" />
         <PropertyColumn Property="static a => a.Name" Title=@Localizer["Affair name"] Groupable="false"
             FilterOperators="FilterOperators.NameColumn" />
-        <PropertyColumn @ref=_clientColumn Property="static a => a.Client" Title=@SharedLocalizer["Client"]
-            Groupable=@(!_initialized || _filteredClient is null) GroupExpanded GroupBy="clientAccessor"
+        <PropertyColumn @ref=_clientColumn Property="static a => a.Client" Title=@SharedLocalizer["Client"] Sortable="false"
+            Groupable=@(_filteredClient is null) GroupExpanded GroupBy="clientAccessor"
             HeaderStyle="width: 30%">
             <GroupTemplate>
                 <MudText>@context.Grouping.Key</MudText>
@@ -44,7 +41,6 @@
 @code {
     private static readonly Func<Affair, Client> clientAccessor = static a => a.Client;
 
-    private bool _initialized;
     private Affair? _openDialogItem;
     private MudDataGrid<Affair> _grid = default!;
     private Column<Affair> _clientColumn = default!;
@@ -60,11 +56,7 @@
     [Parameter]
     public bool ArchivedOnly { get; init; }
 
-    protected override async Task OnAfterRenderAsync(bool firstRender)
-    {
-        await UpdateFilterClients();
-        _initialized = true;
-    }
+    protected override Task OnAfterRenderAsync(bool firstRender) => UpdateFilterClients();
 
     private async Task UpdateFilterClients() =>
         _filterClients = (IList<Client>)await FilterClients(new GridState<Affair> {
