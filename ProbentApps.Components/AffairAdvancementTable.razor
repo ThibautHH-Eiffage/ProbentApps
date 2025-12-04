@@ -1,0 +1,236 @@
+@inject IStringLocalizer<SharedResources> SharedLocalizer
+@inject IStringLocalizer<AffairAdvancementTable> Localizer
+
+<MudDataGrid T=Advancement @ref=_grid ServerData=Advancements Groupable Filterable
+    FilterMode=DataGridFilterMode.ColumnFilterRow RowsPerPage=25
+    ReadOnly=false EditMode=DataGridEditMode.Form EditDialogOptions=dialogOptions
+    CanceledEditingItem=CancelEdition CommittedItemChanges=CommitAdvancement
+    CloneStrategy=AdvancementCloneStrategy.Instance>
+    <ToolBarContent>
+        <MudStack Row Justify="Justify.SpaceBetween" Class="w-100">
+            <MudButton OnClick=CreateAdvancement Variant="Variant.Filled">@Localizer["Create advancement"]</MudButton>
+            <MudSpacer />
+            <FilterAutocomplete Column="_orderColumn" FilteredProperty="orderAccessor" @bind-Value="_filteredOrder"
+                Search=SearchOrders(_filterOrders) Placeholder="@Localizer["Filter by order..."]">
+                <NoItemsTemplate><MudText>@Localizer["No advancements for this affair"]</MudText></NoItemsTemplate>
+            </FilterAutocomplete>
+        </MudStack>
+    </ToolBarContent>
+    <Columns>
+        <PropertyColumn Property="static a => a.Name" Title=@Localizer["Advancement name"] Groupable="false"
+            FilterOperators="FilterOperators.NameColumn" />
+        <PropertyColumn Property="static a => a.Date" Title=@Localizer["Advancement date"] Groupable="false"
+            InitialDirection="SortDirection.Ascending" FilterOperators="FilterOperators.DateColumn">
+            <EditTemplate>
+                <MudDatePicker Required Date=context.Item.Date.ToDateTime(TimeOnly.MinValue)
+                    DateChanged=@(v => context.Item.Date = DateOnly.FromDateTime(v!.Value)) />
+            </EditTemplate>
+        </PropertyColumn>
+        <PropertyColumn Property="static a => a.Value" Title=@Localizer["Advancement value"] Groupable="false" Filterable="false"
+            Format="C" CellClass="text-end" />
+        <PropertyColumn Property="static a => a.Description" Title=@SharedLocalizer["Description"]
+            Sortable="false" Groupable="false" FilterOperators="FilterOperators.TextColumn"
+            Required="false" />
+        <PropertyColumn @ref=_orderColumn Property=@(static a => a.Order) Hidden
+            Grouping=@(_filteredOrder is null) GroupExpanded GroupBy="orderAccessor">
+            <GroupTemplate>
+                @{
+                    var order = (Order)context.Grouping.Key!;
+                    decimal totalAdvancementValue = order.Advancements.Sum(static a => a.Value);
+                    Severity severity = (totalAdvancementValue / order.TotalPrice) switch
+                        {
+                            0 => Severity.Normal,
+                            < 1 => Severity.Info,
+                            1 => Severity.Success,
+                            > 1 => Severity.Warning
+                        };
+                }
+                <MudStack Row AlignItems="AlignItems.Center" Justify="Justify.SpaceBetween" Class="w-100">
+                    <MudText>@order</MudText>
+                    <MudAlert Severity="severity">
+                        @($"{(totalAdvancementValue / order.TotalPrice):P2} ({totalAdvancementValue:C0} / {order.TotalPrice:C0})")
+                    </MudAlert>
+                </MudStack>
+            </GroupTemplate>
+            <EditTemplate>
+                <MudAutocomplete Required SearchFunc=SearchOrders(Affair.Orders) @bind-Value=context.Item.Order
+                    Placeholder="@Localizer["Select order..."]" />
+            </EditTemplate>
+        </PropertyColumn>
+        <PropertyColumn @ref=_reportColumn Property="static a => a.Report" Title=@SharedLocalizer["Report"] Sortable="false"
+            Groupable=@(_filteredReport is null) GroupExpanded GroupBy="reportAccessor">
+            <GroupTemplate>
+                <MudText>@context.Grouping.Key</MudText>
+            </GroupTemplate>
+            <FilterTemplate>
+                <FilterAutocomplete Column="_reportColumn" FilteredProperty="reportAccessor" @bind-Value="_filteredReport"
+                    Search=SearchReports Placeholder="@SharedLocalizer["Report"]" />
+            </FilterTemplate>
+        </PropertyColumn>
+        <PropertyColumn @ref=_invoiceColumn Property="static a => a.Invoice" Title=@SharedLocalizer["Invoice"] Sortable="false"
+            Groupable=@(_filteredInvoice is null) GroupExpanded GroupBy="invoiceAccessor">
+            <GroupTemplate>
+                <MudText>@context.Grouping.Key</MudText>
+            </GroupTemplate>
+            <FilterTemplate>
+                <FilterAutocomplete Column="_invoiceColumn" FilteredProperty="invoiceAccessor" @bind-Value="_filteredInvoice"
+                    Search=SearchInvoices Placeholder="@SharedLocalizer["Invoice"]" />
+            </FilterTemplate>
+        </PropertyColumn>
+        <TemplateColumn CellClass="text-end" Groupable="false" Filterable="false" Sortable="false" HeaderStyle="width: 17%">
+            <CellTemplate>
+                <MudButton OnClick=@(async () => await _grid.SetEditingItemAsync(context.Item))>
+                    @SharedLocalizer["Edit"]
+                </MudButton>
+                <MudButton OnClick=@(() => DeleteAdvancement(context.Item)) Color="Color.Error" Variant="Variant.Outlined">
+                    @SharedLocalizer["Delete"]
+                </MudButton>
+            </CellTemplate>
+        </TemplateColumn>
+    </Columns>
+    <PagerContent>
+        <MudDataGridPager T=Advancement />
+    </PagerContent>
+</MudDataGrid>
+
+@code {
+    private static readonly DialogOptions dialogOptions = new()
+        {
+            CloseOnEscapeKey = false,
+            CloseButton = false,
+            BackdropClick = false,
+            MaxWidth = MaxWidth.Medium
+        };
+    private static readonly Func<Advancement, Order> orderAccessor = static a => a.Order;
+    private static readonly Func<Advancement, Report?> reportAccessor = static a => a.Report;
+    private static readonly Func<Advancement, Invoice?> invoiceAccessor = static a => a.Invoice;
+
+    private struct AdvancementCloneStrategy : MudBlazor.Utilities.Clone.ICloneStrategy<Advancement>
+    {
+        internal static readonly AdvancementCloneStrategy Instance = new();
+
+        Advancement? MudBlazor.Utilities.Clone.ICloneStrategy<Advancement>.CloneObject(Advancement a) => new()
+            {
+                Id = a.Id,
+                Name = a.Name,
+                Description = a.Description,
+                Date = a.Date,
+                Value = a.Value,
+                Order = a.Order
+            };
+    }
+
+    private MudDataGrid<Advancement> _grid = default!;
+    private Column<Advancement> _orderColumn = default!;
+    private Column<Advancement> _reportColumn = default!;
+    private Column<Advancement> _invoiceColumn = default!;
+    private IEnumerable<Order> _filterOrders = default!;
+    private Order? _filteredOrder;
+    private IEnumerable<Report> _filterReports = default!;
+    private Report? _filteredReport;
+    private IEnumerable<Invoice> _filterInvoices = default!;
+    private Invoice? _filteredInvoice;
+
+    [Parameter, EditorRequired]
+    public Affair Affair { get; init; }
+
+    [Parameter, EditorRequired]
+    public required Func<GridState<Advancement>, Task<GridData<Advancement>>> Advancements { get; init; }
+
+    [Parameter, EditorRequired]
+    public required Func<GridState<Advancement>, Task<IEnumerable<Order>>> FilterOrders { get; init; }
+
+    [Parameter, EditorRequired]
+    public required Func<GridState<Advancement>, Task<IEnumerable<Report>>> FilterReports { get; init; }
+
+    [Parameter, EditorRequired]
+    public required Func<GridState<Advancement>, Task<IEnumerable<Invoice>>> FilterInvoices { get; init; }
+
+    [Parameter, EditorRequired]
+    public required EventCallback<Advancement> OnSave { get; init; }
+
+    [Parameter]
+    public required EventCallback<Advancement> OnDelete { get; init; }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (!firstRender)
+            return;
+        await UpdateFilterEntities();
+    }
+
+    private Task UpdateFilterEntities(bool ordersOnly = false)
+    {
+        var state = new GridState<Advancement> {
+            Page = _grid.CurrentPage,
+            PageSize = _grid.RowsPerPage,
+            SortDefinitions = _grid.SortDefinitions.Values.OrderBy(sd => sd.Index).ToList(),
+            FilterDefinitions = _grid.FilterDefinitions.ToList()
+        };
+
+        return Task.WhenAll(
+            ((Func<Task>)(async () => _filterOrders = await FilterOrders(state)))(),
+            ((Func<Task>)(async () => _filterReports = await (ordersOnly
+                ? Task.FromResult<IEnumerable<Report>>(_filterReports)
+                : FilterReports(state))))(),
+            ((Func<Task>)(async () => _filterInvoices = await (ordersOnly
+                ? Task.FromResult<IEnumerable<Invoice>>(_filterInvoices)
+                : FilterInvoices(state))))()
+        );
+    }
+
+    private Task CreateAdvancement()
+    {
+        Advancement advancement = new()
+        {
+            Date = DateOnly.FromDateTime(DateTime.Today),
+            Order = new()
+            {
+                Code = string.Empty,
+                TotalPrice = new decimal(1, 0, 0, false, 28)
+            }
+        };
+
+        ((IList<Advancement>)_grid.ServerItems).Add(advancement);
+        _grid.GroupItems();
+        var task = _grid.SetEditingItemAsync(advancement);
+        advancement.Name = Localizer["New advancement"];
+        return task;
+    }
+
+    private void CancelEdition(Advancement a)
+    {
+        if (a.Id == Guid.Empty)
+        {
+            var list = (IList<Advancement>)_grid.ServerItems;
+            list.RemoveAt(list.Count - 1);
+        }
+    }
+
+    private async Task CommitAdvancement(Advancement a)
+    {
+        await OnSave.InvokeAsync(a);
+        await Task.WhenAll(_grid.ReloadServerData(), UpdateFilterEntities(true));
+    }
+
+    private async Task DeleteAdvancement(Advancement a)
+    {
+        await OnDelete.InvokeAsync(a);
+        await Task.WhenAll(_grid.ReloadServerData(), UpdateFilterEntities());
+    }
+
+    private Func<string?, CancellationToken, Task<IEnumerable<Order>>?> SearchOrders(IEnumerable<Order> orders) =>
+        (string? searchText, CancellationToken cancellationToken) => Task.FromResult(orders
+            .Where(o => string.IsNullOrWhiteSpace(searchText)
+                || $"{o.Name} <{o.Code}>".Contains(searchText, StringComparison.CurrentCultureIgnoreCase)));
+
+    private Task<IEnumerable<Report>>? SearchReports(string? searchText, CancellationToken cancellationToken) =>
+        Task.FromResult(_filterReports
+            .Where(r => string.IsNullOrWhiteSpace(searchText)
+                || r.Name.Contains(searchText, StringComparison.CurrentCultureIgnoreCase)));
+
+    private Task<IEnumerable<Invoice>>? SearchInvoices(string? searchText, CancellationToken cancellationToken) =>
+        Task.FromResult(_filterInvoices
+            .Where(i => string.IsNullOrWhiteSpace(searchText)
+                || $"{i.Name} <{i.Code}>".Contains(searchText, StringComparison.CurrentCultureIgnoreCase)));
+}
