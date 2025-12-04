@@ -4,17 +4,18 @@ public static class IApplicationBuilderExtensions
 {
     public static void UseDevelopmentMiddleware(this IApplicationBuilder app) => app
         .UseDeveloperExceptionPage()
+        .UseForwardedHeaders()
         .UseWebAssemblyDebugging();
 
     public static IApplicationBuilder UseStagingMiddleware(this IApplicationBuilder app) => app
-        .UseExceptionHandler(Routes.Error.Endpoint, createScopeForErrors: true);
+        .UseExceptionHandler(Routes.Error.Endpoint, createScopeForErrors: true)
+        .UseForwardedHeaders();
 
     public static IApplicationBuilder UseProductionMiddleware(this IApplicationBuilder app) => app
-        .UseExceptionHandler(Routes.Error.Endpoint, createScopeForErrors: true)
+        .UseStagingMiddleware()
         .UseHsts();
 
     public static IApplicationBuilder UseApplicationMiddleware(this IApplicationBuilder app) => app
-        .UseForwardedHeaders()
         .UseHttpLogging()
         .UseAuthentication()
         .UseAuthorization()
