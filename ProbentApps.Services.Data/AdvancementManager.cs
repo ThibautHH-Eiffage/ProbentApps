@@ -35,8 +35,6 @@ internal class AdvancementManager(IDbContextFactory<ApplicationDbContext> contex
             return new AdvancementCreationResult(AdvancementCreationResult.Status.OrderNotFound);
         }
 
-        Context.Attach(order);
-
         var advancement = Context.Add(new Advancement
         {
             Name = data.Name,
@@ -122,6 +120,8 @@ internal class AdvancementManager(IDbContextFactory<ApplicationDbContext> contex
             return new AdvancementUpdateResult(AdvancementUpdateResult.Status.InvoiceAlreadyRequested);
         }
 
+        Context.Attach(advancement);
+
         if (data.Name is string name)
             advancement.Name = name;
         if (data.Date is DateOnly date)
@@ -140,7 +140,7 @@ internal class AdvancementManager(IDbContextFactory<ApplicationDbContext> contex
             return new AdvancementUpdateResult(AdvancementUpdateResult.Status.InvalidData);
         }
 
-        logger.LogDebug("Created advancement with ID: {Id}", advancement.Id);
+        logger.LogDebug("Updated advancement with ID: {Id}", advancement.Id);
 
         return new AdvancementUpdateResult(AdvancementUpdateResult.Status.Success);
     }
