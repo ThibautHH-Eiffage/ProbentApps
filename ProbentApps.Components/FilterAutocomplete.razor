@@ -20,7 +20,7 @@
     public RenderFragment? NoItemsTemplate { get; set; }
 
     [Parameter, EditorRequired]
-    public required Func<string, CancellationToken, Task<IEnumerable<T?>>> Search { get; set; }
+    public required Func<string?, CancellationToken, Task<IEnumerable<T>>?> Search { get; set; }
 
     [Parameter, EditorRequired]
     public required Column<TContext> Column { get; set; }
@@ -29,7 +29,7 @@
     public string? Placeholder { get; set; }
 
     [Parameter, EditorRequired]
-    public required Func<TContext, T?> FilteredProperty { get; set; }
+    public required Func<TContext, T> FilteredProperty { get; set; }
 
     [Parameter]
     public T? Value { get; set; }
