@@ -140,7 +140,7 @@ internal class AdvancementManager(IDbContextFactory<ApplicationDbContext> contex
             return new AdvancementUpdateResult(AdvancementUpdateResult.Status.InvalidData);
         }
 
-        logger.LogDebug("Created advancement with ID: {Id}", advancement.Id);
+        logger.LogDebug("Updated advancement with ID: {Id}", advancement.Id);
 
         return new AdvancementUpdateResult(AdvancementUpdateResult.Status.Success);
     }
