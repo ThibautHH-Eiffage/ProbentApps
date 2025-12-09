@@ -1,0 +1,78 @@
+@inject IStringLocalizer<SharedResources> SharedLocalizer
+@inject IStringLocalizer<StructureTree> Localizer
+
+<MudStack Row AlignItems="AlignItems.Start" Justify="Justify.SpaceEvenly" Class="w-100">
+    @* Partie arborescence *@
+    <MudTreeView T=Structure Items=Items ServerData="@DataLoader"
+        SelectedValue=SelectedStructure SelectedValueChanged=SelectedStructureChanged
+        Style="width: max-content">
+        <ItemTemplate>
+            <MudTreeViewItem
+                @bind-Expanded="@context.Expanded"
+                Items="@context.Children"
+                ItemsChanged="@((IReadOnlyCollection<TreeItemData<Structure>> items) =>
+                    context.Children = (List<TreeItemData<Structure>>)items
+                )"
+                CanExpand="@context.Expandable"
+                Value="@context.Value"
+                Icon="@context.Value!.StructureType?.SvgIconCode"
+                Text="@context.Value!.Name"
+                Visible="@context.Visible"
+                LoadingIconColor="Color.Info" />
+        </ItemTemplate>
+    </MudTreeView>
+    @if (SelectedStructure is not null)
+    {
+        bool disableEdition = Items.Any(treeItem => treeItem.Value == SelectedStructure);
+        <MudCard>
+            <MudCardHeader>
+                <MudText Typo="Typo.h4">@SelectedStructure.Name</MudText>
+            </MudCardHeader>
+            <MudCardContent>
+                <MudStack Row>
+                    <MudAutocomplete Label="@Localizer["Head of Department"]" SearchFunc="ManagerFinder" @bind-Value=SelectedStructure.Manager
+                        Placeholder="@SharedLocalizer["Manager"]" ResetValueOnEmptyText Clearable
+                        Disabled=@disableEdition />
+                    <MudAutocomplete Label="@Localizer["Structure type"]" SearchFunc="StructureTypeFinder" @bind-Value=SelectedStructure.StructureType
+                        Placeholder="@SharedLocalizer["Type"]" ResetValueOnEmptyText Clearable>
+                        <ItemTemplate>
+                            <MudStack Row><MudIcon Icon="@context.SvgIconCode" /> @context.Name</MudStack>
+                        </ItemTemplate>
+                    </MudAutocomplete>
+                </MudStack>
+            </MudCardContent>
+            <MudCardActions Class="justify-end">
+                <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="@(() => OnSave.InvokeAsync(!disableEdition))">@SharedLocalizer["Save"]</MudButton>
+            </MudCardActions>
+        </MudCard>
+    }
+</MudStack>
+
+@code {
+    [Parameter]
+    public IReadOnlyCollection<TreeItemData<Structure>> Items { get; set; } = default!;
+
+    [Parameter]
+    public Structure? SelectedStructure { get; set; }
+
+    [Parameter]
+    public EventCallback<Structure?> SelectedStructureChanged { get; set; }
+
+    [Parameter]
+    public Func<string?, CancellationToken, Task<IEnumerable<ApplicationUser>>> ManagerFinder { get; set; } = default!;
+
+    [Parameter]
+    public Func<string?, CancellationToken, Task<IEnumerable<StructureType>>> StructureTypeFinder { get; set; } = default!;
+
+    [Parameter]
+    public Func<Structure?, Task<IReadOnlyCollection<TreeItemData<Structure?>>>> DataLoader { get; set; } = default!;
+
+    /// <summary>
+    /// Rappel d'évènement à l'enregistrement des modifications de la structure.
+    /// </summary>
+    /// <remarks>
+    /// Le paramètre signale s'il est nécessaire d'enregistrer le responsable de la structure.
+    /// </remarks>
+    [Parameter]
+    public EventCallback<bool> OnSave { get; set; }
+}

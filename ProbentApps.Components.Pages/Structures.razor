@@ -1,83 +1,67 @@
 @page "/structures"
 
+@using ProbentApps.Services.Data.Abstractions.Querying
+
 @inject IStringLocalizer<SharedResources> SharedLocalizer
-@inject IRepository<Structure> StructureRepository
+@inject IRepository<ApplicationUser> UserRepository
+@inject IRepository<StructureType> StructureTypeRepository
+@inject IStructureManager StructureManager
 
 @inherits AuthenticatedPage
 
 <PageTitle Title=@SharedLocalizer["Structures"] />
-<StructuresTable StructuresLoader="TableDataLoader" FilterManagers="FilterManagersLoader" />
 
-<MudPaper Width="300px" Elevation="0">
-    <MudStack AlignItems="AlignItems.Center">
-        <MudTextField T="string" Label="Search" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search"
-                      TextChanged="OnTextChanged" Immediate="true" Clearable="true" />
-        <MudTreeView Items="@_treeItemData" @ref="_treeView" FilterFunc="MatchesName">
-            <ItemTemplate>
-                <MudTreeViewItem @bind-Expanded="@context.Expanded" Items="@context.Children" Value="@context.Value"
-                                 Icon="@context.Icon" Text="@context.Text" Visible="@context.Visible" />
-            </ItemTemplate>
-        </MudTreeView>
-    </MudStack>
-</MudPaper>
+@* Treeview des structures *@
+<StructureTree Items="_items" @bind-SelectedStructure=_selectedStructure
+    ManagerFinder="SearchManager" StructureTypeFinder="SearchStructureType"
+    DataLoader="LoadServerData" OnSave="SaveStructure" />
+
+@* Tableau des structures
+<StructuresTable StructuresLoader="TableDataLoader" FilterManagers="FilterManagersLoader" />  *@
 
 @code {
-    // -----------------------------------------------------TreeView-----------------------------------------------------
+    private IReadOnlyCollection<TreeItemData<Structure>> _items = default!;
+    private Structure? _selectedStructure;
 
-    private List<TreeItemData<string>> _treeItemData = [];
-
-    private MudTreeView<string> _treeView;
-
-    private string _searchPhrase;
-
-    public class TreeItemPresenter : TreeItemData<string>
+    public async Task<IReadOnlyCollection<TreeItemData<Structure>>> LoadServerData(Structure? parentValue)
     {
-        public TreeItemPresenter(string text, string icon) : base(text)
-        {
-            Text = text;
-            Icon = icon;
-        }
+        return (IReadOnlyCollection<TreeItemData<Structure>>) await StructureManager.Query<TreeItemData<Structure>>(new QueryParameters<Structure, TreeItemData<Structure>>(
+            Filter: q => q.Where(parentValue?.Code is string code
+                ? s => s.Code.StartsWith(code + "|") && !(s.Code.Substring(code.Length + 1).Contains("|"))
+                : s => !q.Any(structure => s.Code.StartsWith(structure.Code + '|'))),
+            Select: (q, r) =>
+            {
+                var structures = r.GetEntitySet<Structure>();
+                return q.Select(s => new TreeItemData<Structure>
+                {
+                    Value = new Structure
+                    {
+                        Id = s.Id,
+                        Name = s.Name,
+                        Code = s.Code,
+                        Manager = s.Manager == null ? null : new ApplicationUser
+                        {
+                            Id = s.Manager.Id,
+                            UserName = s.Manager.UserName,
+                            Email = s.Manager.Email
+                        },
+                        StructureType = new StructureType
+                        {
+                            Id = s.StructureType.Id,
+                            Name = s.StructureType.Name,
+                            SvgIconCode = s.StructureType.SvgIconCode
+                        }
+                    },
+                    Expandable = structures.Any(structure => structure.Code.StartsWith(s.Code + "|"))
+                });
+            },
+            SortAndPaginate: q => q,
+            User: User,
+            ToList: true
+        ));
     }
 
-    protected override void OnInitialized()
-    {
-        _treeItemData.Add(new TreeItemPresenter("All Mail", Icons.Material.Filled.Email));
-        _treeItemData.Add(new TreeItemPresenter("Trash", Icons.Material.Filled.Delete));
-        _treeItemData.Add(new TreeItemPresenter("Categories", Icons.Material.Filled.Label)
-        {
-            Expanded = true,
-            Children =
-            [
-                new TreeItemPresenter("Social", Icons.Material.Filled.Group),
-                new TreeItemPresenter("Updates", Icons.Material.Filled.Info),
-                new TreeItemPresenter("Forums", Icons.Material.Filled.QuestionAnswer),
-                new TreeItemPresenter("Promotions", Icons.Material.Filled.LocalOffer)
-            ]
-        });
-        _treeItemData.Add(new TreeItemPresenter("History", Icons.Material.Filled.Label));
-    }
-
-    private async void OnTextChanged(string searchPhrase)
-    {
-        _searchPhrase = searchPhrase;
-        await _treeView.FilterAsync();
-    }
-
-    private Task<bool> MatchesName(TreeItemData<string> item)
-    {
-        if (string.IsNullOrEmpty(item.Text))
-        {
-            return Task.FromResult(false);
-        }
-
-        return Task.FromResult(item.Text.Contains(_searchPhrase, StringComparison.OrdinalIgnoreCase));
-    }
-
-    // -----------------------------------------------------TreeView-----------------------------------------------------
-
-
-    private IQueryable<Structure> SelectStructureListData(IQueryable<Structure> query) => query
-        // .Where(s => s.IsArchived == ArchivedOnly)
+    private static IQueryable<Structure> SelectStructureListData(IQueryable<Structure> query) => query
         .Select(static s => new Structure
         {
             Id = s.Id,
@@ -89,7 +73,8 @@
                 Id = s.Manager.Id,
                 UserName = s.Manager.UserName,
                 Email = s.Manager.Email
-            }
+            },
+            StructureType = s.StructureType
         });
 
     private IQueryable<ApplicationUser> SelectFilterManagers(IQueryable<Structure> query) => query
@@ -103,18 +88,42 @@
 
     protected Func<GridState<Structure>, Task<GridData<Structure>>> TableDataLoader { get; private set; } = default!;
 
-    protected Func<GridState<Structure>, Task<ApplicationUser[]>> FilterManagersLoader { get; private set; } = default!;
+    protected Func<GridState<Structure>, Task<IEnumerable<ApplicationUser>>> FilterManagersLoader { get; private set; } = default!;
 
-    // protected override async Task OnInitializedAsync()
-    // {
-    //     await base.OnInitializedAsync();
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
 
-    //     TableDataLoader = StructureRepository.LoadTableDataFor(User, SelectStructureListData);
+        _items = await LoadServerData(null);
 
-    //     FilterManagersLoader = state => StructureRepository.Query<ApplicationUser>(StructureRepository.MakeQueryParametersFor(User, SelectFilterManagers)(state));
-    // }
+        TableDataLoader = StructureManager.LoadTableDataFor(User, SelectStructureListData);
 
+        FilterManagersLoader = state => StructureManager.Query<ApplicationUser>(StructureManager.MakeQueryParametersFor(User, SelectFilterManagers)(state));
+    }
 
+    private async Task<IEnumerable<ApplicationUser>> SearchManager(string? searchText, CancellationToken cancellationToken)
+    {
+        var users = await UserRepository.Query(new QueryParameters<ApplicationUser, ApplicationUser>(
+                Filter: q => q.Where(u => u.Id != ApplicationUser.RootId),
+                Select: (q, _) => q.Select(static u => new ApplicationUser { Id = u.Id, UserName = u.UserName, Email = u.Email }),
+                SortAndPaginate: q => q.OrderBy(static u => u.UserName).Take(10),
+                User: User
+            ), cancellationToken);
 
+        return users.Any(u => u.UserName == searchText) ? users
+            : users.Where(u => $"{u.UserName} <{u.Email}>"
+                .Contains(searchText ?? string.Empty, StringComparison.CurrentCultureIgnoreCase));
+    }
 
+    private async Task<IEnumerable<StructureType>> SearchStructureType(string? searchText, CancellationToken cancellationToken) =>
+        await StructureTypeRepository.Query(new QueryParameters<StructureType, StructureType>(
+                Filter: q => q.Where(st => searchText == null || q.Any(st => st.Name == searchText) || st.Name.Contains(searchText)),
+                Select: (q, _) => q,
+                SortAndPaginate: q => q.OrderBy(static st => st.Name).Take(10),
+                User: User
+            ), cancellationToken);
+
+    private Task SaveStructure(bool updateManager) => Task.WhenAll(
+        updateManager ? StructureManager.SetManagerAsync(_selectedStructure!.Id, _selectedStructure!.Manager?.Id) : Task.CompletedTask,
+        StructureManager.SetStructureTypeAsync(_selectedStructure!.Id, _selectedStructure!.StructureType.Id));
 }

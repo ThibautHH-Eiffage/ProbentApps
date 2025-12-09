@@ -63,4 +63,13 @@
   <data name="Structures" xml:space="preserve">
     <value>Structures</value>
   </data>
+  <data name="Save" xml:space="preserve">
+    <value>Sauvegarder</value>
+  </data>
+  <data name="Manager" xml:space="preserve">
+    <value>Responsable</value>
+  </data>
+  <data name="Type" xml:space="preserve">
+    <value>Type</value>
+  </data>
 </root>
