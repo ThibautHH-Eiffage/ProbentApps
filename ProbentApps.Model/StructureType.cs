@@ -12,15 +12,13 @@ public class StructureType : IEntity
 
     public Guid Id { get; set; }
 
-    public IList<Structure> Structure { get; set; } = [];
-
     [MaxLength(64)]
     [Unicode(false)]
     public string Name { get; set; } = DEFAULT_NAME;
 
     [MaxLength(2048)]
     [Unicode(false)]
-    
     public string SvgIconCode { get; set; } = DEFAULT_SVG_ICONE_CODE;
 
+    public override string ToString() => Name;
 }
