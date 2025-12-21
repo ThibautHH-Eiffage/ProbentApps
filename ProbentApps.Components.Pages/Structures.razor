@@ -16,9 +16,6 @@
     ManagerFinder="SearchManager" StructureTypeFinder="SearchStructureType"
     DataLoader="LoadServerData" OnSave="SaveStructure" />
 
-@* Tableau des structures
-<StructuresTable StructuresLoader="TableDataLoader" FilterManagers="FilterManagersLoader" />  *@
-
 @code {
     private IReadOnlyCollection<TreeItemData<Structure>> _items = default!;
     private Structure? _selectedStructure;
@@ -76,19 +73,6 @@
             },
             StructureType = s.StructureType
         });
-
-    private IQueryable<ApplicationUser> SelectFilterManagers(IQueryable<Structure> query) => query
-        .Where(static s => s.Manager != null)
-        .Select(static s => new ApplicationUser
-        {
-            Id = s.Manager!.Id,
-            UserName = s.Manager.UserName,
-            Email = s.Manager.Email
-        });
-
-    protected Func<GridState<Structure>, Task<GridData<Structure>>> TableDataLoader { get; private set; } = default!;
-
-    protected Func<GridState<Structure>, Task<IEnumerable<ApplicationUser>>> FilterManagersLoader { get; private set; } = default!;
 
     protected override async Task OnInitializedAsync()
     {
