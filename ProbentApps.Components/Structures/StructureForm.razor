@@ -1,0 +1,28 @@
+@inject IStringLocalizer<SharedResources> SharedLocalizer
+@inject IStringLocalizer<StructureTree> Localizer
+
+<MudStack Row>
+    <MudAutocomplete Label="@Localizer["Head of Department"]" SearchFunc="ManagerFinder" @bind-Value=SelectedStructure.Manager
+        Placeholder="@SharedLocalizer["Manager"]" ResetValueOnEmptyText Clearable
+        Disabled=@LockManager />
+    <MudAutocomplete Label="@Localizer["Structure type"]" SearchFunc="StructureTypeFinder" @bind-Value=SelectedStructure.StructureType
+        Placeholder="@SharedLocalizer["Type"]" ResetValueOnEmptyText Clearable>
+        <ItemTemplate>
+            <MudStack Row><MudIcon Icon="@context.SvgIconCode" /> @context.Name</MudStack>
+        </ItemTemplate>
+    </MudAutocomplete>
+</MudStack>
+
+@code {
+    [Parameter]
+    public Structure SelectedStructure { get; set; } = default!;
+
+    [Parameter]
+    public Func<string?, CancellationToken, Task<IEnumerable<ApplicationUser>>> ManagerFinder { get; set; } = default!;
+
+    [Parameter]
+    public Func<string?, CancellationToken, Task<IEnumerable<StructureType>>> StructureTypeFinder { get; set; } = default!;
+
+    [Parameter]
+    public bool LockManager { get; set; }
+}
