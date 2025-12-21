@@ -54,6 +54,9 @@
   <data name="Invoice" xml:space="preserve">
     <value>Facture</value>
   </data>
+  <data name="Add" xml:space="preserve">
+    <value>Ajouter</value>
+  </data>
   <data name="Edit" xml:space="preserve">
     <value>Modifier</value>
   </data>
@@ -71,5 +74,11 @@
   </data>
   <data name="Type" xml:space="preserve">
     <value>Type</value>
+  </data>
+  <data name="Loading..." xml:space="preserve">
+    <value>Chargement ...</value>
+  </data>
+  <data name="No matching records found" xml:space="preserve">
+    <value>Aucun enregistrement trouvé</value>
   </data>
 </root>

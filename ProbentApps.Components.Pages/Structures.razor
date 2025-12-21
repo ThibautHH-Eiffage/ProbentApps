@@ -1,24 +1,31 @@
 @page "/structures"
 
+@using System.Security.Claims
+@using Microsoft.AspNetCore.Identity
 @using ProbentApps.Services.Data.Abstractions.Querying
 
 @inject IStringLocalizer<SharedResources> SharedLocalizer
-@inject IRepository<ApplicationUser> UserRepository
+@inject IUserRepository UserRepository
 @inject IRepository<StructureType> StructureTypeRepository
 @inject IStructureManager StructureManager
+@inject UserManager<ApplicationUser> UserManager
 
 @inherits AuthenticatedPage
 
 <PageTitle Title=@SharedLocalizer["Structures"] />
 
 @* Treeview des structures *@
-<StructureTree Items="_items" @bind-SelectedStructure=_selectedStructure
+<StructureTree Items="_items"
+    SelectedStructure=_selectedStructure SelectedStructureChanged="OnSelectedStructureChanged"
     ManagerFinder="SearchManager" StructureTypeFinder="SearchStructureType"
-    DataLoader="LoadServerData" OnSave="SaveStructure" />
+    TreeItemDataLoader="LoadServerData" OnSave="SaveStructure"
+    ExtraManagers="_extraStructureManagers"
+    OnAddExtraManager="AddExtraManager" OnRemoveExtraManager="RemoveExtraManager" />
 
 @code {
     private IReadOnlyCollection<TreeItemData<Structure>> _items = default!;
     private Structure? _selectedStructure;
+    private List<ApplicationUser> _extraStructureManagers = [];
 
     public async Task<IReadOnlyCollection<TreeItemData<Structure>>> LoadServerData(Structure? parentValue)
     {
@@ -79,10 +86,14 @@
         await base.OnInitializedAsync();
 
         _items = await LoadServerData(null);
+    }
 
-        TableDataLoader = StructureManager.LoadTableDataFor(User, SelectStructureListData);
+    private async Task OnSelectedStructureChanged(Structure? structure)
+    {
+        _selectedStructure = structure;
 
-        FilterManagersLoader = state => StructureManager.Query<ApplicationUser>(StructureManager.MakeQueryParametersFor(User, SelectFilterManagers)(state));
+        _extraStructureManagers = structure is not null
+            ? await UserRepository.GetExtraManagersForAsync(structure.Id) : [];
     }
 
     private async Task<IEnumerable<ApplicationUser>> SearchManager(string? searchText, CancellationToken cancellationToken)
@@ -93,6 +104,7 @@
                 SortAndPaginate: q => q.OrderBy(static u => u.UserName).Take(10),
                 User: User
             ), cancellationToken);
+            // await UserRepository.GetExtraManagersForAsync(_selectedStructure!.Id, true, cancellationToken);
 
         return users.Any(u => u.UserName == searchText) ? users
             : users.Where(u => $"{u.UserName} <{u.Email}>"
@@ -110,4 +122,66 @@
     private Task SaveStructure(bool updateManager) => Task.WhenAll(
         updateManager ? StructureManager.SetManagerAsync(_selectedStructure!.Id, _selectedStructure!.Manager?.Id) : Task.CompletedTask,
         StructureManager.SetStructureTypeAsync(_selectedStructure!.Id, _selectedStructure!.StructureType.Id));
+
+    // Traitement des claims pour l'accès au structures
+    const string ClaimType = "ExtraManagedStructures";
+
+    private async Task AddExtraManager(ApplicationUser user)
+    {
+        user = (await UserManager.FindByIdAsync(user.Id.ToString()))!;
+        //recherche de la (des) claims relatifs aux "ExtraManagers"
+        var claims = (await UserManager.GetClaimsAsync(user)).Where(c => c.Type == ClaimType);
+        //liste des Guids ExtraManager
+        var extraManagedStructuresIds = claims
+            .SelectMany(static c => c.Value
+                .Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
+                .Select(Guid.Parse))
+            .Distinct();
+        // Si l'extramanager est présent => pas d'action
+        if (extraManagedStructuresIds.Contains(_selectedStructure!.Id))
+            return;
+
+        Claim? replacedClaim = claims.FirstOrDefault();
+        if (replacedClaim is not null)
+            // s'il exist un Claims "ExtraManager" => ajout du Guid de la structure sélectionnée sous forme de texte dans la chaine
+            await UserManager.ReplaceClaimAsync(user, replacedClaim, new Claim(
+                type: replacedClaim.Type, value: $"{replacedClaim.Value},{_selectedStructure!.Id}",
+                valueType: replacedClaim.ValueType, issuer: replacedClaim.Issuer,
+                originalIssuer: replacedClaim.OriginalIssuer, subject: replacedClaim.Subject
+            ));
+        else
+            // Création d'une nouvelle Claim "Extramanager" avec le Guid de l'Application user sélectionnée
+            await UserManager.AddClaimAsync(user, new(type: ClaimType, _selectedStructure!.Id.ToString(), null, $"{nameof(ProbentApps)}"));
+    }
+
+    private async Task RemoveExtraManager(ApplicationUser user)
+    {
+        user = (await UserManager.FindByIdAsync(user.Id.ToString()))!;
+        //recherche de la (des) claims relatifs aux "ExtraManagers"
+        var claims = (await UserManager.GetClaimsAsync(user)).Where(c => c.Type == ClaimType);
+        //liste des Guids ExtraManager
+        var extraManagedStructuresIds = claims
+            .SelectMany(static c => c.Value
+                .Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
+                .Select(Guid.Parse))
+            .Distinct();
+        // Si l'extramanager n'est pas présent => pas d'action
+        if (!extraManagedStructuresIds.Contains(_selectedStructure!.Id))
+            return;
+
+        if (extraManagedStructuresIds.Count() == 1)
+            // s'il n'y a qu'un seul ExtraManager => on peut supprimer la claim
+            await UserManager.RemoveClaimAsync(user, claims.First());
+        else
+        {
+            // modification de la chaine de caractère de valeur de la claim en supprimant le Guid de utilisateur
+            Claim? replacedClaim = claims.FirstOrDefault();
+            string newClaimStringGuid = string.Join("," , extraManagedStructuresIds.Where(g => g != _selectedStructure!.Id));
+            await UserManager.ReplaceClaimAsync(user, replacedClaim!, new Claim(
+                type: replacedClaim!.Type, value: newClaimStringGuid,
+                valueType: replacedClaim.ValueType, issuer: replacedClaim.Issuer,
+                originalIssuer: replacedClaim.OriginalIssuer, subject: replacedClaim.Subject
+            ));
+        }
+    }
 }

@@ -3,9 +3,9 @@
 @inject IStringLocalizer<SharedResources> SharedLocalizer
 @inject IStringLocalizer<StructureTree> Localizer
 
-<MudStack Row AlignItems="AlignItems.Start" Justify="Justify.SpaceEvenly" Class="w-100">
+<MudStack Row AlignItems="AlignItems.Start" Justify="Justify.FlexStart" Class="w-100">
     @* Partie arborescence *@
-    <MudTreeView T=Structure Items=Items ServerData="@DataLoader"
+    <MudTreeView T=Structure Items=Items ServerData="@TreeItemDataLoader"
         SelectedValue=SelectedStructure SelectedValueChanged=SelectedStructureChanged
         Style="width: max-content">
         <ItemTemplate>
@@ -34,6 +34,38 @@
                 <MudStack>
                     <StructureForm LockManager=lockManager SelectedStructure=SelectedStructure
                         ManagerFinder=ManagerFinder StructureTypeFinder=StructureTypeFinder />
+                @* table des accès complémentaires (Extra Manager)*@
+                    <MudText Typo="Typo.h6">@Localizer["Other access"]</MudText>
+                    <MudDataGrid Items="@ExtraManagers" Filterable="false" Dense="true" Hover="true" Bordered="true" Striped="true">
+                        <ToolBarContent>
+                            <MudAutocomplete @ref=_newExtraManagerAutocomplete Label="@Localizer["New extra manager"]"
+                                SearchFunc="ManagerFinder" @bind-Value=_newExtraManager
+                                Placeholder="@Localizer["Extra manager"]" ResetValueOnEmptyText Clearable />
+                            <MudButton Disabled=@(_newExtraManager is null) Variant="Variant.Outlined"
+                                OnClick="@(async () => {
+                                    ExtraManagers.Add(_newExtraManager!);
+                                    await OnAddExtraManager.InvokeAsync(_newExtraManager);
+                                    await _newExtraManagerAutocomplete.ClearAsync();
+                                })">
+                                @SharedLocalizer["Add"]
+                            </MudButton>
+                        </ToolBarContent>
+                        <Columns>
+                            <PropertyColumn Property="u => u.UserName" Title="@Localizer["User"]" />
+                            <TemplateColumn Title="@SharedLocalizer["Delete"]">
+                                <CellTemplate>
+                                    <MudIconButton Icon="@Icons.Material.Outlined.Delete"
+                                        OnClick="@(() => {
+                                            ExtraManagers.Remove(context.Item);
+                                            return OnRemoveExtraManager.InvokeAsync(context.Item);
+                                        })" />
+                                </CellTemplate>
+                            </TemplateColumn>
+                        </Columns>
+                        <PagerContent>
+                            <MudDataGridPager T="ApplicationUser" />
+                        </PagerContent>
+                    </MudDataGrid>
                 </MudStack>
             </MudCardContent>
             <MudCardActions Class="justify-end">
@@ -47,12 +79,21 @@
 </MudStack>
 
 @code {
+    MudAutocomplete<ApplicationUser?> _newExtraManagerAutocomplete = default!;
+    ApplicationUser? _newExtraManager = null;
+
     [Parameter]
     public IReadOnlyCollection<TreeItemData<Structure>> Items { get; set; } = default!;
 
     [Parameter]
     public Structure? SelectedStructure { get; set; }
 
+    /// <summary>
+    /// Rappel d'évènement à la modifications de la structure sélectionnée.
+    /// </summary>
+    /// <remarks>
+    /// Le paramètre signale l'élément sélectionné à changé'
+    /// </remarks>
     [Parameter]
     public EventCallback<Structure?> SelectedStructureChanged { get; set; }
 
@@ -63,7 +104,7 @@
     public Func<string?, CancellationToken, Task<IEnumerable<StructureType>>> StructureTypeFinder { get; set; } = default!;
 
     [Parameter]
-    public Func<Structure?, Task<IReadOnlyCollection<TreeItemData<Structure?>>>> DataLoader { get; set; } = default!;
+    public Func<Structure?, Task<IReadOnlyCollection<TreeItemData<Structure?>>>> TreeItemDataLoader { get; set; } = default!;
 
     /// <summary>
     /// Rappel d'évènement à l'enregistrement des modifications de la structure.
@@ -73,4 +114,13 @@
     /// </remarks>
     [Parameter]
     public EventCallback<bool> OnSave { get; set; }
+
+    [Parameter]
+    public EventCallback<ApplicationUser> OnAddExtraManager { get; set; }
+
+    [Parameter]
+    public EventCallback<ApplicationUser> OnRemoveExtraManager { get; set; }
+
+    [Parameter, EditorRequired]
+    public required List<ApplicationUser> ExtraManagers { get; init; }
 }
