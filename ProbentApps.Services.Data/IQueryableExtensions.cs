@@ -20,9 +20,9 @@ internal static class IQueryableExtensions
         Guid userId, Guid[] extraStructureIds,
         IQueryable<Structure> structureSet)
         where T : Structure => userId == ApplicationUser.RootId ? query : query
-            .Where(structure => extraStructureIds.Contains(structure.Id)
-                || structureSet.Where(s => s.Manager!.Id == userId)
-                    .Any(s => structure.Code.StartsWith(s.Code)));
+            .Where(structure => structureSet
+                .Where(s => s.Manager!.Id == userId || extraStructureIds.Contains(s.Id))
+                .Any(s => structure.Code.StartsWith(s.Code)));
 
     public static IQueryable<T> WhereStructureIsAdministeredBy<T, TStructure>(this IQueryable<T> query,
         Guid userId, Guid[] extraStructureIds,
