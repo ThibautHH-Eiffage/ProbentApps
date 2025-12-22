@@ -30,8 +30,8 @@
   <data name="Client: {0}" xml:space="preserve">
     <value>Client : {0}</value>
   </data>
-  <data name="Completion" xml:space="preserve">
-    <value>Achèvement</value>
+  <data name="Order completion" xml:space="preserve">
+    <value>Avancement de la commande</value>
   </data>
   <data name="Last advancement" xml:space="preserve">
     <value>Dernier avancement</value>

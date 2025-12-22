@@ -28,12 +28,12 @@
                 </ColGroup>
                 <HeaderContent>
                     <MudTh>@Localizer["Order name"]</MudTh>
-                    <MudTh>@Localizer["Completion"]</MudTh>
+                    <MudTh>@Localizer["Order completion"]</MudTh>
                     <MudTh>@Localizer["Last advancement"]</MudTh>
                 </HeaderContent>
                 <RowTemplate Context="order">
                     <MudTd DataLabel="@Localizer["Order name"]">@order.Name</MudTd>
-                    <MudTd DataLabel="@Localizer["Completion"]">
+                    <MudTd DataLabel="@Localizer["Order completion"]">
                         <OrderCompletion Order="order" />
                     </MudTd>
                     <MudTd DataLabel="@Localizer["Last advancement"]">
