@@ -2,7 +2,7 @@
 @inject IStringLocalizer<AffairAdvancementTable> Localizer
 
 <MudDataGrid T=Advancement @ref=_grid ServerData=Advancements Groupable Filterable
-    FilterMode=DataGridFilterMode.ColumnFilterRow RowsPerPage=25
+    FilterMode=DataGridFilterMode.ColumnFilterRow RowsPerPage=25 Dense
     ReadOnly=false EditMode=DataGridEditMode.Form EditDialogOptions=dialogOptions
     CanceledEditingItem=CancelEdition CommittedItemChanges=CommitAdvancement
     CloneStrategy=AdvancementCloneStrategy.Instance>
@@ -17,6 +17,20 @@
         </MudStack>
     </ToolBarContent>
     <Columns>
+        <PropertyColumn @ref=_orderColumn Property=@(static a => a.Order) Hidden
+            Grouping=@(_filteredOrder is null) GroupExpanded GroupBy="orderAccessor">
+            <GroupTemplate>
+                @{ var order = (Order)context.Grouping.Key!; }
+                <MudStack Row AlignItems="AlignItems.Center" Justify="Justify.SpaceBetween" Class="w-100">
+                    <MudText>@order</MudText>
+                    <OrderCompletion Order="order" />
+                </MudStack>
+            </GroupTemplate>
+            <EditTemplate>
+                <MudAutocomplete Required SearchFunc=SearchOrders(Affair.Orders) @bind-Value=context.Item.Order
+                    Placeholder="@Localizer["Select order..."]" />
+            </EditTemplate>
+        </PropertyColumn>
         <PropertyColumn Property="static a => a.Name" Title=@Localizer["Advancement name"] Groupable="false"
             FilterOperators="FilterOperators.NameColumn" />
         <PropertyColumn Property="static a => a.Date" Title=@Localizer["Advancement date"] Groupable="false"
@@ -26,37 +40,16 @@
                     DateChanged=@(v => context.Item.Date = DateOnly.FromDateTime(v!.Value)) />
             </EditTemplate>
         </PropertyColumn>
-        <PropertyColumn Property="static a => a.Value" Title=@Localizer["Advancement value"] Groupable="false" Filterable="false"
-            Format="C" CellClass="text-end" />
+        <PropertyColumn Property="static a => a.Value" Title="@Localizer["Advancement value"]" Groupable="false" Filterable="false" Format="C">
+            <CellTemplate>@($"{context.Item.Value:C} ({context.Item.Value / context.Item.Order.TotalPrice:P})")</CellTemplate>
+            <EditTemplate>
+                <MudNumericField Label="@Localizer["Advancement value"]" @bind-Value="@context.Item.Value" Margin="@Margin.Dense"
+                    Required Variant="@Variant.Outlined" Class="mt-4" Format="C" Culture="@CultureInfo.CurrentUICulture" />
+            </EditTemplate>
+        </PropertyColumn>
         <PropertyColumn Property="static a => a.Description" Title=@SharedLocalizer["Description"]
             Sortable="false" Groupable="false" FilterOperators="FilterOperators.TextColumn"
             Required="false" />
-        <PropertyColumn @ref=_orderColumn Property=@(static a => a.Order) Hidden
-            Grouping=@(_filteredOrder is null) GroupExpanded GroupBy="orderAccessor">
-            <GroupTemplate>
-                @{
-                    var order = (Order)context.Grouping.Key!;
-                    decimal totalAdvancementValue = order.Advancements.Sum(static a => a.Value);
-                    Severity severity = (totalAdvancementValue / order.TotalPrice) switch
-                        {
-                            0 => Severity.Normal,
-                            < 1 => Severity.Info,
-                            1 => Severity.Success,
-                            > 1 => Severity.Warning
-                        };
-                }
-                <MudStack Row AlignItems="AlignItems.Center" Justify="Justify.SpaceBetween" Class="w-100">
-                    <MudText>@order</MudText>
-                    <MudAlert Severity="severity">
-                        @($"{(totalAdvancementValue / order.TotalPrice):P2} ({totalAdvancementValue:C0} / {order.TotalPrice:C0})")
-                    </MudAlert>
-                </MudStack>
-            </GroupTemplate>
-            <EditTemplate>
-                <MudAutocomplete Required SearchFunc=SearchOrders(Affair.Orders) @bind-Value=context.Item.Order
-                    Placeholder="@Localizer["Select order..."]" />
-            </EditTemplate>
-        </PropertyColumn>
         <PropertyColumn @ref=_reportColumn Property="static a => a.Report" Title=@SharedLocalizer["Report"] Sortable="false"
             Groupable=@(_filteredReport is null) GroupExpanded GroupBy="reportAccessor">
             <GroupTemplate>
@@ -179,23 +172,15 @@
         );
     }
 
-    private Task CreateAdvancement()
+    private async Task CreateAdvancement()
     {
         Advancement advancement = new()
         {
             Date = DateOnly.FromDateTime(DateTime.Today),
-            Order = new()
-            {
-                Code = string.Empty,
-                TotalPrice = new decimal(1, 0, 0, false, 28)
-            }
+            Order = (await SearchOrders(Affair.Orders)(null, default)).FirstOrDefault()
         };
 
-        ((IList<Advancement>)_grid.ServerItems).Add(advancement);
-        _grid.GroupItems();
-        var task = _grid.SetEditingItemAsync(advancement);
-        advancement.Name = Localizer["New advancement"];
-        return task;
+        await _grid.SetEditingItemAsync(advancement);
     }
 
     private void CancelEdition(Advancement a)
@@ -221,7 +206,7 @@
 
     private Func<string?, CancellationToken, Task<IEnumerable<Order>>?> SearchOrders(IEnumerable<Order> orders) =>
         (string? searchText, CancellationToken cancellationToken) => Task.FromResult(orders
-            .Where(o => string.IsNullOrWhiteSpace(searchText)
+            .Where(o => string.IsNullOrWhiteSpace(searchText) || orders.Any(order => order.Name == searchText)
                 || $"{o.Name} <{o.Code}>".Contains(searchText, StringComparison.CurrentCultureIgnoreCase)));
 
     private Task<IEnumerable<Report>>? SearchReports(string? searchText, CancellationToken cancellationToken) =>

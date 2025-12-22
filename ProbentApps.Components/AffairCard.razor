@@ -6,34 +6,35 @@
 
 <MudCard Elevation=2>
     <MudCardHeader>
-        <MudStack>
+        <MudStack Row Class="w-100" Justify="Justify.SpaceBetween" AlignItems="AlignItems.Center">
             <MudText Typo="Typo.h5" Style="overflow-wrap: anywhere" GutterBottom>@Affair.Name</MudText>
+            <MudAlert Icon="@_status.icon" Severity=_status.severity Variant=Variant.Text Dense>
+                <MudText>@_status.text</MudText>
+            </MudAlert>
         </MudStack>
     </MudCardHeader>
     <MudCardContent Class="pt-0">
         <MudStack AlignItems="AlignItems.Center">
             <MudContainer Class="text-center w-100">
                 <MudChip T=string Icon="@Icons.Material.Filled.Domain" Color="Color.Primary">@Localizer["Structure: {0}", Affair.ParentCode]</MudChip>
-                <MudDivider Class="invisible" />
                 <MudChip T=string Icon="@Icons.Material.Filled.Code">@Localizer["Code: {0}", Affair.ShortCode]</MudChip>
                 <MudChip T=string Icon="@Icons.Material.Filled.Person">@Localizer["Client: {0}", Affair.Client.Name]</MudChip>
-                <MudDivider Class="invisible pb-2" />
-                <MudAlert Icon="@_status.icon" Severity=_status.severity Variant=Variant.Text>
-                    <MudText>@_status.text</MudText>
-                </MudAlert>
             </MudContainer>
             <MudTable Items="Affair.Orders" Elevation=2 Dense RowsPerPage=10>
+                <ColGroup>
+                    <col style="width: 40%;" />
+                    <col />
+                    <col style="width: 20%;" />
+                </ColGroup>
                 <HeaderContent>
                     <MudTh>@Localizer["Order name"]</MudTh>
-                    <MudTh>@Localizer["Completion"]</MudTh>
+                    <MudTh>@Localizer["Order completion"]</MudTh>
                     <MudTh>@Localizer["Last advancement"]</MudTh>
                 </HeaderContent>
                 <RowTemplate Context="order">
                     <MudTd DataLabel="@Localizer["Order name"]">@order.Name</MudTd>
-                    <MudTd DataLabel="@Localizer["Completion"]">
-                        @(order.TotalPrice != default
-                            ? (order.Advancements.Sum(a => a.Value) / order.TotalPrice * 100).ToString("P", CultureInfo.CurrentUICulture)
-                            : SharedLocalizer["N/A"])
+                    <MudTd DataLabel="@Localizer["Order completion"]">
+                        <OrderCompletion Order="order" />
                     </MudTd>
                     <MudTd DataLabel="@Localizer["Last advancement"]">
                         @(order.Advancements.Any()
@@ -46,12 +47,12 @@
                     <MudTablePager HideRowsPerPage HorizontalAlignment="HorizontalAlignment.Center" />
                 </PagerContent>
             </MudTable>
-            <MudChip T=string OnClick=@(async () => await JSRuntime.InvokeVoidAsync("navigator.clipboard.writeText", Affair.Id.ToString()))
-                Icon="@Icons.Material.Filled.Numbers" Size=Size.Small Text="@Localizer["Affair ID: {0}", Affair.Id]" />
         </MudStack>
     </MudCardContent>
     <MudCardActions>
-        <MudStack Row Justify="Justify.FlexEnd" Class="w-100">
+        <MudStack Row Class="w-100" Justify="Justify.SpaceBetween" AlignItems="AlignItems.Center">
+            <MudChip T=string OnClick=@(async () => await JSRuntime.InvokeVoidAsync("navigator.clipboard.writeText", Affair.Id.ToString()))
+                Icon="@Icons.Material.Filled.Numbers" Size=Size.Small Text="@Localizer["Affair ID: {0}", Affair.Id]" />
             <MudButton Href="@($"/affair/{Affair.Id}")" Color="Color.Primary" Variant="Variant.Outlined">
                 @Localizer["Show affair"]
             </MudButton>

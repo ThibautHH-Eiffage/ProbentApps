@@ -22,17 +22,17 @@
     }
     else
     {
-        <MudContainer Class="text-center w-100 pb-3">
-            <MudText GutterBottom Typo="Typo.h5">@_affair.Name</MudText>
-            <MudChip T=string Icon="@Icons.Material.Filled.Domain" Color="Color.Primary">@CardLocalizer["Structure: {0}", _affair.ParentCode]</MudChip>
-            <MudDivider Class="invisible" />
-            <MudChip T=string Icon="@Icons.Material.Filled.Code">@CardLocalizer["Code: {0}", _affair.ShortCode]</MudChip>
-            <MudChip T=string Icon="@Icons.Material.Filled.Person">@CardLocalizer["Client: {0}", _affair.Client.Name]</MudChip>
-            <MudDivider Class="invisible pb-2" />
-            <MudAlert Icon="@Status.icon" Severity=Status.severity Variant=Variant.Text>
+        <MudStack Row Class="w-100 px-3" Justify="Justify.SpaceBetween" AlignItems="AlignItems.Center">
+            <MudText GutterBottom Typo="Typo.h4">@_affair.Name</MudText>
+            <MudAlert Icon="@Status.icon" Severity=Status.severity Variant=Variant.Text Dense>
                 <MudText>@Status.text</MudText>
             </MudAlert>
-        </MudContainer>
+        </MudStack>
+        <MudStack Row Class="pb-3" Justify="Justify.Center">
+            <MudChip T=string Icon="@Icons.Material.Filled.Domain" Color="Color.Primary">@CardLocalizer["Structure: {0}", _affair.ParentCode]</MudChip>
+            <MudChip T=string Icon="@Icons.Material.Filled.Code">@CardLocalizer["Code: {0}", _affair.ShortCode]</MudChip>
+            <MudChip T=string Icon="@Icons.Material.Filled.Person">@CardLocalizer["Client: {0}", _affair.Client.Name]</MudChip>
+        </MudStack>
         <AffairAdvancementTable Affair="_affair" Advancements="_tableDataLoader"
             FilterOrders="_filterOrdersLoader"
             FilterReports="_filterReportsLoader"
