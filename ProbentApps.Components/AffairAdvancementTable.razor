@@ -2,7 +2,7 @@
 @inject IStringLocalizer<AffairAdvancementTable> Localizer
 
 <MudDataGrid T=Advancement @ref=_grid ServerData=Advancements Groupable Filterable
-    FilterMode=DataGridFilterMode.ColumnFilterRow RowsPerPage=25
+    FilterMode=DataGridFilterMode.ColumnFilterRow RowsPerPage=25 Dense
     ReadOnly=false EditMode=DataGridEditMode.Form EditDialogOptions=dialogOptions
     CanceledEditingItem=CancelEdition CommittedItemChanges=CommitAdvancement
     CloneStrategy=AdvancementCloneStrategy.Instance>
