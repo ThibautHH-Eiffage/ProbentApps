@@ -17,20 +17,6 @@
         </MudStack>
     </ToolBarContent>
     <Columns>
-        <PropertyColumn Property="static a => a.Name" Title=@Localizer["Advancement name"] Groupable="false"
-            FilterOperators="FilterOperators.NameColumn" />
-        <PropertyColumn Property="static a => a.Date" Title=@Localizer["Advancement date"] Groupable="false"
-            InitialDirection="SortDirection.Ascending" FilterOperators="FilterOperators.DateColumn">
-            <EditTemplate>
-                <MudDatePicker Required Date=context.Item.Date.ToDateTime(TimeOnly.MinValue)
-                    DateChanged=@(v => context.Item.Date = DateOnly.FromDateTime(v!.Value)) />
-            </EditTemplate>
-        </PropertyColumn>
-        <PropertyColumn Property="static a => a.Value" Title=@Localizer["Advancement value"] Groupable="false" Filterable="false"
-            Format="C" CellClass="text-end" />
-        <PropertyColumn Property="static a => a.Description" Title=@SharedLocalizer["Description"]
-            Sortable="false" Groupable="false" FilterOperators="FilterOperators.TextColumn"
-            Required="false" />
         <PropertyColumn @ref=_orderColumn Property=@(static a => a.Order) Hidden
             Grouping=@(_filteredOrder is null) GroupExpanded GroupBy="orderAccessor">
             <GroupTemplate>
@@ -57,6 +43,25 @@
                     Placeholder="@Localizer["Select order..."]" />
             </EditTemplate>
         </PropertyColumn>
+        <PropertyColumn Property="static a => a.Name" Title=@Localizer["Advancement name"] Groupable="false"
+            FilterOperators="FilterOperators.NameColumn" />
+        <PropertyColumn Property="static a => a.Date" Title=@Localizer["Advancement date"] Groupable="false"
+            InitialDirection="SortDirection.Ascending" FilterOperators="FilterOperators.DateColumn">
+            <EditTemplate>
+                <MudDatePicker Required Date=context.Item.Date.ToDateTime(TimeOnly.MinValue)
+                    DateChanged=@(v => context.Item.Date = DateOnly.FromDateTime(v!.Value)) />
+            </EditTemplate>
+        </PropertyColumn>
+        <PropertyColumn Property="static a => a.Value" Title="@Localizer["Advancement value"]" Groupable="false" Filterable="false" Format="C">
+            <CellTemplate>@($"{context.Item.Value:C} ({context.Item.Value / context.Item.Order.TotalPrice:P})")</CellTemplate>
+            <EditTemplate>
+                <MudNumericField Label="@Localizer["Advancement value"]" @bind-Value="@context.Item.Value" Margin="@Margin.Dense"
+                    Required Variant="@Variant.Outlined" Class="mt-4" Format="C" Culture="@CultureInfo.CurrentUICulture" />
+            </EditTemplate>
+        </PropertyColumn>
+        <PropertyColumn Property="static a => a.Description" Title=@SharedLocalizer["Description"]
+            Sortable="false" Groupable="false" FilterOperators="FilterOperators.TextColumn"
+            Required="false" />
         <PropertyColumn @ref=_reportColumn Property="static a => a.Report" Title=@SharedLocalizer["Report"] Sortable="false"
             Groupable=@(_filteredReport is null) GroupExpanded GroupBy="reportAccessor">
             <GroupTemplate>
@@ -179,23 +184,15 @@
         );
     }
 
-    private Task CreateAdvancement()
+    private async Task CreateAdvancement()
     {
         Advancement advancement = new()
         {
             Date = DateOnly.FromDateTime(DateTime.Today),
-            Order = new()
-            {
-                Code = string.Empty,
-                TotalPrice = new decimal(1, 0, 0, false, 28)
-            }
+            Order = (await SearchOrders(Affair.Orders)(null, default)).FirstOrDefault()
         };
 
-        ((IList<Advancement>)_grid.ServerItems).Add(advancement);
-        _grid.GroupItems();
-        var task = _grid.SetEditingItemAsync(advancement);
-        advancement.Name = Localizer["New advancement"];
-        return task;
+        await _grid.SetEditingItemAsync(advancement);
     }
 
     private void CancelEdition(Advancement a)
