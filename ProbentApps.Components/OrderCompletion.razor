@@ -1,0 +1,32 @@
+@inject IStringLocalizer<OrderCompletion> Localizer
+
+<MudAlert Dense Severity=Severity>
+    @if (Order.TotalPrice == default)
+    {
+        @Localizer["No total order price"]
+    }
+    else
+    {
+        <MudText>
+            @($"{_totalAdvancementValue / Order.TotalPrice:P0}") (@($"{_totalAdvancementValue:C0}") / @($"{Order.TotalPrice:C0}"))
+        </MudText>
+    }
+</MudAlert>
+
+@code {
+    decimal _totalAdvancementValue;
+
+    [Parameter, EditorRequired]
+    public Order Order { get; set; }
+
+    Severity Severity => (Order.TotalPrice == default ? (decimal?)null : _totalAdvancementValue / Order.TotalPrice) switch
+        {
+            null => Severity.Error,
+            0 => Severity.Normal,
+            < 1 => Severity.Info,
+            1 => Severity.Success,
+            > 1 => Severity.Warning
+        };
+
+    protected override void OnInitialized() => _totalAdvancementValue = Order.Advancements.Sum(static a => a.Value);
+}

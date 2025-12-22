@@ -20,22 +20,10 @@
         <PropertyColumn @ref=_orderColumn Property=@(static a => a.Order) Hidden
             Grouping=@(_filteredOrder is null) GroupExpanded GroupBy="orderAccessor">
             <GroupTemplate>
-                @{
-                    var order = (Order)context.Grouping.Key!;
-                    decimal totalAdvancementValue = order.Advancements.Sum(static a => a.Value);
-                    Severity severity = (totalAdvancementValue / order.TotalPrice) switch
-                        {
-                            0 => Severity.Normal,
-                            < 1 => Severity.Info,
-                            1 => Severity.Success,
-                            > 1 => Severity.Warning
-                        };
-                }
+                @{ var order = (Order)context.Grouping.Key!; }
                 <MudStack Row AlignItems="AlignItems.Center" Justify="Justify.SpaceBetween" Class="w-100">
                     <MudText>@order</MudText>
-                    <MudAlert Severity="severity">
-                        @($"{(totalAdvancementValue / order.TotalPrice):P2} ({totalAdvancementValue:C0} / {order.TotalPrice:C0})")
-                    </MudAlert>
+                    <OrderCompletion Order="order" />
                 </MudStack>
             </GroupTemplate>
             <EditTemplate>
