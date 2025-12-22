@@ -206,7 +206,7 @@
 
     private Func<string?, CancellationToken, Task<IEnumerable<Order>>?> SearchOrders(IEnumerable<Order> orders) =>
         (string? searchText, CancellationToken cancellationToken) => Task.FromResult(orders
-            .Where(o => string.IsNullOrWhiteSpace(searchText)
+            .Where(o => string.IsNullOrWhiteSpace(searchText) || orders.Any(order => order.Name == searchText)
                 || $"{o.Name} <{o.Code}>".Contains(searchText, StringComparison.CurrentCultureIgnoreCase)));
 
     private Task<IEnumerable<Report>>? SearchReports(string? searchText, CancellationToken cancellationToken) =>
