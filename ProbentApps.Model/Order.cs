@@ -26,6 +26,8 @@ public class Order : IEntity, IEquatable<Order>
     [DeleteBehavior(DeleteBehavior.NoAction)]
     public Client Client { get; set; } = default!;
 
+    public DateOnly Date { get; set; }
+
     [MaxLength(64)]
     [Unicode(false)]
     public string Code { get; set; } = default!;
