@@ -22,13 +22,22 @@
             <GroupTemplate>
                 @{ var order = (Order)context.Grouping.Key!; }
                 <MudStack Row AlignItems="AlignItems.Center" Justify="Justify.SpaceBetween" Class="w-100">
-                    <MudText>@order</MudText>
+                    <MudText>
+                        <MudText Inline Style="font-weight: 700" HtmlTag="strong">@order</MudText> @Localizer["from {0}", order.Date]
+                    </MudText>
                     <OrderCompletion Order="order" />
                 </MudStack>
             </GroupTemplate>
             <EditTemplate>
                 <MudAutocomplete Required SearchFunc=SearchOrders(Affair.Orders) @bind-Value=context.Item.Order
                     Placeholder="@Localizer["Select order..."]" />
+                @if (context.Item.Order is not null)
+                {
+                    <MudStack Row Class="w-100" Justify="Justify.SpaceBetween">
+                        <MudChip T=string Icon="@Icons.Material.Filled.CalendarMonth">@Localizer["Date: {0}", context.Item.Order.Date]</MudChip>
+                        <MudChip T=string Icon="@Icons.Material.Filled.Money">@Localizer["Total price: {0:C}", context.Item.Order.TotalPrice]</MudChip>
+                    </MudStack>
+                }
             </EditTemplate>
         </PropertyColumn>
         <PropertyColumn Property="static a => a.Name" Title=@Localizer["Advancement name"] Groupable="false"
