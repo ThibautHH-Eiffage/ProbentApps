@@ -49,7 +49,14 @@
             </EditTemplate>
         </PropertyColumn>
         <PropertyColumn Property="static a => a.Value" Title="@Localizer["Advancement value"]" Groupable="false" Filterable="false" Format="C">
-            <CellTemplate>@($"{context.Item.Value:C} ({context.Item.Value / context.Item.Order.TotalPrice:P})")</CellTemplate>
+            <CellTemplate>
+                @($"{context.Item.Value:C}")
+                &#32;
+                @if (context.Item.Order.TotalPrice != decimal.Zero)
+                {
+                    @($"({context.Item.Value / context.Item.Order.TotalPrice:P})")
+                }
+            </CellTemplate>
             <EditTemplate>
                 <MudNumericField Label="@Localizer["Advancement value"]" @bind-Value="@context.Item.Value" Margin="@Margin.Dense"
                     Required Variant="@Variant.Outlined" Class="mt-4" Format="C" Culture="@CultureInfo.CurrentUICulture" />
