@@ -60,8 +60,18 @@
                 }
             </CellTemplate>
             <EditTemplate>
-                <MudNumericField Label="@Localizer["Advancement value"]" @bind-Value="@context.Item.Value" Margin="@Margin.Dense"
-                    Required Variant="@Variant.Outlined" Class="mt-4" Format="C" Culture="@CultureInfo.CurrentUICulture" />
+                <MudStack Row AlignItems="AlignItems.Center" Justify="Justify.SpaceBetween" Class="w-100">
+                    @{ bool isTotalPriceAvailable = context.Item.Order is not null && context.Item.Order.TotalPrice != decimal.Zero; }
+                    <MudNumericField Label="@Localizer["Advancement value"]" @bind-Value="@context.Item.Value" Margin="@Margin.Dense"
+                        Required Variant="@Variant.Outlined" Class="mt-4" Format="C" Culture="@CultureInfo.CurrentUICulture"
+                        Disabled="isTotalPriceAvailable && _useValuePercentage" />
+                    <MudSwitch @bind-Value=_useValuePercentage Color="Color.Primary" Disabled="!isTotalPriceAvailable" />
+                    <MudNumericField Label="@Localizer["Advancement percentage"]" Margin="@Margin.Dense" Converter="percentageConverter"
+                        Value="@(isTotalPriceAvailable ? context.Item.Value / context.Item.Order!.TotalPrice : null)"
+                        ValueChanged=@((decimal? value) => context.Item.Value = (value ?? decimal.Zero) * context.Item.Order!.TotalPrice)
+                        Required="isTotalPriceAvailable" Disabled="!isTotalPriceAvailable || !_useValuePercentage"
+                        Variant="Variant.Outlined" Class="mt-4" Format="P" Culture="@CultureInfo.CurrentUICulture" />
+                </MudStack>
             </EditTemplate>
         </PropertyColumn>
         <PropertyColumn Property="static a => a.Description" Title=@SharedLocalizer["Description"]
@@ -115,6 +125,14 @@
             BackdropClick = false,
             MaxWidth = MaxWidth.Medium
         };
+    private static readonly Converter<decimal?> percentageConverter = new()
+        {
+            Format = "P",
+            SetFunc = value => $"{value:P}",
+            GetFunc = input => !string.IsNullOrWhiteSpace(input)
+                && decimal.TryParse(input.Replace(CultureInfo.CurrentUICulture.NumberFormat.PercentSymbol, string.Empty), out var value)
+                    ? value / 100.0m : null
+        };
     private static readonly Func<Advancement, Order> orderAccessor = static a => a.Order;
     private static readonly Func<Advancement, Report?> reportAccessor = static a => a.Report;
     private static readonly Func<Advancement, Invoice?> invoiceAccessor = static a => a.Invoice;
@@ -144,6 +162,7 @@
     private Report? _filteredReport;
     private IEnumerable<Invoice> _filterInvoices = default!;
     private Invoice? _filteredInvoice;
+    private bool _useValuePercentage = false;
 
     [Parameter, EditorRequired]
     public Affair Affair { get; init; }
