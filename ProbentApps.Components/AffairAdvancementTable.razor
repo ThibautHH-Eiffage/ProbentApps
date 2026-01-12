@@ -9,10 +9,12 @@
         <MudStack Row Justify="Justify.SpaceBetween" Class="w-100">
             <MudButton OnClick=CreateAdvancement Variant="Variant.Filled">@Localizer["Create advancement"]</MudButton>
             <MudSpacer />
+            @{ #pragma warning disable CS8620 }
             <FilterAutocomplete Column="_orderColumn" FilteredProperty="orderAccessor" @bind-Value="_filteredOrder"
                 Search=SearchOrders(_filterOrders) Placeholder="@Localizer["Filter by order..."]">
                 <NoItemsTemplate><MudText>@Localizer["No advancements for this affair"]</MudText></NoItemsTemplate>
             </FilterAutocomplete>
+            @{ #pragma warning restore CS8620 }
         </MudStack>
     </ToolBarContent>
     <Columns>
@@ -71,8 +73,10 @@
                 <MudText>@context.Grouping.Key</MudText>
             </GroupTemplate>
             <FilterTemplate>
+                @{ #pragma warning disable CS8621 }
                 <FilterAutocomplete Column="_reportColumn" FilteredProperty="reportAccessor" @bind-Value="_filteredReport"
                     Search=SearchReports Placeholder="@SharedLocalizer["Report"]" />
+                @{ #pragma warning restore CS8621 }
             </FilterTemplate>
         </PropertyColumn>
         <PropertyColumn @ref=_invoiceColumn Property="static a => a.Invoice" Title=@SharedLocalizer["Invoice"] Sortable="false"
@@ -81,8 +85,10 @@
                 <MudText>@context.Grouping.Key</MudText>
             </GroupTemplate>
             <FilterTemplate>
+                @{ #pragma warning disable CS8621 }
                 <FilterAutocomplete Column="_invoiceColumn" FilteredProperty="invoiceAccessor" @bind-Value="_filteredInvoice"
                     Search=SearchInvoices Placeholder="@SharedLocalizer["Invoice"]" />
+                @{ #pragma warning restore CS8621 }
             </FilterTemplate>
         </PropertyColumn>
         <TemplateColumn CellClass="text-end" Groupable="false" Filterable="false" Sortable="false" HeaderStyle="width: 17%">
@@ -201,17 +207,17 @@
         await Task.WhenAll(_grid.ReloadServerData(), UpdateFilterEntities());
     }
 
-    private Func<string?, CancellationToken, Task<IEnumerable<Order>>?> SearchOrders(IEnumerable<Order> orders) =>
-        (string? searchText, CancellationToken cancellationToken) => Task.FromResult(orders
+    private Func<string, CancellationToken, Task<IEnumerable<Order>>> SearchOrders(IEnumerable<Order> orders) =>
+        (string searchText, CancellationToken cancellationToken) => Task.FromResult(orders
             .Where(o => string.IsNullOrWhiteSpace(searchText) || orders.Any(order => order.Name == searchText)
                 || $"{o.Name} <{o.Code}>".Contains(searchText, StringComparison.CurrentCultureIgnoreCase)));
 
-    private Task<IEnumerable<Report>>? SearchReports(string? searchText, CancellationToken cancellationToken) =>
+    private Task<IEnumerable<Report>> SearchReports(string searchText, CancellationToken cancellationToken) =>
         Task.FromResult(_filterReports
             .Where(r => string.IsNullOrWhiteSpace(searchText)
                 || r.Name.Contains(searchText, StringComparison.CurrentCultureIgnoreCase)));
 
-    private Task<IEnumerable<Invoice>>? SearchInvoices(string? searchText, CancellationToken cancellationToken) =>
+    private Task<IEnumerable<Invoice>> SearchInvoices(string searchText, CancellationToken cancellationToken) =>
         Task.FromResult(_filterInvoices
             .Where(i => string.IsNullOrWhiteSpace(searchText)
                 || $"{i.Name} <{i.Code}>".Contains(searchText, StringComparison.CurrentCultureIgnoreCase)));
