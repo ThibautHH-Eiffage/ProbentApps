@@ -24,6 +24,9 @@
   <data name="Advancement value" xml:space="preserve">
     <value>Valeur de l'avancement</value>
   </data>
+  <data name="Advancement percentage" xml:space="preserve">
+    <value>Pourcentage d'avancement</value>
+  </data>
   <data name="Select order..." xml:space="preserve">
     <value>Sélectionner une commande...</value>
   </data>
@@ -35,5 +38,14 @@
   </data>
   <data name="No advancements for this affair" xml:space="preserve">
     <value>Pas d'avancements pour cette affaire</value>
+  </data>
+  <data name="from {0}" xml:space="preserve">
+    <value>du {0}</value>
+  </data>
+  <data name="Date: {0}" xml:space="preserve">
+    <value>Date : {0}</value>
+  </data>
+  <data name="Total price: {0:C}" xml:space="preserve">
+    <value>Montant total : {0:C}</value>
   </data>
 </root>
