@@ -4,8 +4,7 @@
 <MudDataGrid T=Advancement @ref=_grid ServerData=Advancements Groupable Filterable
     FilterMode=DataGridFilterMode.ColumnFilterRow RowsPerPage=25 Dense
     ReadOnly=false EditMode=DataGridEditMode.Form EditDialogOptions=dialogOptions
-    CanceledEditingItem=CancelEdition CommittedItemChanges=CommitAdvancement
-    CloneStrategy=AdvancementCloneStrategy.Instance>
+    CloneStrategy=AdvancementCloneStrategy.Instance CommittedItemChanges=CommitAdvancement>
     <ToolBarContent>
         <MudStack Row Justify="Justify.SpaceBetween" Class="w-100">
             <MudButton OnClick=CreateAdvancement Variant="Variant.Filled">@Localizer["Create advancement"]</MudButton>
@@ -181,25 +180,7 @@
         );
     }
 
-    private async Task CreateAdvancement()
-    {
-        Advancement advancement = new()
-        {
-            Date = DateOnly.FromDateTime(DateTime.Today),
-            Order = (await SearchOrders(Affair.Orders)(null, default)).FirstOrDefault()
-        };
-
-        await _grid.SetEditingItemAsync(advancement);
-    }
-
-    private void CancelEdition(Advancement a)
-    {
-        if (a.Id == Guid.Empty)
-        {
-            var list = (IList<Advancement>)_grid.ServerItems;
-            list.RemoveAt(list.Count - 1);
-        }
-    }
+    private Task CreateAdvancement() => _grid.SetEditingItemAsync(new() { Date = DateOnly.FromDateTime(DateTime.Today), Order = Affair.Orders.FirstOrDefault()! });
 
     private async Task CommitAdvancement(Advancement a)
     {
